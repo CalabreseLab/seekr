@@ -26,8 +26,6 @@ Any issues can be reported to https://github.com/CalabreseLab #TODO
 ---
 """
 
-import sys
-import argparse
 import numpy as np
 import pandas as pd
 
@@ -37,8 +35,9 @@ try:
     from scipy.stats import t
 except ImportError:
     pass
-from kmer_counts import BasicCounter
 from tqdm import tqdm, tqdm_notebook
+
+from .kmer_counts import BasicCounter
 
 def pearson(counts1, counts2, row_standardize=True, outfile=None):
     """Calculates a column standardized Pearson correlation matrix"""
@@ -214,39 +213,6 @@ class StreamDist(object):
         self.dist = np.zeros(self.n, dtype=np.float32)
         self._stream_seqs(self.calc_dist)
         self.save()
-
-
-def cmd_line_pearson():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=__doc__,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('counts1', help='full path of first count file produced by kmer_counts.py')
-    parser.add_argument('counts2', help='full path of second count file produced by kmer_counts.py. This can be the same path as the first counts file.')
-    parser.add_argument('-o', '--outfile', default='pearson.seekr', help='path of file to save similarities to')
-    parser.add_argument('-nbi', '--nonbinary_input', action='store_true', help='select if the input will be a csv file')
-    parser.add_argument('-nbo', '--nonbinary_output', action='store_true', help='select if output should be a csv file')
-    if len(sys.argv)==1:
-        parser.print_help()
-        sys.exit(0)
-    args = parser.parse_args()
-
-    names1 = None
-    names2 = None
-    if args.nonbinary_input:
-        counts1 = pd.read_csv(args.counts1, index_col=0)
-        counts2 = pd.read_csv(args.counts2, index_col=0)
-        names1 = counts1.index.values
-        names2 = counts2.index.values
-    else:
-        counts1 = np.load(args.counts1)
-        counts2 = np.load(args.counts2)
-
-    if args.nonbinary_output:
-        dist = pearson(counts1, counts2)
-        dist = pd.DataFrame(dist, names1, names2)
-        dist.to_csv(args.outfile)
-    else:
-        pearson(counts1, counts2, outfile=args.outfile)
 
 
 if __name__ == '__main__':

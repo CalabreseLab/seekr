@@ -2,16 +2,26 @@
 
 A library for counting small kmer frequencies in nucleotide sequences.
 
+A webportal is available at [seekr.org](http://seekr.org).
+
 ## Installation
 
- * To use this library, you have to have Python3.x on your computer. If you don't have it installed, the easiest place to get it is from the [Anaconda distribution](https://www.continuum.io/downloads). Downloading Anaconda will also provide you with most of the dependencies you need to use SEEKR.
- * Either download this repository as a .zip file, or use git to `clone` it.
- * Install any missing dependencies by running: `pip install -r requirements.txt`.
+ To use this library, you have to have Python3.x on your computer. If you don't have it installed, the easiest place to get it is from the [Anaconda distribution](https://www.continuum.io/downloads).
+
+ Once you have Python, run:
+
+ ```
+ $ pip install seekr
+ ```
+
+ which will make both the command line tool and the python module available.
 
 ## Usage
 
-You can either use SEEKR from the command-line or as a python module. In either case, you will use `kmer_counts.py` to generate a kmer count matrix of m rows by n columns,
-where m is the number of transcripts in a fasta file and n is 4^kmer. Then  `pearson.py` can be used to calculate how well correlated all pairwise combinations of sequences are. ** Note: ** Some advanced usages are currently not available from the command-line and require that you import the the module.
+You can either use SEEKR from the command line or as a python module. In either case, you will use `kmer_counts.py` to generate a kmer count matrix of m rows by n columns,
+where m is the number of transcripts in a fasta file and n is 4^kmer. Then  `pearson.py` can be used to calculate how well correlated all pairwise combinations of sequences are.
+
+**Note:** Some advanced usages are currently not available from the command line and require that you import the module.
 
 Here are some quick-start examples if you just want to get going:
 
@@ -59,7 +69,7 @@ $ python pearson.py /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy 
 
 ### Advanced usage
 
-A common task is to use the normalization vectors from a large .fa file to analyze specific lncRNAs of interest. Currently, this cannot be done from the command-line, but is still fairly straightforward from within python. This example will serve as a walkthrough on using SEEKR as a module and will take you through creating the normalization vectors (using 4mers) to creating the Pearson's similarity matrix.
+A common task is to use the normalization vectors from a large .fa file to analyze specific lncRNAs of interest. Currently, this cannot be done from the command line, but is still fairly straightforward from within python. This example will serve as a walkthrough on using SEEKR as a module and will take you through creating the normalization vectors (using 4mers) to creating the Pearson's similarity matrix.
 
 ```python
 import numpy as np

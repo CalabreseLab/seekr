@@ -27,21 +27,19 @@ To label the axes of the matrix, for example, you can call BasicCounter('/path/r
 
 Issues
 ------
-Any issues can be reported to https://github.com/CalabreseLab #TODO
+Any issues can be reported to https://github.com/CalabreseLab
 
 ---
 """
 
-import sys
-import argparse
 import numpy as np
 
 from collections import defaultdict
 from itertools import product
 from pandas import DataFrame
 
-from my_tqdm import my_tqdm
-from fasta_reader import Reader
+from .my_tqdm import my_tqdm
+from .fasta_reader import Reader
 
 class BasicCounter:
     """Generates overlapping kmer counts for a fasta file
@@ -194,23 +192,3 @@ class BasicCounter:
         if self.outfile is not None:
             self.save(names)
         return self.counts
-
-if __name__ == '__main__':
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=__doc__,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('fasta', help='full path of fasta file')
-    parser.add_argument('-o', '--outfile', default='counts.seekr', help='name of file to save counts to')
-    parser.add_argument('-k', '--kmer', default=6, help='length of kmers you want to count')
-    parser.add_argument('-nb', '--nonbinary', action='store_false', help='select if output should be a csv file')
-    parser.add_argument('-uc', '--uncentered', action='store_false', help='select if output should not have the mean subtracted')
-    parser.add_argument('-us', '--unstandardized', action='store_false', help='select if output should not be divided by the standard deviation')
-    parser.add_argument('-lb', '--label', action='store_true', help='select to save with fasta header labels.')
-    if len(sys.argv)==1:
-        parser.print_help()
-        sys.exit(0)
-    args = parser.parse_args()
-    counter = BasicCounter(args.fasta, args.outfile, int(args.kmer),
-                           args.nonbinary, args.uncentered,
-                           args.unstandardized, label=args.label)
-    counter.make_count_file()
