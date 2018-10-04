@@ -126,7 +126,7 @@ def console_kmer_counts():
     parser.add_argument('-sv', '--std_vector', default=None,
                         help='optional path to std vector numpy file')
     args = _parse_args_or_exit(parser)
-    _run_kmer_counts(args.fasta, args.kmer, args.nonbinary, args.uncentered,
+    _run_kmer_counts(args.fasta, args.outfile, args.kmer, args.nonbinary, args.uncentered,
                      args.unstandardized, args.label, args.mean_vector, args.std_vector)
 
 
@@ -189,5 +189,4 @@ def console_norm_vectors():
     parser.add_argument('-k', '--kmer', default=6,
                         help='length of kmers you want to count')
     args = _parse_args_or_exit(parser)
-
-
+    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, args.kmer)

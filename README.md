@@ -33,7 +33,8 @@ as a small sample set,
 if you want to open that file and follow along.
 * GENCODE is a high quality source for human and mouse lncRNA annotation.
 Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
-  * We'll use these to reference larger data sets.
+  * In the examples below we'll generically refer to `gencode.fa`.
+    Any sufficiently large fasta file can be used, as needed.
 
 Here are some quick-start examples if you just want to get going.
 
@@ -42,16 +43,18 @@ Here are some quick-start examples if you just want to get going.
 #### kmer_counts
 
 Let's make a small `.csv` file we can view.
-We'll set the:
-* `--nonbinary` flag so the output is plain text
+We'll set several flags:
+* `--nonbinary` so the output is plain text
 * `--kmer 2` so we only have 16 kmers
 * `--label` so there are column and row labels
 
 ```commandline
-$ kmer_counts example.fa -o /path/to/out.csv -k 2 -nb -lb
+$ kmer_counts example.fa -o out_counts.csv -k 2 -nb -lb
+$ cat out_counts.csv
+
 ```
 
-You can see the output of this command 
+You can also see the output of this command 
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
 
@@ -59,7 +62,7 @@ If we want a more compact, efficient numpy file,
 we can drop the `--nonbinary` and `--label` flags:
 
 ```commandline
-$ kmer_counts example.fa -o /path/to/out.npy -k 2
+$ kmer_counts example.fa -o out_counts.npy -k 2
 ```
 
 **Note:** This numpy file is binary, so you won't be able to view it directly.
@@ -67,7 +70,7 @@ $ kmer_counts example.fa -o /path/to/out.npy -k 2
 What happens if we also remove the `--kmer 2` option?
 
 ```commandline
-$ kmer_counts example.fa -o /path/to/out.npy
+$ kmer_counts example.fa -o out_counts.npy
 ~/seekr/seekr/kmer_counts.py:143: RuntimeWarning: invalid value encountered in true_divide
   self.counts /= self.std
 
@@ -87,7 +90,7 @@ If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gen
 this same line works fine:
 
 ```commandline
-$ kmer_counts gencode.fa -o /path/to/out.npy
+$ kmer_counts gencode.fa -o gencode_counts.npy
 ```
 
 But what should you do if you're only interested in specific sequences?
@@ -116,7 +119,7 @@ $ norm_vectors gencode.fa -k 7 -mv mean_7mers.npy -sv std_7mers.npy
 Now, we can use these vectors to analyze our RNAs of interest:
 
 ```commandline
-$ kmer_counts example.fa -o /path/to/out.npy -k 7 -mv mean_7mers.npy -sv std_7mers.npy
+$ kmer_counts example.fa -o out_7mers_gencode_norm.npy -k 7 -mv mean_7mers.npy -sv std_7mers.npy
 ```
 
 #### pearson
@@ -128,7 +131,7 @@ one or more runs of `kmer_counts`.
 The default setting accept two numpy files and output a third numpy file.
 
 ```commandline
-$ pearson /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy
+$ pearson out_counts.npy out_counts.npy -o example_vs_self.npy
 ```
 
 The only other options besides the `-o` flag control binary versus .csv input and output. 
@@ -136,7 +139,9 @@ If you have a non binary input file (i.e. a .csv file),
 and also want a non binary output file, you can do:
 
 ```commandline
-$ python pearson.py /path/to/kc_out.csv /path/to/kc_out.csv -o /path/to/out.csv -nbi -nbo
+$ pearson out_counts.csv out_counts.csv -o example_vs_self.csv -nbi -nbo
+$ cat example_vs_example.csv
+
 ```
 
 If we want to compare counts between two files 
@@ -156,6 +161,7 @@ where RNAs have been normalized to `gencode.fa` using 6mers, we would run:
 $ norm_vectors gencode.fa
 $ kmer_counts example.fa -o 6mers.npy -mv mean.npy -sv std.npy
 $ pearson 6mers.npy 6mers.npy -o example_vs_self.csv -nbo
+$ cat example_vs_self.csv
 ```
 ### Module example
 
