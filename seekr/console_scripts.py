@@ -25,7 +25,7 @@ If you want to add default labels, also set the label flag:
     $ kmer_counts /path/to/rnas.fa -o /path/to/out.csv -nb -lb
 
 You can change also change the size of the kmer you're using, and prevent normalization:
-    $ kmer_counts /path/to/rnas.fa -o /path/to/out.npy -k 4 -nc -ns
+    $ kmer_counts /path/to/rnas.fa -o /path/to/out.npy -k 4 -uc -us
 
 Notes
 -----
@@ -45,11 +45,12 @@ Generate a matrix of Pearson similarities from two kmer count files.
 
 Examples
 --------
-The default setting accept two numpy files and output a third numpy file.
+The default settings accept two numpy files and output a third numpy file.
 
 $ pearson /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy
 
-The only other options besides the `-o` flag control binary versus .csv input and output. If you have a non binary input file (i.e. a .csv file) and also want a non binary output file, you can do:
+The only other options besides the `-o` flag control binary versus .csv input and output. 
+If you have a non binary input file (i.e. a .csv file) and also want a non binary output file, you can do:
 
 $ pearson /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy -nbi -nbo
 
@@ -155,9 +156,9 @@ def console_pearson():
     parser = argparse.ArgumentParser(usage=PEARSON_DOC,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('counts1',
-                        help='full path of first count file produced by kmer_counts.py')
+                        help='full path of a count file produced by kmer_counts.py')
     parser.add_argument('counts2',
-                        help=('full path of second count file produced by kmer_counts.py. '
+                        help=('full path of a second count file produced by kmer_counts.py. '
                               'This can be the same path as the first counts file.'))
     parser.add_argument('-o', '--outfile', default='pearson.seekr',
                         help='path of file to save similarities to')

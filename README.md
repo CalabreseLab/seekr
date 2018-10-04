@@ -28,13 +28,22 @@ Then  `pearson` can be used to calculate how well correlated all pairwise combin
 **Notes:** 
 
 * Some advanced usages are not available from the command line and require that you import the module.
-* We'll use [`example.fa`](https://github.com/CalabreseLab/seekr/seekr/tests/data/example.fa) 
+* We'll use [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa) 
 as a small sample set,
 if you want to open that file and follow along.
 * GENCODE is a high quality source for human and mouse lncRNA annotation.
 Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
   * In the examples below we'll generically refer to `gencode.fa`.
     Any sufficiently large fasta file can be used, as needed.
+
+### Help
+
+For full documentation of the parameters and flags, you can run any of the commands without any arguments.
+For example:
+
+```
+$ kmer_counts
+```
 
 Here are some quick-start examples if you just want to get going.
 
@@ -128,7 +137,7 @@ To find Pearson correlations between kmer count profiles, run `pearson`.
 Running the program and options are similar to `kmers_counts`. 
 Input files for `pearson` will always be the output files from 
 one or more runs of `kmer_counts`. 
-The default setting accept two numpy files and output a third numpy file.
+The default settings accept two numpy files and output a third numpy file.
 
 ```commandline
 $ pearson out_counts.npy out_counts.npy -o example_vs_self.npy
@@ -230,14 +239,6 @@ Once this has been saved, the first portion of the code doesn't need to be run a
 * `{k}mers_lncs.npy`: Normalized kmer profile for other lncRNAs of interest.
 * `xist_vs_lncs_{k}mers.npy`: Pearson's r values for all pairwise comparisons between Xist and the other lncRNAs.
 * `xist_vs_lncs_{k}mers.csv`: Labeled, plain text version of pairwise comparisons.
-
-### Help
-
-For full documentation of the parameters and flags, you can run `kmer_counts`  or  `pearson` without any arguments.
-
-```
-$ kmer_counts
-```
 
 ## Issues
 

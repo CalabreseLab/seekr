@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='seekr',
-      version='1.1.2',
+      version='1.1.3',
       install_requires=['tqdm', 'numpy', 'pandas'],
       description='A library for counting small kmer frequencies in nucleotide sequences.',
       long_description=long_description,
