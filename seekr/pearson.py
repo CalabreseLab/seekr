@@ -3,25 +3,26 @@
 """
 Description
 -----------
-Generate a matrix of Pearson similarites from two kmer count files.
+Generate a matrix of Pearson similarities from two kmer count files.
 
 Examples
 --------
-The default setting accept two numpy files and output a third numpy file.
+Generate a small, plain text .csv file:
 
-$ python pearson.py /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy
+```
+import pandas as pd
+from seekr.pearson import pearson
 
-The only other options besides the `-o` flag control binary versus .csv input and output. If you have a non binary input file (i.e. a .csv file) and also want a non binary output file, you can do:
-
-$ python pearson.py /path/to/kc_out.npy /path/to/kc_out.npy -o /path/to/out.npy -nbi -nbo
+dist = pearson(counts1=example_2mers,
+               counts2=example_2mers)
+pd.DataFrame(dist).to_csv('example_vs_example_2mers.csv')
 
 Notes
 -----
-For more sophisticated options, you cannot use the command-line, but need python instead.
 
 Issues
 ------
-Any issues can be reported to https://github.com/CalabreseLab #TODO
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 
 ---
 """

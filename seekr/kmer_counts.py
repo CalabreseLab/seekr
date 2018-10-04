@@ -8,22 +8,21 @@ where m is the number of transcripts in a fasta file and n is 4^kmer.
 
 Examples
 --------
-The default settings produce a binary, normalized numpy file:
-    $ python kmer_counts.py /path/to/rnas.fa -o /path/to/out.npy
+Generate a small, plain text .csv file:
 
-To get a human readable csv file, set the nonbinary flag:
-    $ python kmer_counts.py /path/to/rnas.fa -o /path/to/out.csv -nb
+```
+from seekr.kmer_counts import BasicCounter
 
-If you want to add default labels, also set the label flag:
-    $ python kmer_counts.py /path/to/rnas.fa -o /path/to/out.csv -nb -lb
-
-You can change also change the size of the kmer you're using, and prevent normalization:
-    $ python kmer_counts.py /path/to/rnas.fa -o /path/to/out.npy -k 4 -nc -ns
+counter = BasicCounter(infasta='example.fa',
+                       outfile='example_2mers.csv',
+                       k=2,
+                       binary=False)
+counts = counter.make_count_file()
+```
 
 Notes
 -----
-For more sophisticated options, you cannot use the command-line, but need python instead.
-To label the axes of the matrix, for example, you can call BasicCounter('/path/rnas.fa').to_csv(names)
+
 
 Issues
 ------
@@ -40,6 +39,7 @@ from pandas import DataFrame
 
 from .my_tqdm import my_tqdm
 from .fasta_reader import Reader
+
 
 class BasicCounter:
     """Generates overlapping kmer counts for a fasta file
@@ -98,11 +98,12 @@ class BasicCounter:
         self.kmers = [''.join(i) for i in product('AGTC', repeat=k)]
         self.map = {k:i for k,i in zip(self.kmers, range(4**k))}
 
-        if len(self.seqs) == 1 and self.std is True:
-            err = ('You cannot standardize a single sequence. '
-                   'Please pass the path to an std. dev. array, '
-                   'or use raw counts by setting std=False.')
-            raise ValueError(err)
+        if self.seqs is not None:
+            if len(self.seqs) == 1 and self.std is True:
+                err = ('You cannot standardize a single sequence. '
+                       'Please pass the path to an std. dev. array, '
+                       'or use raw counts by setting std=False.')
+                raise ValueError(err)
 
     def occurrences(self, row, seq):
         """Counts kmers on a per kilobase scale"""
@@ -118,7 +119,7 @@ class BasicCounter:
         return row
 
     def _progress(self):
-        """Determine which iterator to loop over for counting."""
+        """Determine which iterator to loop over for counting"""
         if self.silent:
             return self.seqs
 
@@ -130,17 +131,24 @@ class BasicCounter:
         return tqdm_seqs
 
     def center(self):
-        """mean center counts by column"""
+        """Mean center counts by column"""
         if self.mean is True:
             self.mean  = np.mean(self.counts, axis=0)
         self.counts -= self.mean
 
     def standardize(self):
-        """divide out the standard deviations from columns of the count matrix"""
+        """Divide out the standard deviations from columns of the count matrix"""
         if self.std is True:
             self.std = np.std(self.counts, axis=0)
         self.counts /= self.std
-
+        if np.isnan(self.counts).any():
+            print(('\nWARNING: You have `np.nan` values in your counts '
+                   'after standardization. This is likely due to '
+                   'a kmer not appearing in any of your sequences. '
+                   'Try: \n1) using a smaller kmer size, \n2) beginning '
+                   'with a larger set of sequences, \n3) passing '
+                   'precomputed normalization vectors from a larger '
+                   'data set (e.g. GENCODE).'))
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
         self.counts = np.zeros([len(self.seqs), 4**self.k], dtype=np.float32)

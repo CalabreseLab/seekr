@@ -17,4 +17,5 @@ setup(name='seekr',
       zip_safe=False,
       entry_points = {'console_scripts':
           ['kmer_counts = seekr.console_scripts:console_kmer_counts',
-           'pearson = seekr.console_scripts:console_pearson']})
+           'pearson = seekr.console_scripts:console_pearson',
+           'norm_vectors = seekr.console_scripts:console_norm_vectors']})
