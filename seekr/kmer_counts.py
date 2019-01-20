@@ -46,36 +46,38 @@ class BasicCounter:
 
     Parameters
     ----------
-    infasta : str (default=None)
+    infasta: str (default=None)
         Full path to fasta file to be counted
-    outfile : str (default=None)
+    outfile: str (default=None)
         Full path to the counts file to be saved
-    k : int (default=6)
+    k: int (default=6)
         Size of kmer to be counted
-    binary : bool (default=True)
+    binary: bool (default=True)
         Saves as numpy array if True, else saves as csv
-    mean : bool, np.array, str (default=True)
+    mean: bool, np.array, str (default=True)
         Set the mean to 0 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated mean array.
-    std : bool or str (default=True)
+    std: bool or str (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix
         If str, provide path to a previously calculated std array.
-    leave : bool (default=True)
+    log2: bool (default=True)
+        If False, do not apply a log2 transform to the count matrix
+    leave: bool (default=True)
         Set to False if get_counts is used within another tqdm loop
-    silent : bool (default=False)
+    silent: bool (default=False)
         Set to True to turn off tqdm progress bar
 
     Attributes
     ----------
-    counts : None
-        Stores the ndarray of kmer counts
-    kmers : list
-        str elements of all kmers of size k
-    map : dict
+    counts: np.array
+        Matrix of kmer counts. Dimensions are equal to # of transcripts by # of kmers.
+    kmers: list
+        Str elements of all kmers of size k
+    map: dict
         Mapping of kmers to column values
     """
     def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True,
+                 binary=True, mean=True, std=True, log2=True,
                  leave=True, silent=False, label=False):
         self.infasta = infasta
         self.seqs = None
@@ -90,6 +92,7 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
+        self.log2 = log2
         self.leave = leave
         self.silent = silent
         self.label = label
@@ -149,6 +152,12 @@ class BasicCounter:
                    'with a larger set of sequences, \n3) passing '
                    'precomputed normalization vectors from a larger '
                    'data set (e.g. GENCODE).'))
+
+    def log2_norm(self):
+        """Apply a log2 transform to the count matrix"""
+        self.counts += abs(self.counts.min()) + 1
+        self.counts = np.log2(self.counts)
+
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
         self.counts = np.zeros([len(self.seqs), 4**self.k], dtype=np.float32)
@@ -159,6 +168,8 @@ class BasicCounter:
             self.center()
         if self.std is not False:
             self.standardize()
+        if self.log2:
+            self.log2_norm()
 
     def save(self, names=None):
         """Saves the counts appropriately based on current settings.
@@ -174,7 +185,8 @@ class BasicCounter:
         names : [str] (default=None)
             Unique names for rows of the Dataframe.
         """
-        assert not (self.binary and self.label), 'You cannot label a binary file. Set only one as True.'
+        err_msg = 'You cannot label a binary file. Set only one of "binary" or "label" as True.'
+        assert not (self.binary and self.label), err_msg
         assert self.outfile is not None, 'Please provide an outfile location.'
         if self.binary:
             np.save(self.outfile, self.counts)
@@ -188,6 +200,7 @@ class BasicCounter:
 
     def make_count_file(self, names=None):
         """Wrapper function for the most common way to generate count files.
+
         Given a numpy file name, it will save a numpy file where counts have been:
         cast as a dense array, centered, and standardized.
 
@@ -195,6 +208,11 @@ class BasicCounter:
         ----------
         names : [str] (default=None)
             lncRNA names to pass to self.save
+
+        Returns
+        -------
+        counts: np.array
+            Matrix of kmer counts. Dimensions are equal to # of transcripts by # of kmers.
         """
         self.get_counts()
         if self.outfile is not None:

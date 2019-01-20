@@ -80,16 +80,27 @@ class TestBasicCounter:
         counter.standardize()
         assert np.allclose(counter.counts, expected)
 
+    def test_log2_norm(self):
+        counter = self._create_basic_counter_with_data(k=1)
+        counts = np.array([[1, 2, 3, 4], [0, -2, 5, 10]], dtype=np.float32)
+        counter.counts = counts
+        counter.log2_norm()
+        expected = np.array([[2.       , 2.321928 , 2.5849624, 2.807355 ],
+                             [1.5849625, 0.       , 3.       , 3.7004397]],
+                            dtype=np.float32)
+        assert np.allclose(counter.counts, expected)
+
     def test_get_counts(self):
         counter = self._create_basic_counter_with_data(k=1)
         counter.get_counts()
-        expected = np.array([[ 1.8932464 , -1.4252993 , -1.6378726 , -1.2105556 ],
-                             [-1.0827353 ,  1.6793344 ,  1.4974962 , -1.2105556 ],
-                             [-0.3387398 ,  0.12701759, -0.07018813,  0.8703152 ],
-                             [-0.32881987, -0.01786529, -0.04928571,  1.0090398 ],
-                             [-0.14295156, -0.36318776,  0.25985077,  0.5417567 ]],
+        expected = np.array([[2.1798673 , 0.27807194, 0.        , 0.5133058 ],
+                             [0.6370419 , 2.1100981 , 2.048016  , 0.5133058 ],
+                             [1.2010899 , 1.4672222 , 1.3604679 , 1.8107259 ],
+                             [1.2073011 , 1.3895708 , 1.3721647 , 1.8666755 ],
+                             [1.318994  , 1.1856667 , 1.5349197 , 1.6688585 ]],
                              dtype=np.float32)
-        assert np.allclose(counter.counts, expected)
+
+        assert np.allclose(counter.counts, expected, rtol=.0001, atol=.00001)
 
     def test_get_counts_raw(self):
         counter = self._create_basic_counter_with_data(
