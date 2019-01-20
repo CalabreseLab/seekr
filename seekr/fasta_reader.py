@@ -41,7 +41,7 @@ class Reader():
         """Sets data to stripped lines from the fasta file
         """
         with open(self.infasta) as infasta:
-            self.data = [l.strip() for l in infasta.readlines()]
+            self.data = [l.strip() for l in infasta]
 
     def _upper_seq_per_line(self):
         """Sets data to upper case, single line sequences for each header

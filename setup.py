@@ -1,21 +1,53 @@
+import os
+
 from setuptools import setup
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+about = {}
+version = os.path.join(HERE, 'seekr', '__version__.py')
+with open(version, 'r', encoding='utf-8') as f:
+    exec(f.read(), about)
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name='seekr',
-      version='1.1.3',
-      install_requires=['tqdm', 'numpy', 'pandas'],
-      description='A library for counting small kmer frequencies in nucleotide sequences.',
+requirements = [
+    'cython',
+    'tqdm',
+    'numpy',
+    'pandas',
+    'ushuffle',
+    'requests',
+    'networkx',
+    'igraph',
+    'louvain'
+]
+
+test_requirements = [
+    'pytest'
+]
+setup(name=about['__title__'],
+      version=about['__version__'],
+      install_requires=requirements,
+      tests_require=test_requirements,
+      description=about['__description__'],
       long_description=long_description,
       long_description_content_type="text/markdown",
-      url='https://github.com/CalabreseLab/seekr',
-      author='Jessime Kirk',
-      author_email='jessime.kirk@gmail.com',
-      license='MIT',
+      url=about['__url__'],
+      author=about['__author__'],
+      author_email=about['__author_email__'],
+      license=about['__license__'],
       packages=['seekr'],
       zip_safe=False,
+      classifiers=['Intended Audience :: Science/Research',
+                   'License :: OSI Approved :: MIT License',
+                   'Natural Language :: English',
+                   'Programming Language :: Python :: 3.6'],
       entry_points = {'console_scripts':
-          ['kmer_counts = seekr.console_scripts:console_kmer_counts',
-           'pearson = seekr.console_scripts:console_pearson',
-           'norm_vectors = seekr.console_scripts:console_norm_vectors']})
+          ['seekr_download_gencode = seekr.console_scripts:console_download_gencode',
+           'seekr_kmer_counts = seekr.console_scripts:console_kmer_counts',
+           'seekr_pearson = seekr.console_scripts:console_pearson',
+           'seekr_norm_vectors = seekr.console_scripts:console_norm_vectors',
+           'seekr_rand_rnas = seekr.console_scripts:console_gen_rand_rnas',
+           'seekr_graph = seekr.console_scripts:console_graph',
+           'seekr = seekr.console_scripts:console_seekr_help']})

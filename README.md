@@ -1,13 +1,13 @@
 # SEEKR
 
-A library for counting small kmer frequencies in nucleotide sequences.
+Find communities of nucleotide sequences based on kmer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
 
 ## Installation
 
- To use this library, you have to have Python3.x on your computer. 
- If you don't have it installed, the easiest place to get it is from the 
+ To use this library, you have to have Python3.x on your computer.
+ If you don't have it installed, the easiest place to get it is from the
  [Anaconda distribution](https://www.continuum.io/downloads).
 
  Once you have Python, run:
@@ -20,15 +20,39 @@ A web portal is available at [seekr.org](http://seekr.org).
 
 ## Usage
 
-You can either use SEEKR from the command line or as a python module. 
-In either case, you will use `kmer_counts` to generate a kmer count matrix of `m` rows by `n` columns,
-where `m` is the number of transcripts in a fasta file and `n` is 4^kmer. 
-Then  `pearson` can be used to calculate how well correlated all pairwise combinations of sequences are.
+You can either use SEEKR from the command line or as a python module.
+The package is broken up into a set of tools, each of which perform a single task.
+From the command line, all of the functions will begin with `seekr_`.
+For example, you can use `seekr_kmer_counts` to generate a kmer count matrix of `m` rows by `n` columns,
+where `m` is the number of transcripts in a fasta file and `n` is 4^kmer.
+Then  `seekr_pearson` can be used to calculate how well correlated all pairwise combinations of sequences are.
 
-**Notes:** 
+To see all tools and some examples, run:
+
+```
+$ seekr
+```
+
+### Quickstart
+
+If we want to get a .csv file containing a community for every transcript in a small fasta file called  `example.fa`, (where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/)), we would run:
+
+```commandline
+$ seekr_download lncRNA
+$ seekr_norm_vectors gencode.v29.lncRNA_transcripts.fa  # Name may change with GENCODE updates.
+$ kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy -lb
+$ seekr_pearson 6mers.csv 6mers.csv -o example_vs_self.csv
+$ seekr_graph example_vs_self.csv
+$ cat example_vs_self.csv
+```
+
+This quickstart procedure produces a number of other files beside the file `communities.csv`.
+See below to learn about the other files produced along the way.
+
+**Notes:**
 
 * Some advanced usages are not available from the command line and require that you import the module.
-* We'll use [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa) 
+* We'll use [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa)
 as a small sample set,
 if you want to open that file and follow along.
 * GENCODE is a high quality source for human and mouse lncRNA annotation.
@@ -42,36 +66,65 @@ For full documentation of the parameters and flags, you can run any of the comma
 For example:
 
 ```
-$ kmer_counts
+$ seekr_kmer_counts
 ```
 
-Here are some quick-start examples if you just want to get going.
+Here are some examples if you just want to get going.
 
 ### Command line examples
 
-#### kmer_counts
+#### seekr_download
 
-Let's make a small `.csv` file we can view.
-We'll set several flags:
-* `--nonbinary` so the output is plain text
+Browsing [GENCODE](https://www.gencodegenes.org/)) is nice if you want to explore fasta file options.
+But if you know what you want, you can just download it from the command line.
+This tool is also helpful on remote clusters.
+
+To download all human transcripts of the latest release into a fasta file, run:
+
+```
+    $ seekr_download_gencode all
+```
+
+GENCODE also stores mouse sequences:
+
+```
+    $ seekr_download_gencode all -s mouse
+```
+
+For consistency across experiments, you may want to stick to a particular release of GENCODE. To get lncRNAs from the M5 release of mouse:
+
+```
+    $ seekr_download_gencode lncRNA -s mouse -r M5
+```
+
+Finally, if you do not want the script to automatically unzip the file, you can leave the fasta file gzipped:
+
+```
+    $ seekr_download_gencode all -z
+```
+
+#### seekr_kmer_counts
+
+Let's make a small `.csv` file of counts.
+We'll set a couple flags:
 * `--kmer 2` so we only have 16 kmers
 * `--label` so there are column and row labels
 
 ```commandline
-$ kmer_counts example.fa -o out_counts.csv -k 2 -nb -lb
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nb -lb
 $ cat out_counts.csv
 
 ```
 
-You can also see the output of this command 
+You can also see the output of this command
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
 
 If we want a more compact, efficient numpy file,
-we can drop the `--nonbinary` and `--label` flags:
+we can add the `--binary` and remove the `--label` flag:
 
 ```commandline
-$ kmer_counts example.fa -o out_counts.npy -k 2
+$ seekr_kmer_counts example.fa -o out_counts.npy -k 2 --binary
 ```
 
 **Note:** This numpy file is binary, so you won't be able to view it directly.
@@ -79,23 +132,23 @@ $ kmer_counts example.fa -o out_counts.npy -k 2
 What happens if we also remove the `--kmer 2` option?
 
 ```commandline
-$ kmer_counts example.fa -o out_counts.npy
+$ seekr_kmer_counts example.fa -o out_counts.npy
 ~/seekr/seekr/kmer_counts.py:143: RuntimeWarning: invalid value encountered in true_divide
   self.counts /= self.std
 
-WARNING: You have `np.nan` values in your counts after standardization. 
-This is likely due to a kmer not appearing in any of your sequences. Try: 
-1) using a smaller kmer size, 
-2) beginning with a larger set of sequences, 
+WARNING: You have `np.nan` values in your counts after standardization.
+This is likely due to a kmer not appearing in any of your sequences. Try:
+1) using a smaller kmer size,
+2) beginning with a larger set of sequences,
 3) passing precomputed normalization vectors from a larger data set (e.g. GENCODE).
 
 ```
 
-The code runs, but we get a warning. 
+The code runs, but we get a warning.
 That's because we're normalizing 4096 columns of kmers.
 Most of those kmers never appear in any of our 5 lncRNAs.
-This necessarily results in division by 0. 
-If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.lncRNA_transcripts.fa.gz), 
+This necessarily results in division by 0.
+If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.lncRNA_transcripts.fa.gz),
 this same line works fine:
 
 ```commandline
@@ -104,16 +157,16 @@ $ kmer_counts gencode.fa -o gencode_counts.npy
 
 But what should you do if you're only interested in specific sequences?
 
-#### norm_vectors
+#### seekr_norm_vectors
 
 An effective way to find important kmers in a small number of RNAs is to
-count their kmers, but normalize their counts to mean and 
+count their kmers, but normalize their counts to mean and
 standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
 
 ```commandline
-$ norm_vectors gencode.fa 
+$ seekr_norm_vectors gencode.fa
 ```
 
 If you run `ls`, you should see `mean.npy` and `std.npy` in your directory.
@@ -122,63 +175,95 @@ To specify the path of these output files,
 use the `--mean_vector` and `--std_vector` flags:
 
 ```commandline
-$ norm_vectors gencode.fa -k 7 -mv mean_7mers.npy -sv std_7mers.npy
+$ seekr_norm_vectors gencode.fa -k 5 -mv mean_5mers.npy -sv std_5mers.npy
 ```
 
 Now, we can use these vectors to analyze our RNAs of interest:
 
 ```commandline
-$ kmer_counts example.fa -o out_7mers_gencode_norm.npy -k 7 -mv mean_7mers.npy -sv std_7mers.npy
+$ kmer_counts example.fa -o out_5mers_gencode_norm.csv -k 5 -mv mean_5mers.npy -sv std_5mers.npy
 ```
 
-#### pearson
+#### seekr_pearson
 
-To find Pearson correlations between kmer count profiles, run `pearson`. 
-Running the program and options are similar to `kmers_counts`. 
-Input files for `pearson` will always be the output files from 
-one or more runs of `kmer_counts`. 
-The default settings accept two numpy files and output a third numpy file.
+To find Pearson correlations between kmer count profiles, run `seekr_pearson`.
+Running the program and options are similar to `seekr_kmers_counts`.
+Input files for `seekr_pearson` will always be the output files from
+one or more runs of `kmer_counts`.
+The default settings accept two csv files and output a third csv file.
 
 ```commandline
-$ pearson out_counts.npy out_counts.npy -o example_vs_self.npy
+$ seekr_pearson out_counts.csv out_counts.csv -o example_vs_self.csv
+$ cat example_vs_self.csv
 ```
 
-The only other options besides the `-o` flag control binary versus .csv input and output. 
-If you have a non binary input file (i.e. a .csv file), 
-and also want a non binary output file, you can do:
+The only other options besides the `-o` flag control binary versus plain text input and output.
+If you have a binary input file (i.e. a .npy file),
+and also want a binary output file, you can do:
 
 ```commandline
-$ pearson out_counts.csv out_counts.csv -o example_vs_self.csv -nbi -nbo
-$ cat example_vs_example.csv
-
+$ seekr_pearson out_counts.npy out_counts.npy -o example_vs_self.npy -bi -bo
 ```
 
-If we want to compare counts between two files 
-(e.g. RNAs between mouse and human), 
+If we want to compare counts between two files
+(e.g. RNAs between mouse and human),
 that is also possible:
 
 ```commandline
-$ pearson human_6mers.npy mouse_6mers.npy -o human_vs_mouse.npy
+$ seekr_pearson human_6mers.npy mouse_6mers.npy -o human_vs_mouse.npy
 ```
 
-#### Summary
+#### seekr_graph
 
-If we want to get a .csv file that has all pairwise comparisons of `example.fa`,
-where RNAs have been normalized to `gencode.fa` using 6mers, we would run:
+We can treat the results of `seekr_pearson` as an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix), and use it to find communities of transcripts with the [Louvain algorithm](https://arxiv.org/abs/0803.0476).
 
-```commandline
-$ norm_vectors gencode.fa
-$ kmer_counts example.fa -o 6mers.npy -mv mean.npy -sv std.npy
-$ pearson 6mers.npy 6mers.npy -o example_vs_self.csv -nbo
-$ cat example_vs_self.csv
+The default setting accept a single csv file.
+This csv file should be the product of seekr_pearson, or some other adjacency matrix.
+A [gml](https://gephi.org/users/supported-graph-formats/gml-format/) file contain the graph and communities will be produced.
+
 ```
+    $ seekr_graph example_vs_self.csv -g example.gml
+```
+
+Numpy files are also valid input:
+
+```
+    $ seekr_graph example_vs_self.npy -g graph.gml
+```
+
+GML files are plain text, so you can view them if you want.
+But they contain all of the information describing the graph.
+Often you just want to know what transcripts belong to what community.
+To get a csv file mapping transcripts to communities, run:
+
+```
+    $ seekr_graph example_vs_self.csv -g example.gml -c communities.csv
+```
+
+Often, keeping all edges above 0 makes the graph too large,
+and retains too many unnecessary edges.
+Similarly, the Louvain algorithm allows you course control of community size with its resolution parameter (gamma).
+Testing ranges from .1 to 5 is reasonable, where values from 1-3 have been most useful in our experience.
+
+```
+    $ seekr_graph example_vs_self.csv -g graph.gml -l .1 -r 1.5
+```
+
+A third tunable parameters is a cap of the number of communities found.
+And finally, since Louvain is partially random,
+you can make your results reproducible by setting a seed value:
+
+```
+    $ seekr_graph example_vs_self.csv -g graph.gml -n 10 -s 0
+```
+
 ### Module example
 
 For larger or more specific workloads, it may be better to use the `seekr` module.
 In this example, we'll calculate similarities between two example fasta files,
 (e.g., XIST and a set of RNAs we think could be similar to XIST)
 using the normalization vectors from the human GENCODE set.
-We'll use all kmers from 3 to 7, and label transcripts with unique labels.
+We'll use all kmers from 3 to 6, and label transcripts with unique labels.
 
 ```python
 import numpy as np
@@ -196,7 +281,7 @@ lncRNAs = 'other_lncs.fa'
 headers = Reader(lncRNAs).get_headers()
 names = [h.strip('>') + f'_{i}' for i, h in enumerate(headers)]
 
-for k in range(3, 8):
+for k in range(3, 7):
     # Make normalization vectors
     gencode_counter = BasicCounter(gencode, k=k)
     gencode_counter.get_counts()
@@ -232,7 +317,7 @@ for k in range(3, 8):
 
 Each loop will write six files to disk:
 
-* `mean_{k}mers.npy`: Mean vector for GENCODE human lncRNAs. 
+* `mean_{k}mers.npy`: Mean vector for GENCODE human lncRNAs.
 Once this has been saved, the first portion of the code doesn't need to be run again.
 * `std_{k}mers.npy`: Standard deviation vector for GENCODE human lncRNAs.
 * `{k}mers_xist.npy`: Normalized kmer profile for Xist.
@@ -242,7 +327,7 @@ Once this has been saved, the first portion of the code doesn't need to be run a
 
 ## Issues
 
-Any suggestions, questions, or problems can be directed to our 
+Any suggestions, questions, or problems can be directed to our
 [GitHub Issues page](https://github.com/CalabreseLab/seekr/issues).
 
 ## Citation

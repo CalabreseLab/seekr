@@ -1,11 +1,30 @@
+"""These tests are treated a little like integration tests."""
+
+import networkx
 import numpy as np
 import pandas as pd
 import pkg_resources
+
+from pathlib import Path
 
 from seekr import console_scripts
 
 
 class TestConsoleScripts:
+
+    def test_run_download_gencode(self, tmpdir):
+        out_path = Path(tmpdir, 'lncs.fa.gz')
+        unzipped = Path(tmpdir, 'lncs.fa')
+        console_scripts._run_download_gencode(biotype='lncRNA',
+                                              species='human',
+                                              release='20',
+                                              out_path=str(out_path),
+                                              unzip=True)
+        assert not out_path.exists()
+        assert unzipped.exists()
+        with unzipped.open() as in_file:
+            count = len(in_file.readlines())
+            assert count == 48978
 
     def test_run_kmer_counts(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -14,9 +33,10 @@ class TestConsoleScripts:
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
                                          kmer='2',
-                                         nonbinary=True,
+                                         binary=True,
                                          centered=True,
                                          standardized=True,
+                                         log2=True,
                                          label=False,
                                          mean_vector=None,
                                          std_vector=None)
@@ -33,9 +53,10 @@ class TestConsoleScripts:
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
                                          kmer='3',
-                                         nonbinary=False,
+                                         binary=False,
                                          centered=False,
                                          standardized=False,
+                                         log2=False,
                                          label=False,
                                          mean_vector=None,
                                          std_vector=None)
@@ -56,9 +77,10 @@ class TestConsoleScripts:
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
                                          kmer='2',
-                                         nonbinary=True,
+                                         binary=True,
                                          centered=False,
                                          standardized=False,
+                                         log2=True,
                                          label=False,
                                          mean_vector=mean_vector,
                                          std_vector=std_vector)
@@ -87,3 +109,29 @@ class TestConsoleScripts:
         expected_std = np.load(expected_std)
         assert np.allclose(mean, expected_mean)
         assert np.allclose(std, expected_std)
+
+    def test_run_graph(self, tmpdir):
+        kmers = 'tests/data/example_2mers.npy'
+        kmers = pkg_resources.resource_filename('seekr', kmers)
+        kmers = np.load(kmers)
+        adj = np.corrcoef(kmers) * -1  # Flip signs for fewer negatives
+        names = list(range(5))
+        adj = pd.DataFrame(adj, names, names)
+        adj_path = str(tmpdir.join('adj.csv'))
+        adj.to_csv(adj_path)
+        gml_path = str(tmpdir.join('graph.gml'))
+        csv_path = str(tmpdir.join('communities.csv'))
+        console_scripts._run_graph(adj=adj,
+                                   gml_path=gml_path,
+                                   csv_path=csv_path,
+                                   limit=.15,
+                                   resolution=1,
+                                   n_comms=5,
+                                   seed=0)
+        in_graph = networkx.read_gml(gml_path)
+        in_df = pd.read_csv(csv_path, index_col=0)
+        assert list(in_graph.nodes()) == [str(i) for i in range(5)]
+        expected_weight = in_graph.edges()[('0', '2')]['weight']
+        assert np.isclose(expected_weight, 0.5278957407763157)
+        assert np.alltrue(in_df['Group'].values == np.array([0, 1, 0, 0, 1]))
+
