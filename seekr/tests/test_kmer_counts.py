@@ -3,6 +3,7 @@ import pkg_resources
 
 from seekr import kmer_counts
 
+
 class TestBasicCounter:
 
     def _create_basic_counter_with_data(self, **kwargs):

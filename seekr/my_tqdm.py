@@ -13,6 +13,7 @@ from tqdm import tnrange, trange, tqdm, tqdm_notebook
 
 import sys
 
+
 def _is_kernel():
     if 'IPython' not in sys.modules:
         # IPython hasn't been imported, definitely not
@@ -21,8 +22,10 @@ def _is_kernel():
     # check for `kernel` attribute on the IPython instance
     return getattr(get_ipython(), 'kernel', None) is not None
 
+
 def my_tqdm():
     return tqdm_notebook if _is_kernel() else tqdm
+
 
 def my_trange():
     return tnrange if _is_kernel() else trange

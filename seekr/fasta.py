@@ -28,7 +28,6 @@ import numpy as np
 from contextlib import closing
 from os.path import exists, join
 from os import makedirs
-from ushuffle import shuffle
 
 from .my_tqdm import my_tqdm, my_trange
 from .kmer_counts import BasicCounter

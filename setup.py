@@ -16,7 +16,6 @@ requirements = [
     'tqdm',
     'numpy',
     'pandas',
-    'ushuffle',
     'requests',
     'networkx',
     'igraph',

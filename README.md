@@ -35,7 +35,9 @@ $ seekr
 
 ### Quickstart
 
-If we want to get a .csv file containing a community for every transcript in a small fasta file called  `example.fa`, (where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/)), we would run:
+To get a .csv file of communities for every transcript in a small .fa file called  `example.fa`, 
+(where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/), 
+we would run:
 
 ```commandline
 $ seekr_download lncRNA
