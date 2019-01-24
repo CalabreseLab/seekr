@@ -25,6 +25,7 @@ requirements = [
 test_requirements = [
     'pytest'
 ]
+
 setup(name=about['__title__'],
       version=about['__version__'],
       install_requires=requirements,
