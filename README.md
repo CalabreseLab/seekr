@@ -1,5 +1,7 @@
 # SEEKR
 
+[![Build Status](https://travis-ci.com/CalabreseLab/seekr.svg?branch=master)](https://travis-ci.com/CalabreseLab/seekr)
+
 Find communities of nucleotide sequences based on kmer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).

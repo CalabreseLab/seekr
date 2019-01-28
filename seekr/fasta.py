@@ -331,6 +331,39 @@ class Downloader:
         release = title.split('Release')[1].strip().strip('</title>')
         return release
 
+    def build_url(self, biotype, species, release):
+        """Build the correct ftp URL to download from GENCODE.
+
+        Parameters
+        ----------
+        biotype: str
+            Name of Genocde set to download. Must be one of ('all', 'pc', 'lncRNA').
+        species: str (default='human')
+            Name of species. Must be one of: ('human' or 'mouse').
+        release: str (default=None)
+            Name of specific release to download (e.g. 'M5'). If None, download latest release.
+
+        Returns
+        -------
+        url: str
+            FTP file to download.
+        """
+        error_msg = "'biotype' must be in ('all', 'pc', 'lncRNA')."
+        assert biotype in ('all', 'pc', 'lncRNA'), error_msg
+        error_msg = "'species' must be either 'human' or 'mouse'."
+        assert species in ('human', 'mouse'), error_msg
+        biotype2prefix = {'all': '', 'pc': 'pc_', 'lncRNA': 'lncRNA_'}
+        prefix = biotype2prefix[biotype]
+        if release is None:
+            release = self.find_current_release(species)
+        if species == 'mouse':
+            error_msg = "Mouse releases must begin with 'M'."
+            assert release[0] == 'M', error_msg
+        url_base = 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
+        url = f'{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz'
+        url = url_base + url
+        return url
+
     def gunzip(self, gzip_path):
         """Unzip a gzipped file and remove orginal.
 
@@ -361,24 +394,11 @@ class Downloader:
         unzip: bool (default=True)
             If False, do not gunzip fasta file after downloading
         """
-        error_msg = "'biotype' must be in ('all', 'pc', 'lncRNA')."
-        assert biotype in ('all', 'pc', 'lncRNA'), error_msg
-        error_msg = "'species' must be either 'human' or 'mouse'."
-        assert species in ('human', 'mouse'), error_msg
-        biotype2prefix = {'all': '', 'pc': 'pc_', 'lncRNA': 'lncRNA_'}
-        prefix = biotype2prefix[biotype]
-        if release is None:
-            release = self.find_current_release(species)
-        if species == 'mouse':
-            error_msg = "Mouse releases must begin with 'M'."
-            assert release[0] == 'M', error_msg
+        url = self.build_url(biotype, species, release)
         if out_path is not None:
             error_msg = "Even if unzipping, 'out_path' must end with '.gz'."
             assert out_path.endswith('.gz'), error_msg
-        url_base = 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
-        url = f'{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz'
-        url = url_base + url
-        with closing(urllib.request.urlopen(url, timeout=300)) as r:
+        with closing(urllib.request.urlopen(url)) as r:
             if out_path is None:
                 out_path = f'v{release}_{biotype}.fa.gz'
             with open(out_path, 'wb') as out_file:

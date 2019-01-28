@@ -20,13 +20,14 @@ They will be shuttled into a version number just before the version is released.
 
 ### Fixed
 
-*
+* Separate fasta.Downloader's url building from file downloading functionality.
 
 ### Changed
 
 * In `seekr_graph`, change '-l', '--limit' to '-t', '--threshold'.
 * Set default community detection to Leiden.
 * Temporarily remove `ushuffle` dependency.
+* Remove testing of fasta file downloading. 
 
 ---
 
