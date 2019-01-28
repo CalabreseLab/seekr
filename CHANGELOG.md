@@ -14,7 +14,8 @@ They will be shuttled into a version number just before the version is released.
 
 ### Added
 
-* `seekr_canonical` command line script filters for -001 transcripts.
+* `seekr_canonical_gencode` command line script filters for -001 transcripts.
+* Example integration script in the test directory.
 * Add legacy option to continue using Louvain instead of Leiden.
 * Travis CI automatic push testing.
 
@@ -27,7 +28,7 @@ They will be shuttled into a version number just before the version is released.
 * In `seekr_graph`, change '-l', '--limit' to '-t', '--threshold'.
 * Set default community detection to Leiden.
 * Temporarily remove `ushuffle` dependency.
-* Remove testing of fasta file downloading. 
+* Remove testing of fasta file downloading.
 
 ---
 

@@ -37,16 +37,16 @@ $ seekr
 
 ### Quickstart
 
-To get a .csv file of communities for every transcript in a small .fa file called  `example.fa`, 
-(where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/), 
+To get a .csv file of communities for every transcript in a small .fa file called  `example.fa`,
+(where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/),
 we would run:
 
 ```commandline
 $ seekr_download lncRNA
 $ seekr_norm_vectors gencode.v29.lncRNA_transcripts.fa  # Name may change with GENCODE updates.
-$ kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy -lb
+$ seekr_kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy -lb
 $ seekr_pearson 6mers.csv 6mers.csv -o example_vs_self.csv
-$ seekr_graph example_vs_self.csv
+$ seekr_graph example_vs_self.csv -g example_vs_self.gml -c communities.csv
 $ cat example_vs_self.csv
 ```
 
@@ -105,6 +105,17 @@ Finally, if you do not want the script to automatically unzip the file, you can 
 
 ```
     $ seekr_download_gencode all -z
+```
+
+#### seekr_canonical_gencode
+
+Gencode fasta files provide multiple transcripts per genomic loci.
+To reduce kmer redundancy due to these isoforms,
+we can filter for transcripts ending in "01",
+as indicated by the sequence headers:
+
+```
+$ seekr_canonical_gencode v22_lncRNAs.fa v22-01.fa
 ```
 
 #### seekr_kmer_counts

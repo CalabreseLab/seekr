@@ -52,10 +52,10 @@ No strict guarantees are made about the relationship between genes and transcrip
 Examples
 --------
 To filter transcripts ending in 01, an input and output fasta file are required:
-    $ seekr_canonical rnas.fa rnas01.fa
+    $ seekr_canonical_gencode rnas.fa rnas01.fa
 
 If you want to specifically find transcripts with the ending 001:
-    $ seekr_canonical rnas.fa rnas01.fa -z 2
+    $ seekr_canonical_gencode rnas.fa rnas01.fa -z 2
 
 Issues
 ------
@@ -230,7 +230,8 @@ def console_canonical_gencode():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('in_fasta', help='Full path of fasta file.')
     parser.add_argument('out_fasta', help='Full path of filtered fasta file.')
-    parser.add_argument('-z', '--zeros', help='Number of zeroes needed to be considered canonical.')
+    parser.add_argument('-z', '--zeros', default=1,
+                        help='Number of zeroes needed to be considered canonical.')
     args = _parse_args_or_exit(parser)
     _run_canonical_gencode(args.in_fasta, args.out_fasta, args.zeros)
 

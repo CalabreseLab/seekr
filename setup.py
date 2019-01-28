@@ -46,6 +46,7 @@ setup(name=about['__title__'],
                    'Programming Language :: Python :: 3.6'],
       entry_points = {'console_scripts':
           ['seekr_download_gencode = seekr.console_scripts:console_download_gencode',
+           'seekr_canonical_gencode = seekr.console_scripts:console_canonical_gencode',
            'seekr_kmer_counts = seekr.console_scripts:console_kmer_counts',
            'seekr_pearson = seekr.console_scripts:console_pearson',
            'seekr_norm_vectors = seekr.console_scripts:console_norm_vectors',
