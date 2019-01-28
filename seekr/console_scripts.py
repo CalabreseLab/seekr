@@ -270,7 +270,8 @@ def console_kmer_counts():
                         help='Optional path to std vector numpy file.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, args.kmer, args.binary, args.uncentered,
-                     args.unstandardized, args.log2, args.label, args.mean_vector, args.std_vector)
+                     args.unstandardized, args.no_log2, args.label, args.mean_vector,
+                     args.std_vector)
 
 
 def _run_pearson(counts1, counts2, outfile, binary_input, binary_output):
