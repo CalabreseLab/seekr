@@ -18,7 +18,7 @@ requirements = [
     'pandas',
     'requests',
     'networkx',
-    'igraph',
+    'python-igraph',
     'louvain',
     'leidenalg'
 ]
