@@ -378,7 +378,7 @@ class Downloader:
         url_base = 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
         url = f'{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz'
         url = url_base + url
-        with closing(urllib.request.urlopen(url)) as r:
+        with closing(urllib.request.urlopen(url, timeout=300)) as r:
             if out_path is None:
                 out_path = f'v{release}_{biotype}.fa.gz'
             with open(out_path, 'wb') as out_file:

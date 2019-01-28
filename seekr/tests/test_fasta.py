@@ -1,12 +1,27 @@
 import requests
 import gzip
+import pkg_resources
+
 from pathlib import Path
 
 from seekr import fasta
 
 
 class TestMaker:
-    pass #TODO
+
+    def test_filter01(self, tmpdir):
+        infasta = 'tests/data/v22_pc_head.fa'
+        infasta = pkg_resources.resource_filename('seekr', infasta)
+        maker = fasta.Maker(infasta, str(Path(tmpdir, 'out.fa')))
+        names = maker.filter1()
+        assert names == ['OR4F5-001', 'FO538757.3-201', 'FO538757.2-201']
+
+    def test_filter001(self, tmpdir):
+        infasta = 'tests/data/v22_pc_head.fa'
+        infasta = pkg_resources.resource_filename('seekr', infasta)
+        maker = fasta.Maker(infasta, str(Path(tmpdir, 'out.fa')))
+        names = maker.filter1(2)
+        assert names == ['OR4F5-001']
 
 
 class TestRandomMaker:

@@ -10,6 +10,7 @@ import pandas as pd
 import igraph
 import networkx
 import louvain
+import leidenalg
 
 
 class Maker:
@@ -26,11 +27,11 @@ class Maker:
     limit: float (default=0)
         Value for thresholding adjacency matrix. Below this limit, all edges are 0.
     gamma: float (default=1)
-        Resolution parameter for louvain algorithm
+        Resolution parameter for community detection algorithm.
     n_comms: int (default=5)
         Number of communities to find. This does not count a null community.
     seed: int (default=None)
-        Set the seed for reproducible results from louvain.
+        Set the seed for reproducible results from community detection.
 
     Attributes
     ----------
@@ -38,19 +39,20 @@ class Maker:
         Primary graph build from adjacency matrix
     main_sub: networkx.Graph
         Largest connected subgraph of primary graph
-    partition: louvain.RBConfigurationVertexPartition
+    partition: RBConfigurationVertexPartition
         Contains the membership data for each node
     df: DataFrame
         Stores transcript name and membership
     """
 
-    def __init__(self, adj=None, gml_path=None, csv_path=None,
+    def __init__(self, adj=None, gml_path=None, csv_path=None, leiden=True,
                  limit=0, gamma=1, n_comms=5, seed=None):
         self.adj = adj
         if adj is not None:
             self.adj = self.get_adj(adj)
         self.gml_path = gml_path
         self.csv_path = csv_path
+        self.detector = leidenalg if leiden else louvain
         self.limit = limit
         self.gamma = gamma
         self.n_comms = n_comms
@@ -60,6 +62,7 @@ class Maker:
         self.main_sub = None
         self.partition = None
         self.df = None
+
 
     def get_adj(self, adj):
         """Load adjacency matrix from .csv or .npy file, if necessary.
@@ -115,7 +118,7 @@ class Maker:
         networkx.write_gml(graph, self.gml_path)
 
     def get_partition(self, gml_path=None):
-        """Run Louvain to call communities on the graph
+        """Run community detection to call communities on the graph
 
         Parameters
         ----------
@@ -125,17 +128,22 @@ class Maker:
         if gml_path is None:
             gml_path = self.gml_path
         graph = igraph.Graph.Read_GML(gml_path)
+        extra_args = {}
         if self.seed is not None:
-            louvain.set_rng_seed(self.seed)
-        self.partition = louvain.find_partition(graph,
-                                                louvain.RBConfigurationVertexPartition,
-                                                weights='weight',
-                                                resolution_parameter=self.gamma)
+            if self.detector is louvain:
+                self.detector.set_rng_seed(self.seed)
+            else:
+                extra_args['seed'] = self.seed
+        self.partition = self.detector.find_partition(graph,
+                                                      self.detector.RBConfigurationVertexPartition,
+                                                      weights='weight',
+                                                      resolution_parameter=self.gamma,
+                                                      **extra_args)
 
     def membership2attribute(self):
         """Store communities in graph.
 
-        The function maps values from the Louvain partition to graph nodes.
+        The function maps values from the partition to graph nodes.
         Nodes found in communities with values larger than n_comms are put into the null community.
         Similarly, nodes not found in main_sub will also be added to the null community.
 

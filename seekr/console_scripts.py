@@ -3,10 +3,10 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from .kmer_counts import BasicCounter
-from .pearson import pearson
-from .fasta import Downloader
-from .graph import Maker
+from seekr import fasta
+from seekr import graph
+from seekr.kmer_counts import BasicCounter
+from seekr.pearson import pearson
 
 
 DOWNLOAD_GENCODE_DOC = """
@@ -34,6 +34,34 @@ To get lncRNAs from the M5 release of mouse:
 If you want to leave the fasta file gzipped:
     $ seekr_download_gencode all -z
 
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
+"""
+
+CANONICAL_GENCODE_DOC = """
+Description
+-----------
+Filter GENCODE fasta file for only transcripts ending in 01.
+
+This is based on the common names provided by GENCODE.
+No strict guarantees are made about the relationship between genes and transcripts.
+
+Examples
+--------
+To filter transcripts ending in 01, an input and output fasta file are required:
+    $ seekr_canonical rnas.fa rnas01.fa
+
+If you want to specifically find transcripts with the ending 001:
+    $ seekr_canonical rnas.fa rnas01.fa -z 2
+
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
 """
 
 KMER_COUNTS_DOC = """
@@ -139,10 +167,10 @@ A gml file contain the graph and communities will be produced.
 For a cleaner csv file of just community information:
     $ seekr_graph adj.csv -g graph.gml -c communities.csv
 
-To threshold edges at a value besides 0, and change Louvain's resolution parameter (gamma):
-    $ seekr_graph adj.csv -g graph.gml -l .1 -r 1.5
+To threshold edges at a value besides 0, and change the resolution parameter (gamma):
+    $ seekr_graph adj.csv -g graph.gml -t .1 -r 1.5
     
-To change the cap of the number of communities found, and set Louvain's seed:
+To change the cap of the number of communities found, and set the seed:
     $ seekr_graph adj.csv -g graph.gml -n 10 -s 0
     
 Numpy files are also valid input:
@@ -166,7 +194,7 @@ def _parse_args_or_exit(parser):
 
 def _run_download_gencode(biotype, species, release, out_path, unzip):
     # Note: This function is separated for testing purposes.
-    downloader = Downloader()
+    downloader = fasta.Downloader()
     downloader.get_gencode(biotype, species, release, out_path, unzip)
 
 
@@ -175,17 +203,36 @@ def console_download_gencode():
     parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('biotype',
-                        help="Name of Genocde set to download. Must be one of ('all', 'pc', 'lncRNA').")
+                        help=("Name of Genocde set to download. "
+                              "Must be one of ('all', 'pc', 'lncRNA')."))
     parser.add_argument('-s', '--species', default='human',
                         help=" Name of species. Must be one of: ('human' or 'mouse').")
     parser.add_argument('-r', '--release', default=None,
-                        help="Name of specific release to download (e.g. 'M5'). If None, download latest release.")
+                        help=("Name of specific release to download (e.g. 'M5'). "
+                              "If None, download latest release."))
     parser.add_argument('-o', '--out_path', default=None,
                         help="Path to location for fasta file. Default will save by release name.")
     parser.add_argument('-z', '--zip', action='store_false',
                         help="Set if you do not want to gunzip fasta file after downloading.")
     args = _parse_args_or_exit(parser)
     _run_download_gencode(args.biotype, args.species, args.release, args.out_path, args.zip)
+
+
+def _run_canonical_gencode(in_fasta, out_fasta, zeros):
+    # Note: This function is separated from console_kmer_counts for testing purposes.
+    maker = fasta.Maker(in_fasta, out_fasta)
+    maker.filter1(zeros)
+
+
+def console_canonical_gencode():
+    assert sys.version_info[0] == 3, 'Python version must be 3.x'
+    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('in_fasta', help='Full path of fasta file.')
+    parser.add_argument('out_fasta', help='Full path of filtered fasta file.')
+    parser.add_argument('-z', '--zeros', help='Number of zeroes needed to be considered canonical.')
+    args = _parse_args_or_exit(parser)
+    _run_canonical_gencode(args.in_fasta, args.out_fasta, args.zeros)
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
@@ -202,7 +249,7 @@ def console_kmer_counts():
     assert sys.version_info[0] == 3, 'Python version must be 3.x'
     parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('fasta', help='full path of fasta file')
+    parser.add_argument('fasta', help='Full path of fasta file.')
     parser.add_argument('-o', '--outfile', default='counts.seekr',
                         help='Name of file to save counts to.')
     parser.add_argument('-k', '--kmer', default=6,
@@ -289,11 +336,12 @@ def console_norm_vectors():
     _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, args.kmer)
 
 
-def _run_graph(adj, gml_path, csv_path, limit, resolution, n_comms, seed):
+def _run_graph(adj, gml_path, csv_path, louvain, limit, resolution, n_comms, seed):
     # Note: This function is separated for testing purposes.
+    leiden = not louvain
     if seed is not None:
         seed = int(seed)
-    maker = Maker(adj, gml_path, csv_path, limit, resolution, n_comms, seed)
+    maker = graph.Maker(adj, gml_path, csv_path, leiden, limit, resolution, n_comms, seed)
     maker.make_gml_csv_files()
 
 
@@ -307,17 +355,19 @@ def console_graph():
                         help='Path to output graph file in .gml format')
     parser.add_argument('-c', '--csv_path', default=None,
                         help='Path to output community file in .csv format')
-    parser.add_argument('-l', '--limit', default=6,
+    parser.add_argument('-l', '--louvain',  action='store_true',
+                        help='If set, use Louvain for community detection instead of Leiden.')
+    parser.add_argument('-t', '--threshold', default=0,
                         help=('Value for thresholding adjacency matrix. '
                               'Below this limit, all edges are 0.'))
     parser.add_argument('-r', '--resolution', default=1,
-                        help=' Resolution parameter for louvain algorithm')
+                        help=' Resolution parameter for community detection algorithm')
     parser.add_argument('-n', '--n_comms', default=5,
                         help='Number of communities to find. This does not count a null community.')
     parser.add_argument('-s', '--seed', default=None)
     args = _parse_args_or_exit(parser)
-    _run_graph(args.adj, args.gml_path, args.csv_path, args.limit, args.resolution,
-               args.n_comms, args.seed)
+    _run_graph(args.adj, args.gml_path, args.csv_path, args.louvain, args.threshold,
+               args.resolution, args.n_comms, args.seed)
 
 
 def _run_gen_rand_rnas(fasta, mean_vector, std_vector, kmer):

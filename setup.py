@@ -19,7 +19,8 @@ requirements = [
     'requests',
     'networkx',
     'igraph',
-    'louvain'
+    'louvain',
+    'leidenalg'
 ]
 
 test_requirements = [

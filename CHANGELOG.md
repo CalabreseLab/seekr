@@ -12,6 +12,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 This is where you should add changes as you go along.
 They will be shuttled into a version number just before the version is released.
 
+### Added
+
+* `seekr_canonical` command line script filters for -001 transcripts.
+* Add legacy option to continue using Louvain instead of Leiden.
+* Travis CI automatic push testing.
+
+### Fixed
+
+*
+
+### Changed
+
+* In `seekr_graph`, change '-l', '--limit' to '-t', '--threshold'.
+* Set default community detection to Leiden.
+* Temporarily remove `ushuffle` dependency.
+
 ---
 
 ## 1.2.0

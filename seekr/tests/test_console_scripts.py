@@ -124,6 +124,7 @@ class TestConsoleScripts:
         console_scripts._run_graph(adj=adj,
                                    gml_path=gml_path,
                                    csv_path=csv_path,
+                                   louvain=False,
                                    limit=.15,
                                    resolution=1,
                                    n_comms=5,
