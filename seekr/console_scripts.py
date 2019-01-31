@@ -7,7 +7,8 @@ from seekr import fasta
 from seekr import graph
 from seekr.kmer_counts import BasicCounter
 from seekr.pearson import pearson
-
+# TODO (Dan) fix names
+from seekr.pwm import CountsWeighter
 
 DOWNLOAD_GENCODE_DOC = """
 Description
@@ -175,6 +176,36 @@ To change the cap of the number of communities found, and set the seed:
     
 Numpy files are also valid input:
     $ seekr_graph adj.npy -g graph.gml
+
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
+"""
+
+
+PWM_DOC = """
+Description
+-----------
+# TODO (Dan) Add a one line description of this tool.
+
+Examples
+--------
+A standard run of this tool needs three things:
+1. A directory of PWM files
+2. A counts file (produced from seekr_kmer_counts)
+3. An output path
+    # TODO (DAN) update script name here too. And consider changing output name?
+    $ seekr_pwm path/to/pwms/ kc_out.csv -o pwm_weight_sums.csv
+
+Numpy files can also be passed as input, but .csv files are the only output:
+    $ seekr_pwm path/to/pwms/ kc_out.npy -o pwm_weight_sums.csv
+
+The kmer size can also be passed. 
+It should match the counts file.
+Unlike most other seekr tools k=5 is the default for this tool.
+    $ seekr_pwm path/to/pwms/ kc_out.npy -k 6 -o pwm_weight_sums.csv
 
 Issues
 ------
@@ -391,6 +422,29 @@ def console_gen_rand_rnas():
                         help='set to concatenate RNAs before shuffling and mutating.')
     args = _parse_args_or_exit(parser)
     _run_norm_vectors(args.fasta, args.out_fasta, args.mutations, args.group)
+
+
+def _run_pwms(pwm_dir, counts, kmer, out_path):
+    # TODO (Dan) name this function
+    # Note: This function is separated for testing purposes.
+    counts_weighter = CountsWeighter(pwm_dir, counts, kmer, out_path)
+    counts_weighter.run()
+
+
+def console_pwms():
+    # TODO (Dan) name this function
+    assert sys.version_info[0] == 3, 'Python version must be 3.x'
+    parser = argparse.ArgumentParser(usage=PWM_DOC,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('pwm_dir', help='Path to directory containing PWM files.')
+    parser.add_argument('counts', help='Path to kmer_counts file.')
+    parser.add_argument('-k', '--kmer', default=5,
+                        help='Length of kmer.')
+    parser.add_argument('-o', '--out_path',
+                        help='Path to new csv file containing weighted count sums.')
+    args = _parse_args_or_exit(parser)
+    # TODO (Dan) update name
+    _run_pwms(args.pwm_dir, args.counts, int(args.kmer), args.out_path)
 
 
 def console_seekr_help():
