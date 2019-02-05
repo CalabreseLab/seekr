@@ -150,6 +150,13 @@ Users control how similar the synthetic RNAs are to the originals.
 Gross scale of kmer content can be controlled by setting kmer conservation size.
 Fine scale control of similarity can be set by number of SNP mutations.
 
+# TODO Add examples.
+
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
 """
 
 
@@ -272,7 +279,7 @@ def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
-    counter = BasicCounter(fasta, outfile, int(kmer), binary,
+    counter = BasicCounter(fasta, outfile, kmer, binary,
                            mean, std, log2, label=label)
     counter.make_count_file()
 
@@ -301,7 +308,7 @@ def console_kmer_counts():
     parser.add_argument('-sv', '--std_vector', default=None,
                         help='Optional path to std vector numpy file.')
     args = _parse_args_or_exit(parser)
-    _run_kmer_counts(args.fasta, args.outfile, args.kmer, args.binary, args.uncentered,
+    _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
                      args.unstandardized, args.no_log2, args.label, args.mean_vector,
                      args.std_vector)
 
@@ -366,7 +373,7 @@ def console_norm_vectors():
     parser.add_argument('-k', '--kmer', default=6,
                         help='length of kmers you want to count')
     args = _parse_args_or_exit(parser)
-    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, args.kmer)
+    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, int(args.kmer))
 
 
 def _run_graph(adj, gml_path, csv_path, louvain, limit, resolution, n_comms, seed):
@@ -397,31 +404,39 @@ def console_graph():
                         help=' Resolution parameter for community detection algorithm')
     parser.add_argument('-n', '--n_comms', default=5,
                         help='Number of communities to find. This does not count a null community.')
-    parser.add_argument('-s', '--seed', default=None)
+    parser.add_argument('-s', '--seed', default=None,
+                        help='An integer to create reproducible results between runs.')
     args = _parse_args_or_exit(parser)
-    _run_graph(args.adj, args.gml_path, args.csv_path, args.louvain, args.threshold,
-               args.resolution, args.n_comms, args.seed)
+    _run_graph(args.adj, args.gml_path, args.csv_path, args.louvain, float(args.threshold),
+               float(args.resolution), int(args.n_comms), args.seed)
 
 
-def _run_gen_rand_rnas(fasta, mean_vector, std_vector, kmer):
+def _run_gen_rand_rnas(in_fasta, out_fasta, kmer, mutations, seed, group):
     # Note: This function is separated for testing purposes.
-    pass
+    # TODO do something with group?
+    if seed is not None:
+        seed = int(seed)
+    rand_maker = fasta.RandomMaker(in_fasta, out_fasta, kmer, mutations, seed, group)
+    rand_maker.synthesize_random()
 
 
 def console_gen_rand_rnas():
     assert sys.version_info[0] == 3, 'Python version must be 3.x'
     parser = argparse.ArgumentParser(usage=GEN_RAND_RNAS_DOC,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('fasta', help='path to .fa file')
+    parser.add_argument('in_fasta', help='path to .fa file')
     parser.add_argument('out_fasta', help='path to new .fa file')
     parser.add_argument('-k', '--kmer', default=1,
-                        help='length of kmers you want to conserve')
+                        help='Length of kmers you want to conserve')
     parser.add_argument('-m', '--mutations', default=0,
-                        help='number of SNP mutations to make in RNA')
+                        help='Number of SNP mutations to make in RNA')
+    parser.add_argument('-s', '--seed', default=None,
+                        help='An integer to create reproducible results between runs.')
     parser.add_argument('-g', '--group', action='store_false',
-                        help='set to concatenate RNAs before shuffling and mutating.')
+                        help='Set to concatenate RNAs before shuffling and mutating.')
     args = _parse_args_or_exit(parser)
-    _run_norm_vectors(args.fasta, args.out_fasta, args.mutations, args.group)
+    _run_norm_vectors(args.in_fasta, args.out_fasta, int(args.kmer), int(args.mutations), args.seed,
+                      args.group)
 
 
 def _run_pwms(pwm_dir, counts, kmer, out_path):

@@ -26,6 +26,7 @@ class TestMaker:
 
 class TestRandomMaker:
     pass
+    # TODO Add testing
 
 
 class TestDownloader:

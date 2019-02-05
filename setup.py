@@ -20,7 +20,8 @@ requirements = [
     'networkx',
     'python-igraph',
     'louvain',
-    'leidenalg'
+    'leidenalg',
+    'ushuffle'
 ]
 
 test_requirements = [
@@ -29,6 +30,7 @@ test_requirements = [
 
 setup(name=about['__title__'],
       version=about['__version__'],
+
       install_requires=requirements,
       tests_require=test_requirements,
       description=about['__description__'],

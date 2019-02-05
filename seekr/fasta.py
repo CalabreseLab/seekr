@@ -28,11 +28,10 @@ import numpy as np
 from contextlib import closing
 from os.path import exists, join
 from os import makedirs
+from ushuffle import shuffle
 
 from .my_tqdm import my_tqdm, my_trange
-from .kmer_counts import BasicCounter
 from .fasta_reader import Reader
-from .pearson import pearson
 
 
 class Maker:
@@ -198,6 +197,8 @@ class RandomMaker(Maker):
         The size of kmer to conserve between original and random sequences
     mutations: int
         Number of SNP mutations to make in sequence
+    seed: int (default=None)
+        Seed to use for reproducible shuffling with ushuffle
     individual: bool (default=True)
         Whether to conserve kmers of each sequence or the entire fasta file
 
@@ -220,10 +221,11 @@ class RandomMaker(Maker):
         https://github.com/guma44/ushuffle
     """
 
-    def __init__(self, infasta=None, outfasta=None, k=1, mutations=0, individual=True):
+    def __init__(self, infasta=None, outfasta=None, k=1, mutations=0, seed=None, individual=True):
         super(RandomMaker, self).__init__(infasta=infasta, outfasta=outfasta)
         self.k = k
         self.mutations = mutations
+        self.seed = seed
         self.individual = individual
         self.weights = None
         self.new_fasta_seqs = None

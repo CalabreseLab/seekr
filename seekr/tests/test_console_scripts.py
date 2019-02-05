@@ -33,7 +33,7 @@ class TestConsoleScripts:
         outfile = str(tmpdir.join('2mers.npy'))
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
-                                         kmer='2',
+                                         kmer=2,
                                          binary=True,
                                          centered=True,
                                          standardized=True,
@@ -53,7 +53,7 @@ class TestConsoleScripts:
         outfile = str(tmpdir.join('3mers.csv'))
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
-                                         kmer='3',
+                                         kmer=3,
                                          binary=False,
                                          centered=False,
                                          standardized=False,
@@ -77,7 +77,7 @@ class TestConsoleScripts:
         outfile = str(tmpdir.join('2mers_vectors.npy'))
         console_scripts._run_kmer_counts(fasta=infasta,
                                          outfile=outfile,
-                                         kmer='2',
+                                         kmer=2,
                                          binary=True,
                                          centered=False,
                                          standardized=False,
