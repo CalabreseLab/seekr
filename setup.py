@@ -9,10 +9,18 @@ from setuptools import setup
 # That way, if setup fails, we can return state on exit.
 IS_MAC = sys.platform == 'darwin'
 MAYBE_CONDA = any('CONDA' in key for key in os.environ)
-SET_TARGET = IS_MAC and MAYBE_CONDA
+NO_TARGET = 'MACOSX_DEPLOYMENT_TARGET' not in os.environ
+SET_TARGET = IS_MAC and MAYBE_CONDA and NO_TARGET
 if SET_TARGET:
-    current_target = os.environ.get('MACOSX_DEPLOYMENT_TARGET', '')
-    os.environ['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
+    msg = ('It looks like you are using OSX and Anaconda. '
+           'Please run the command:\n\n'
+           '$ export MACOSX_DEPLOYMENT_TARGET=10.14\n\n'
+           'Then, rerun:\n\n'
+           '$ pip install seekr\n\n'
+           'For more details see: \n\n'
+           'https://github.com/igraph/python-igraph/issues/208\n\n'
+           'This issue will hopefully be fixed soon.')
+    raise OSError(msg)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 about = {}
@@ -33,7 +41,9 @@ requirements = [
     'python-igraph',
     'louvain',
     'leidenalg',
-    'ushuffle'
+    'ushuffle',
+    'matplotlib',
+    'seaborn'
 ]
 
 test_requirements = [
@@ -42,7 +52,6 @@ test_requirements = [
 
 setup(name=about['__title__'],
       version=about['__version__'],
-
       install_requires=requirements,
       tests_require=test_requirements,
       description=about['__description__'],
@@ -63,13 +72,9 @@ setup(name=about['__title__'],
            'seekr_canonical_gencode = seekr.console_scripts:console_canonical_gencode',
            'seekr_kmer_counts = seekr.console_scripts:console_kmer_counts',
            'seekr_pearson = seekr.console_scripts:console_pearson',
+           'seekr_visualize_distro = seekr.console_scripts:console_visualize_distro',
            'seekr_norm_vectors = seekr.console_scripts:console_norm_vectors',
            'seekr_rand_rnas = seekr.console_scripts:console_gen_rand_rnas',
            'seekr_graph = seekr.console_scripts:console_graph',
            'seekr = seekr.console_scripts:console_seekr_help']})
 
-if SET_TARGET:
-    if current_target:
-        os.environ['MACOSX_DEPLOYMENT_TARGET'] = current_target
-    else:
-        del os.environ['MACOSX_DEPLOYMENT_TARGET']

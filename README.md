@@ -240,20 +240,21 @@ $ seekr_pearson human_6mers.npy mouse_6mers.npy -o human_vs_mouse.npy
 
 #### seekr_graph
 
-We can treat the results of `seekr_pearson` as an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix), and use it to find communities of transcripts with the [Louvain algorithm](https://arxiv.org/abs/0803.0476).
+We can treat the results of `seekr_pearson` as an [adjacency matrix](https://en.wikipedia.org/wiki/Adjacency_matrix), and use it to find communities of transcripts with the [Louvain algorithm](https://arxiv.org/abs/0803.0476) or the [Leiden algorithm](https://arxiv.org/abs/1810.08473).
 
-The default setting accept a single csv file.
+The default setting accept a csv file and a threshold value.
 This csv file should be the product of seekr_pearson, or some other adjacency matrix.
+The threshold is the value below which edges are removed from the graph.
 A [gml](https://gephi.org/users/supported-graph-formats/gml-format/) file contain the graph and communities will be produced.
 
 ```
-    $ seekr_graph example_vs_self.csv -g example.gml
+    $ seekr_graph example_vs_self.csv .13 -g example.gml
 ```
 
 Numpy files are also valid input:
 
 ```
-    $ seekr_graph example_vs_self.npy -g graph.gml
+    $ seekr_graph example_vs_self.npy .13 -g graph.gml
 ```
 
 GML files are plain text, so you can view them if you want.
@@ -262,24 +263,26 @@ Often you just want to know what transcripts belong to what community.
 To get a csv file mapping transcripts to communities, run:
 
 ```
-    $ seekr_graph example_vs_self.csv -g example.gml -c communities.csv
+    $ seekr_graph example_vs_self.csv .13 -g example.gml -c communities.csv
 ```
 
-Often, keeping all edges above 0 makes the graph too large,
-and retains too many unnecessary edges.
-Similarly, the Louvain algorithm allows you course control of community size with its resolution parameter (gamma).
+The value for thresholding the adjacency matrix is very experiment dependent.
+Because a reasonable default is difficult to predict, it is a required parameter.
+For example, if you are using `k=5`, it likely makes sense to increase the threshold (e.g. to .3).
+`seekr_pearson_distro` can be run to suggest a value for the threshold.
+Similarly, the community finding algorithm allows you course control of community size with its resolution parameter (gamma).
 Testing ranges from .1 to 5 is reasonable, where values from 1-3 have been most useful in our experience.
 
 ```
-    $ seekr_graph example_vs_self.csv -g graph.gml -l .1 -r 1.5
+    $ seekr_graph example_vs_self.csv .3 -g graph.gml -r 1.5
 ```
 
 A third tunable parameters is a cap of the number of communities found.
-And finally, since Louvain is partially random,
+And finally, since community finding is partially random,
 you can make your results reproducible by setting a seed value:
 
 ```
-    $ seekr_graph example_vs_self.csv -g graph.gml -n 10 -s 0
+    $ seekr_graph example_vs_self.csv .13 -g graph.gml -n 10 -s 0
 ```
 
 ### Module example

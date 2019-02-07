@@ -6,7 +6,7 @@ import pandas as pd
 from seekr import fasta
 from seekr import graph
 from seekr.kmer_counts import BasicCounter
-from seekr.pearson import pearson
+from seekr.pearson import pearson, visualize_distro
 # TODO (Dan) fix names
 from seekr.pwm import CountsWeighter
 
@@ -121,6 +121,31 @@ Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 ---
 """
 
+
+VISUALIZE_DISTRO_DOC = """
+Description
+-----------
+Generate an image showing the distribution of all Pearson r-values.
+This can be useful for determining a threshold for the adjacency matrix.
+
+Examples
+--------
+There are no optional flags for this utility. 
+You must pass an adjacency matrix and an output path.
+    $ seekr_visualize_distro adj.csv adj.pdf
+
+Notes
+-----
+For more sophisticated options, you cannot use the command line, but need python instead.
+
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
+"""
+
+
 NORM_VECTORS_DOC = """
 Description
 -----------
@@ -167,22 +192,24 @@ Find communities of transcripts from an adjacency matrix.
 
 Examples
 --------
-The default setting accept a single csv file.
-This csv file should be the product of seekr_pearson, or some other adjacency matrix.
+Default setting accept a csv file, and a threshold value.
+The csv file should be the product of seekr_pearson, or some other adjacency matrix.
+The threshold is the value below which edges are removed from the graph.
+seekr_pearson_distro can be run to suggest a value for the threshold.
 A gml file contain the graph and communities will be produced.
-    $ seekr_graph adj.csv -g graph.gml
+    $ seekr_graph adj.csv .13 -g graph.gml
 
 For a cleaner csv file of just community information:
-    $ seekr_graph adj.csv -g graph.gml -c communities.csv
+    $ seekr_graph adj.csv .5 -g graph.gml -c communities.csv
 
-To threshold edges at a value besides 0, and change the resolution parameter (gamma):
-    $ seekr_graph adj.csv -g graph.gml -t .1 -r 1.5
+To change the resolution parameter (gamma) for louvain/leidenalg:
+    $ seekr_graph adj.csv .1 -g graph.gml -r 1.5
     
 To change the cap of the number of communities found, and set the seed:
-    $ seekr_graph adj.csv -g graph.gml -n 10 -s 0
+    $ seekr_graph adj.csv .1 -g graph.gml -n 10 -s 0
     
 Numpy files are also valid input:
-    $ seekr_graph adj.npy -g graph.gml
+    $ seekr_graph adj.npy .1 -g graph.gml
 
 Issues
 ------
@@ -355,6 +382,21 @@ def console_pearson():
                  args.binary_input, args.binary_output)
 
 
+def _run_visualize_distro(adj, out_path):
+    visualize_distro(adj, out_path)
+
+
+def console_visualize_distro():
+    assert sys.version_info[0] == 3, 'Python version must be 3.x'
+    parser = argparse.ArgumentParser(usage=VISUALIZE_DISTRO_DOC,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('adj',
+                        help='Path to either .csv or .npy file, representing adjacency matrix')
+    parser.add_argument('out_path', help='Full path of a output image.')
+    args = _parse_args_or_exit(parser)
+    _run_visualize_distro(args.adj, args.out_path)
+
+
 def _run_norm_vectors(fasta, mean_vector, std_vector, kmer):
     counter = BasicCounter(fasta, k=int(kmer))
     counter.get_counts()
@@ -377,7 +419,7 @@ def console_norm_vectors():
     _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, int(args.kmer))
 
 
-def _run_graph(adj, gml_path, csv_path, louvain, threshold, resolution, n_comms, seed):
+def _run_graph(adj, threshold, gml_path, csv_path, louvain, resolution, n_comms, seed):
     # Note: This function is separated for testing purposes.
     leiden = not louvain
     if seed is not None:
@@ -392,15 +434,14 @@ def console_graph():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('adj',
                         help='Path to either .csv or .npy file, representing adjacency matrix')
+    parser.add_argument('threshold', help=('Value for thresholding adjacency matrix. '
+                                           'Below this limit, all edges are 0.'))
     parser.add_argument('-g', '--gml_path', default=None,
                         help='Path to output graph file in .gml format')
     parser.add_argument('-c', '--csv_path', default=None,
                         help='Path to output community file in .csv format')
     parser.add_argument('-l', '--louvain',  action='store_true',
                         help='If set, use Louvain for community detection instead of Leiden.')
-    parser.add_argument('-t', '--threshold', default=0,
-                        help=('Value for thresholding adjacency matrix. '
-                              'Below this limit, all edges are 0.'))
     parser.add_argument('-r', '--resolution', default=1,
                         help=' Resolution parameter for community detection algorithm')
     parser.add_argument('-n', '--n_comms', default=5,
@@ -408,7 +449,7 @@ def console_graph():
     parser.add_argument('-s', '--seed', default=None,
                         help='An integer to create reproducible results between runs.')
     args = _parse_args_or_exit(parser)
-    _run_graph(args.adj, args.gml_path, args.csv_path, args.louvain, float(args.threshold),
+    _run_graph(args.adj, float(args.threshold), args.gml_path, args.csv_path, args.louvain,
                float(args.resolution), int(args.n_comms), args.seed)
 
 

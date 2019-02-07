@@ -27,6 +27,8 @@ Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 ---
 """
 
+import seaborn as sns
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -38,7 +40,9 @@ except ImportError:
     pass
 from tqdm import tqdm, tqdm_notebook
 
-from .kmer_counts import BasicCounter
+from seekr.kmer_counts import BasicCounter
+from seekr.utils import get_adj
+
 
 def pearson(counts1, counts2, row_standardize=True, outfile=None):
     """Calculates a column standardized Pearson correlation matrix"""
@@ -53,6 +57,26 @@ def pearson(counts1, counts2, row_standardize=True, outfile=None):
     if outfile:
         np.save(outfile, dist)
     return dist
+
+
+def visualize_distro(adj, out_path):
+    adj = get_adj(adj)
+    if isinstance(adj, pd.DataFrame):
+        adj = adj.values
+    flat = adj.flatten()
+    mean = flat.mean()
+    std = flat.std()
+    std1 = mean + std
+    std2 = mean + (2*std)
+    ax = sns.distplot(flat, label='Distribution')
+    y_max = ax.get_ylim()[1]
+    plt.plot((mean, mean), (0, y_max/2), label='Mean')
+    plt.plot((std1, std1), (0, y_max/2), label='Mean + 1 std. dev.')
+    plt.plot((std2, std2), (0, y_max/2), label='Mean + 2 std. dev.')
+    plt.xlabel('r-value')
+    plt.legend()
+    plt.savefig(out_path, bbox_inches='tight', dpi=600)
+
 
 def pvalue(dist, N):
     """Calculate the p-values (two tailed) of a Pearson correlation matrix
@@ -214,7 +238,3 @@ class StreamDist(object):
         self.dist = np.zeros(self.n, dtype=np.float32)
         self._stream_seqs(self.calc_dist)
         self.save()
-
-
-if __name__ == '__main__':
-    cmd_line_pearson()

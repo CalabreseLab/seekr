@@ -44,31 +44,6 @@ class TestMaker:
         maker.get_partition()
         return maker
 
-    def test_get_adj_ndarray(self):
-        adj = self._build_adj().values
-        maker = graph.Maker(adj)
-        assert type(maker.adj) == np.ndarray
-
-    def test_get_adj_df(self):
-        adj = self._build_adj()
-        maker = graph.Maker(adj)
-        assert type(maker.adj) == pd.DataFrame
-
-    def test_get_adj_str_ndarray(self, tmpdir):
-        adj_path = self._save_adj(tmpdir)
-        maker = graph.Maker(adj_path)
-        assert type(maker.adj) == np.ndarray
-
-    def test_get_adj_str_df(self, tmpdir):
-        adj_path = self._save_adj(tmpdir, binary=False)
-        maker = graph.Maker(adj_path)
-        assert type(maker.adj) == pd.DataFrame
-
-    def test_get_adj_list(self):
-        adj = [[1, 1], [1, 1]]
-        with pytest.raises(AssertionError):
-            maker = graph.Maker(adj)
-
     def test_apply_threshold(self):
         adj = self._build_adj()
         maker = graph.Maker(adj)
