@@ -69,24 +69,24 @@ class TestMaker:
         with pytest.raises(AssertionError):
             maker = graph.Maker(adj)
 
-    def test_threshold(self):
+    def test_apply_threshold(self):
         adj = self._build_adj()
         maker = graph.Maker(adj)
-        maker.threshold()
+        maker.apply_threshold()
         assert np.alltrue(maker.adj.values.diagonal() == np.zeros(5))
         assert adj.values[1, 0] == 0
         assert adj.values[1, 2] != 0
 
-    def test_threshold_limit1(self):
+    def test_apply_threshold_t1(self):
         adj = self._build_adj()
-        maker = graph.Maker(adj, limit=1)
-        maker.threshold()
+        maker = graph.Maker(adj, threshold=1)
+        maker.apply_threshold()
         assert maker.adj.values.sum() == 0
 
-    def test_threshold_ndarray(self):
+    def test_apply_threshold_ndarray(self):
         adj = self._build_adj().values
-        maker = graph.Maker(adj, limit=1)
-        maker.threshold()
+        maker = graph.Maker(adj, threshold=1)
+        maker.apply_threshold()
         assert maker.adj.sum() == 0
 
     def test_build(self):
@@ -160,7 +160,7 @@ class TestMaker:
     def test_membership2attribute(self, tmpdir):
         maker = self._get_maker_with_partition(tmpdir)
         name2group = maker.membership2attribute()
-        assert name2group == {0: 1, 1: 0, 2: 1, 3: 0, 4: 0}
+        assert name2group == {'0': 1, '1': 0, '2': 1, '3': 0, '4': 0}
         assert name2group == networkx.get_node_attributes(maker.graph, 'Group')
 
     def test_membership2attribute_disconnected(self, tmpdir):

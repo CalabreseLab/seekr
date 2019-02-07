@@ -24,8 +24,8 @@ class Maker:
         Path to output file for new network
     csv_path: str
         Path to two column file storing transcript name and membership
-    limit: float (default=0)
-        Value for thresholding adjacency matrix. Below this limit, all edges are 0.
+    threshold: float (default=0)
+        Value for thresholding adjacency matrix. Below this threshold, all edges are 0.
     gamma: float (default=1)
         Resolution parameter for community detection algorithm.
     n_comms: int (default=5)
@@ -46,14 +46,14 @@ class Maker:
     """
 
     def __init__(self, adj=None, gml_path=None, csv_path=None, leiden=True,
-                 limit=0, gamma=1, n_comms=5, seed=None):
+                 threshold=0, gamma=1, n_comms=5, seed=None):
         self.adj = adj
         if adj is not None:
             self.adj = self.get_adj(adj)
         self.gml_path = gml_path
         self.csv_path = csv_path
         self.detector = leidenalg if leiden else louvain
-        self.limit = limit
+        self.threshold = threshold
         self.gamma = gamma
         self.n_comms = n_comms
         self.seed = seed
@@ -87,13 +87,13 @@ class Maker:
                 adj = np.load(adj)
         return adj
 
-    def threshold(self):
+    def apply_threshold(self):
         """Remove low weighted edges from graph."""
         adj = self.adj
         if isinstance(adj, pd.DataFrame):
             adj = adj.values
         np.fill_diagonal(adj, 0)
-        adj[adj < self.limit] = 0
+        adj[adj < self.threshold] = 0
 
     def find_main_sub(self):
         """Calculate the largest connected subgraph
@@ -171,11 +171,12 @@ class Maker:
         main_sub: bool (default=True)
             If False, skip finding main commected subgraph.
         """
-        self.threshold()
+        self.apply_threshold()
         if isinstance(self.adj, np.ndarray):
             self.graph = networkx.from_numpy_array(self.adj)
         else:
             self.graph = networkx.from_pandas_adjacency(self.adj)
+        networkx.relabel_nodes(self.graph, lambda n: str(n), False)
         if clear_adj:
             self.adj = None
         if main_sub:

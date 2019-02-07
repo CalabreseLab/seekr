@@ -38,7 +38,7 @@ class TestConsoleScripts:
                                          centered=True,
                                          standardized=True,
                                          log2=True,
-                                         label=False,
+                                         remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None)
         kmers = np.load(outfile)
@@ -58,7 +58,7 @@ class TestConsoleScripts:
                                          centered=False,
                                          standardized=False,
                                          log2=False,
-                                         label=False,
+                                         remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None)
         kmers = pd.read_csv(outfile, header=None)
@@ -82,7 +82,7 @@ class TestConsoleScripts:
                                          centered=False,
                                          standardized=False,
                                          log2=True,
-                                         label=False,
+                                         remove_labels=True,
                                          mean_vector=mean_vector,
                                          std_vector=std_vector)
         kmers = np.load(outfile)
@@ -126,7 +126,7 @@ class TestConsoleScripts:
                                    gml_path=gml_path,
                                    csv_path=csv_path,
                                    louvain=False,
-                                   limit=.15,
+                                   threshold=.15,
                                    resolution=1,
                                    n_comms=5,
                                    seed=0)

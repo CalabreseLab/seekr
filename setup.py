@@ -1,6 +1,18 @@
 import os
+import sys
 
 from setuptools import setup
+
+
+# This is a temporary hack for installing igraph on Mac with Anaconda
+# If this stays in long term, the rest of the setup should be wrapped in a context manager.
+# That way, if setup fails, we can return state on exit.
+IS_MAC = sys.platform == 'darwin'
+MAYBE_CONDA = any('CONDA' in key for key in os.environ)
+SET_TARGET = IS_MAC and MAYBE_CONDA
+if SET_TARGET:
+    current_target = os.environ.get('MACOSX_DEPLOYMENT_TARGET', '')
+    os.environ['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 about = {}
@@ -55,3 +67,9 @@ setup(name=about['__title__'],
            'seekr_rand_rnas = seekr.console_scripts:console_gen_rand_rnas',
            'seekr_graph = seekr.console_scripts:console_graph',
            'seekr = seekr.console_scripts:console_seekr_help']})
+
+if SET_TARGET:
+    if current_target:
+        os.environ['MACOSX_DEPLOYMENT_TARGET'] = current_target
+    else:
+        del os.environ['MACOSX_DEPLOYMENT_TARGET']

@@ -1,3 +1,13 @@
+# Testing
+
+Before distributing, the test suite should pass all tests. Run:
+
+```
+$ pytest -p no:warnings -v
+```
+
+to generate a report. 
+
 # Create new PYPI version
 
 You must have a pypi account, and be a collaborator. 

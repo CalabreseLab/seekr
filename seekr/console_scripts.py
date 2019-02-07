@@ -275,10 +275,11 @@ def console_canonical_gencode():
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     log2, label, mean_vector, std_vector):
+                     log2, remove_labels, mean_vector, std_vector):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
+    label = not remove_labels
     counter = BasicCounter(fasta, outfile, kmer, binary,
                            mean, std, log2, label=label)
     counter.make_count_file()
@@ -301,15 +302,15 @@ def console_kmer_counts():
                         help='Select if output should not be divided by the standard deviation.')
     parser.add_argument('-nl', '--no_log2', action='store_false',
                         help='Select if output should not be log2 transformed.')
-    parser.add_argument('-lb', '--label', action='store_true',
-                        help='Select to save with fasta header labels.')
+    parser.add_argument('-rl', '--remove_labels', action='store_true',
+                        help='Select to save without index and column labels.')
     parser.add_argument('-mv', '--mean_vector', default=None,
                         help='Optional path to mean vector numpy file.')
     parser.add_argument('-sv', '--std_vector', default=None,
                         help='Optional path to std vector numpy file.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
-                     args.unstandardized, args.no_log2, args.label, args.mean_vector,
+                     args.unstandardized, args.no_log2, args.remove_labels, args.mean_vector,
                      args.std_vector)
 
 
@@ -376,12 +377,12 @@ def console_norm_vectors():
     _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, int(args.kmer))
 
 
-def _run_graph(adj, gml_path, csv_path, louvain, limit, resolution, n_comms, seed):
+def _run_graph(adj, gml_path, csv_path, louvain, threshold, resolution, n_comms, seed):
     # Note: This function is separated for testing purposes.
     leiden = not louvain
     if seed is not None:
         seed = int(seed)
-    maker = graph.Maker(adj, gml_path, csv_path, leiden, limit, resolution, n_comms, seed)
+    maker = graph.Maker(adj, gml_path, csv_path, leiden, threshold, resolution, n_comms, seed)
     maker.make_gml_csv_files()
 
 
