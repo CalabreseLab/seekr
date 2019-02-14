@@ -61,7 +61,7 @@ class TestDownloader:
 
     def test_build_url(self):
         downloader = fasta.Downloader()
-        url = downloader.build_url('lncRNA', 'human', None)
+        url, release = downloader.build_url('lncRNA', 'human', None)
         exp_release = self._expected_current_release('human')
         expected = ('ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
                     f'human/release_{exp_release}/gencode.v{exp_release}.lncRNA_transcripts.fa.gz')
@@ -69,7 +69,7 @@ class TestDownloader:
 
     def test_build_url_mouse(self):
         downloader = fasta.Downloader()
-        url = downloader.build_url('all', 'mouse', None)
+        url, release = downloader.build_url('all', 'mouse', None)
         exp_release = self._expected_current_release('mouse')
         expected = ('ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
                     f'mouse/release_{exp_release}/gencode.v{exp_release}.transcripts.fa.gz')
@@ -77,7 +77,7 @@ class TestDownloader:
 
     def test_build_url_pc22(self):
         downloader = fasta.Downloader()
-        url = downloader.build_url('pc', 'human', '22')
+        url, release = downloader.build_url('pc', 'human', '22')
         expected = ('ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
                     'human/release_22/gencode.v22.pc_transcripts.fa.gz')
         assert url == expected

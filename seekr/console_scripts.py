@@ -73,17 +73,17 @@ where m is the number of transcripts in a fasta file and n is 4^kmer.
 
 Examples
 --------
-The default settings take a .fa file and produce a csv file:
+The default settings take a .fa file and produce a labeld csv file:
     $ seekr_kmer_counts rnas.fa -o out.csv
-
-It's usually helpful to label the csv file with transcript names:
-    $ seekr_kmer_counts rnas.fa -o out.csv -lb
 
 To get a compact and efficient .npy file, set the binary flag:
     $ seekr_kmer_counts rnas.fa -o out.npy -b
 
 You can change also change the size of the kmer you're using, and prevent normalization:
     $ seekr_kmer_counts rnas.fa -o out.csv -k 4 -uc -us -nl
+    
+If you ever do not want labels on a csv file:
+    $ seekr_kmer_counts rnas.fa -o out.csv -rl
 
 Notes
 -----
@@ -291,7 +291,7 @@ def _run_canonical_gencode(in_fasta, out_fasta, zeros):
 
 def console_canonical_gencode():
     assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
+    parser = argparse.ArgumentParser(usage=CANONICAL_GENCODE_DOC,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('in_fasta', help='Full path of fasta file.')
     parser.add_argument('out_fasta', help='Full path of filtered fasta file.')
@@ -383,7 +383,9 @@ def console_pearson():
 
 
 def _run_visualize_distro(adj, out_path):
-    visualize_distro(adj, out_path)
+    mean, std = visualize_distro(adj, out_path)
+    print('Mean: ', mean)
+    print('Std. Dev.: ', std)
 
 
 def console_visualize_distro():
@@ -510,14 +512,16 @@ def console_seekr_help():
              'For additional help see the README at: \n'
              'https://github.com/CalabreseLab/seekr.\n\n')
     print(intro)
-    cmds = ['seekr_download',
-            'seekr_norm_vectors',
-            'seekr_kmer_counts',
-            'seerk_pearson',
-            'seekr_graph']
-    docs = [DOWNLOAD_GENCODE_DOC, NORM_VECTORS_DOC, KMER_COUNTS_DOC, PEARSON_DOC, GRAPH_DOC]
-    for c, d in zip(cmds, docs):
-        print(f"{'='*20}\n{c}\n{'='*20}\n{d}")
+    cmds2doc = {'seekr_download': DOWNLOAD_GENCODE_DOC,
+                'seekr_canonical_gencode': CANONICAL_GENCODE_DOC,
+                'seekr_norm_vectors': NORM_VECTORS_DOC,
+                'seekr_kmer_counts': KMER_COUNTS_DOC,
+                'seekr_pearson': PEARSON_DOC,
+                'seekr_visualize_distro': VISUALIZE_DISTRO_DOC,
+                'seekr_graph': GRAPH_DOC}
+    for c, d in cmds2doc.items():
+        print(f"{'='*25}\n{c}\n{'='*25}\n{d}")
     conclusion = ('To see a full description of flags and defaults, '
                   'run any of the commands listed above, without any parameters '
                   '(e.g. "$ seekr_graph").')
+    print(conclusion)

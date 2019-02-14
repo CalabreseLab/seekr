@@ -76,6 +76,7 @@ def visualize_distro(adj, out_path):
     plt.xlabel('r-value')
     plt.legend()
     plt.savefig(out_path, bbox_inches='tight', dpi=600)
+    return mean, std
 
 
 def pvalue(dist, N):

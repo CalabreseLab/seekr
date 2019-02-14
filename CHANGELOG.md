@@ -18,12 +18,15 @@ They will be shuttled into a version number just before the version is released.
 * Example integration script in the test directory.
 * Add legacy option to continue using Louvain instead of Leiden.
 * Travis CI automatic push testing.
+* `seekr_visualize_distro` command makes distribution of r-values.
 
 ### Fixed
 
 * Separate fasta.Downloader's url building from file downloading functionality.
 * Convert arguments to integers appropriately in console_scripts.
 * Add help strings to `seed` docs.
+* 'None' is no longer a part of downloaded file names.
+* Provide unique default path for dumping gml file if one isn't provided.
 
 ### Changed
 

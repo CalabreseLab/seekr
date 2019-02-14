@@ -4,13 +4,15 @@
 
 """
 
-
+import uuid
 import numpy as np
 import pandas as pd
 import igraph
 import networkx
 import louvain
 import leidenalg
+
+from pathlib import Path
 
 from seekr.utils import get_adj
 
@@ -45,6 +47,9 @@ class Maker:
         Contains the membership data for each node
     df: DataFrame
         Stores transcript name and membership
+    tempfile_path: Path
+        Location of temporary gml file if gml_path is not specified.
+        Needed for converting networkx Graph to igraph Graph.
     """
 
     def __init__(self, adj=None, gml_path=None, csv_path=None, leiden=True,
@@ -64,6 +69,9 @@ class Maker:
         self.main_sub = None
         self.partition = None
         self.df = None
+        self.tempfile_path = None
+        if self.gml_path is None:
+            self.tempfile_path = Path(str(uuid.uuid4()) + '.gml')
 
     def apply_threshold(self):
         """Remove low weighted edges from graph."""
@@ -93,19 +101,21 @@ class Maker:
             If True, the graph stored in self.main_sub will be saved
         """
         graph = self.main_sub if main_sub else self.graph
-        networkx.write_gml(graph, self.gml_path)
+        # This gives a way to dump the main_sub even when a gml_path hasn't been assigned.
+        gml_path = self.gml_path if self.gml_path else self.tempfile_path
+        networkx.write_gml(graph, gml_path)
 
     def get_partition(self, gml_path=None):
-        """Run community detection to call communities on the graph
+        """Run community detection on igraph Graph from .gml file.
 
         Parameters
         ----------
         gml_path: str (default=None)
             Alternative location for loading in .gml file. Defaults to self.gml_path.
         """
-        if gml_path is None:
-            gml_path = self.gml_path
-        graph = igraph.Graph.Read_GML(gml_path)
+        paths = (gml_path, self.gml_path, self.tempfile_path)
+        gml_path = next(path for path in paths if path is not None)
+        graph = igraph.Graph.Read_GML(str(gml_path))
         extra_args = {}
         if self.seed is not None:
             if self.detector is louvain:
@@ -166,8 +176,11 @@ class Maker:
         self.save(True)
         self.get_partition()
         name2group = self.membership2attribute()
-        self.save()
+        if self.gml_path is not None:  # This is outside of the save function intentionally.
+            self.save()
         self.df = pd.DataFrame.from_dict(name2group, orient='index')
         self.df.columns = ['Group']
         if self.csv_path is not None:
             self.df.to_csv(self.csv_path)
+        if self.tempfile_path:
+            self.tempfile_path.unlink()

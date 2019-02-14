@@ -349,6 +349,8 @@ class Downloader:
         -------
         url: str
             FTP file to download.
+        release: str
+            Name of specific release to download (e.g. 'M5'). Will not be None.
         """
         error_msg = "'biotype' must be in ('all', 'pc', 'lncRNA')."
         assert biotype in ('all', 'pc', 'lncRNA'), error_msg
@@ -364,7 +366,7 @@ class Downloader:
         url_base = 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
         url = f'{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz'
         url = url_base + url
-        return url
+        return url, release
 
     def gunzip(self, gzip_path):
         """Unzip a gzipped file and remove orginal.
@@ -396,7 +398,7 @@ class Downloader:
         unzip: bool (default=True)
             If False, do not gunzip fasta file after downloading
         """
-        url = self.build_url(biotype, species, release)
+        url, release = self.build_url(biotype, species, release)
         if out_path is not None:
             error_msg = "Even if unzipping, 'out_path' must end with '.gz'."
             assert out_path.endswith('.gz'), error_msg
