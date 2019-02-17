@@ -14,11 +14,27 @@ They will be shuttled into a version number just before the version is released.
 
 ### Added
 
+*
+### Fixed
+
+*
+
+### Changed
+
+*
+
+---
+
+## 1.3.0
+
+### Added
+
 * `seekr_canonical_gencode` command line script filters for -001 transcripts.
 * Example integration script in the test directory.
 * Add legacy option to continue using Louvain instead of Leiden.
 * Travis CI automatic push testing.
 * `seekr_visualize_distro` command makes distribution of r-values.
+* `seekr_domain_pearson` command line script compares queries and domains in targets.
 
 ### Fixed
 

@@ -30,8 +30,8 @@ from os.path import exists, join
 from os import makedirs
 from ushuffle import shuffle
 
-from .my_tqdm import my_tqdm, my_trange
-from .fasta_reader import Reader
+from seekr.my_tqdm import my_tqdm, my_trange
+from seekr.fasta_reader import Reader
 
 
 class Maker:
@@ -74,7 +74,7 @@ class Maker:
         if self.outnames is not None:
             pickle.dump(common_name_list, open(self.outnames, 'wb'))
 
-    def filter1(self, zeros=1):
+    def filter1(self, zeros=1, unique_per_gene=False):
         """Filters a fasta file to only keep *1 transcript names.
 
         Parameters
@@ -82,21 +82,55 @@ class Maker:
         zeros: int (default=1)
             The number of zeros preceding `1`.
             (e.g. zeros=1 will filter for `01` transcripts. zeros=2 will filter for `001`)
+        unique_per_gene: bool (default=False)
+            If True, when multiple 01 isoforms exist per gene, only keep the smaller name.
+            (e.g. if XIST-001 and XIST-201 both exist, keep XIST-001)
 
         Returns
         -------
-        common_name_list : list
+        common_name_list: List[str]
             The common style names of the sequences which are being kept
         """
         common_name_list = []
         with open(self.outfasta, 'w') as outfasta:
+            current_gene = ''
+            best_name_for_gene = ''
+            best_seq_for_gene = ''
             for name, seq in self.data:
-                common_name = name.split('|')[4]
-                if common_name[-(zeros+1):] == '0'*zeros+'1':
-                    common_name_list.append(common_name)
-                    outfasta.write(name+'\n')
-                    outfasta.write(seq+'\n')
-
+                name_data = name.split('|')
+                common_name = name_data[4]
+                gene = name_data[1]
+                canonical = common_name[-(zeros+1):] == '0'*zeros+'1'
+                if canonical:
+                    if not unique_per_gene:
+                        common_name_list.append(common_name)
+                        outfasta.write(name+'\n')
+                        outfasta.write(seq+'\n')
+                        continue
+                    new_gene = gene != current_gene
+                    if not best_name_for_gene:
+                        best_name_for_gene = name
+                        best_seq_for_gene = seq
+                        current_gene = gene
+                    elif best_seq_for_gene and not new_gene:
+                        new_is_better = common_name[-3:] < best_name_for_gene.split('|')[4][-3:]
+                        if new_is_better:
+                            best_name_for_gene = name
+                            best_seq_for_gene = seq
+                        warning = (f'Gene {gene} has at least two viable isoforms. '
+                                   f'Keeping: {best_name_for_gene}')
+                        print(warning)
+                    elif new_gene:
+                        common_name_list.append(best_name_for_gene.split('|')[4])
+                        outfasta.write(best_name_for_gene+'\n')
+                        outfasta.write(best_seq_for_gene + '\n')
+                        current_gene = gene
+                        best_name_for_gene = name
+                        best_seq_for_gene = seq
+            if best_seq_for_gene:
+                common_name_list.append(common_name)
+                outfasta.write(best_name_for_gene + '\n')
+                outfasta.write(best_seq_for_gene + '\n')
         self._name_dump(common_name_list)
         return common_name_list
 

@@ -5,8 +5,9 @@ import pandas as pd
 
 from seekr import fasta
 from seekr import graph
+from seekr import pearson
 from seekr.kmer_counts import BasicCounter
-from seekr.pearson import pearson, visualize_distro
+
 # TODO (Dan) fix names
 from seekr.pwm import CountsWeighter
 
@@ -57,6 +58,9 @@ To filter transcripts ending in 01, an input and output fasta file are required:
 
 If you want to specifically find transcripts with the ending 001:
     $ seekr_canonical_gencode rnas.fa rnas01.fa -z 2
+    
+To enforce one isoform per ENSG id (specifically, the smallest 01 isoform):
+    $ seekr_canonical_gencode rnas.fa rnas01_1per.fa -u
 
 Issues
 ------
@@ -249,6 +253,45 @@ Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 """
 
 
+DOMAIN_PEARSON_DOC = """
+Description
+-----------
+# Find domains of similarity between query transcripts and tiles of target transcripts.
+
+Examples
+--------
+This tool requires several pieces of data:
+1. A fasta file containing query sequences.
+2. A second fasta file containing target sequences which will be tiled.
+3. A mean vector for normalization (e.g. from `seekr_norm_vectors`).
+4. A std vector for standardization (e.g. from `seekr_norm_vectors`).
+
+For brevity in the documentation below, 
+we will assume that these required data have been stored in a variable:
+    $ REQUIRED="queries.fa targets.fa mean.npy std.npy"
+    
+To see the r-values, pass a location for storing them in a csv file.
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv
+    
+Intepretation of r-value elements can be aided by viewing them as percentiles:
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv -p percentiles.csv
+
+Parameters you might pass to `seekr_kmer_counts` can also be passed.
+If you change --kmer, ensure that your mean.npy and std.npy files match:
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv -nl -k 5
+    
+You can also change the size of the domain,
+and how far you slide along the target sequence before creating another domain:
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv -w 1200 -s 150
+
+Issues
+------
+Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
+
+---
+"""
+
+
 def _parse_args_or_exit(parser):
     """"""
     if len(sys.argv) == 1:
@@ -283,10 +326,10 @@ def console_download_gencode():
     _run_download_gencode(args.biotype, args.species, args.release, args.out_path, args.zip)
 
 
-def _run_canonical_gencode(in_fasta, out_fasta, zeros):
+def _run_canonical_gencode(in_fasta, out_fasta, zeros, unique_per_gene):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     maker = fasta.Maker(in_fasta, out_fasta)
-    maker.filter1(zeros)
+    maker.filter1(zeros, unique_per_gene)
 
 
 def console_canonical_gencode():
@@ -297,8 +340,10 @@ def console_canonical_gencode():
     parser.add_argument('out_fasta', help='Full path of filtered fasta file.')
     parser.add_argument('-z', '--zeros', default=1,
                         help='Number of zeroes needed to be considered canonical.')
+    parser.add_argument('-u', '--unique_per_gene', action='store_true',
+                        help='Set to enforce a limit of one isoform per ENSG id.')
     args = _parse_args_or_exit(parser)
-    _run_canonical_gencode(args.in_fasta, args.out_fasta, args.zeros)
+    _run_canonical_gencode(args.in_fasta, args.out_fasta, args.zeros, args.unique_per_gene)
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
@@ -355,9 +400,9 @@ def _run_pearson(counts1, counts2, outfile, binary_input, binary_output):
         names2 = counts2.index.values
 
     if binary_output:
-        pearson(counts1, counts2, outfile=outfile)
+        pearson.pearson(counts1, counts2, outfile=outfile)
     else:
-        dist = pearson(counts1, counts2)
+        dist = pearson.pearson(counts1, counts2)
         dist = pd.DataFrame(dist, names1, names2)
         dist.to_csv(outfile)
 
@@ -383,7 +428,7 @@ def console_pearson():
 
 
 def _run_visualize_distro(adj, out_path):
-    mean, std = visualize_distro(adj, out_path)
+    mean, std = pearson.visualize_distro(adj, out_path)
     print('Mean: ', mean)
     print('Std. Dev.: ', std)
 
@@ -506,6 +551,42 @@ def console_pwms():
     _run_pwms(args.pwm_dir, args.counts, int(args.kmer), args.out_path)
 
 
+def _run_domain_pearson(query_path, target_path, mean, std, r_values,
+                        percentiles, kmer, log2, window, slide):
+    # Note: This function is separated for testing purposes.
+    domain_pearson = pearson.DomainPearson(query_path, target_path, r_values, percentiles, mean,
+                                           std, log2, kmer, window, slide)
+    domain_pearson.run()
+
+
+def console_domain_pearson():
+    assert sys.version_info[0] == 3, 'Python version must be 3.x'
+    parser = argparse.ArgumentParser(usage=DOMAIN_PEARSON_DOC,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('query_path',
+                        help='Path to fa file containing transcripts of interest (e.g. Xist-2kb).')
+    parser.add_argument('target_path', help=('Path to second fa file which will be tiled to find '
+                                             'domains similar to query transcripts.'))
+    parser.add_argument('mean', help='Path to npy file containing mean array for normalization.')
+    parser.add_argument('std', help='Path to npy file containing std array for standardization.')
+    parser.add_argument('--r_values', '-r', help='Path to new csv file for storing r-values.')
+    parser.add_argument('--percentiles', '-p', help='Path to new csv file for storing percentiles.')
+    parser.add_argument('-k', '--kmer', default=6,
+                        help='Length of kmers you want to count.')
+    parser.add_argument('-nl', '--no_log2', action='store_false',
+                        help='Select if kmer counts should not be log2 transformed.')
+    parser.add_argument('--window', '-w', default=1000,
+                        help=('Size of tile/domain to be created from target transcripts for '
+                              'comparison against queries.'))
+    parser.add_argument('--slide', '-s', default=100,
+                        help=('Number of basepairs to move along target transcript before creating '
+                              'another tile/domain.'))
+    args = _parse_args_or_exit(parser)
+    _run_domain_pearson(args.query_path, args.target_path, args.mean, args.std, args.r_values,
+                        args.percentiles, int(args.kmer), args.no_log2, int(args.window),
+                        args.slide)
+
+
 def console_seekr_help():
     intro = ('Welcome to SEEKR! \n'
              'Below is a description of all SEEKR commands.\n'
@@ -518,7 +599,8 @@ def console_seekr_help():
                 'seekr_kmer_counts': KMER_COUNTS_DOC,
                 'seekr_pearson': PEARSON_DOC,
                 'seekr_visualize_distro': VISUALIZE_DISTRO_DOC,
-                'seekr_graph': GRAPH_DOC}
+                'seekr_graph': GRAPH_DOC,
+                'seekr_domain_pearson': DOMAIN_PEARSON_DOC}
     for c, d in cmds2doc.items():
         print(f"{'='*25}\n{c}\n{'='*25}\n{d}")
     conclusion = ('To see a full description of flags and defaults, '

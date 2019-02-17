@@ -23,3 +23,8 @@ class TestPearson:
         dist = pearson.pearson(counts1, counts1)
         expected = np.ones((2, 2))
         assert np.allclose(dist, expected)
+
+
+class TestDomainPearson:
+    # TODO (jessime) Add tests!
+    pass

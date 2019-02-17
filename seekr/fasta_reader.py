@@ -5,6 +5,7 @@ Created on Mon Jul  4 13:10:49 2016
 @author: jessime
 """
 
+
 class Reader():
     """Fixes any compatibility issues a fasta file might have with this code.
 

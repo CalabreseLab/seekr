@@ -37,8 +37,8 @@ from collections import defaultdict
 from itertools import product
 from pandas import DataFrame
 
-from .my_tqdm import my_tqdm
-from .fasta_reader import Reader
+from seekr.my_tqdm import my_tqdm
+from seekr.fasta_reader import Reader
 
 
 class BasicCounter:
@@ -57,8 +57,8 @@ class BasicCounter:
     mean: bool, np.array, str (default=True)
         Set the mean to 0 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated mean array.
-    std: bool or str (default=True)
-        Set the std. dev. to 1 for each kmer/column of the count matrix
+    std: bool, np.array, str (default=True)
+        Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
     log2: bool (default=True)
         If False, do not apply a log2 transform to the count matrix

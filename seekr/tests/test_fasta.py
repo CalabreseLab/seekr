@@ -23,6 +23,19 @@ class TestMaker:
         names = maker.filter1(2)
         assert names == ['OR4F5-001']
 
+    def test_filter01_1per(self, tmpdir, capsys):
+        infasta = 'tests/data/example2.fa'
+        infasta = pkg_resources.resource_filename('seekr', infasta)
+        maker = fasta.Maker(infasta, str(Path(tmpdir, 'out.fa')))
+        names = maker.filter1(one_per_gene=True)
+        assert names == ['JK-001', 'JK2-001']
+        captured = capsys.readouterr()
+        expected = ('Gene ENSG1 has at least two viable isoforms. '
+                    'Keeping: >ENST1|ENSG1|OTTHUMG1|OTTHUMT1|JK-001|JK|918|CDS:1-918|\n'
+                    'Gene ENSG2 has at least two viable isoforms. '
+                    'Keeping: >ENST4|ENSG2|OTTHUMG2|OTTHUMT4|JK2-001|JK2|918|CDS:1-918|\n')
+        assert captured.out == expected
+
 
 class TestRandomMaker:
     pass
