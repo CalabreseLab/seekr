@@ -8,3 +8,9 @@ install:
   - pip install -e .
 # command to run tests
 script: python -m pytest -p no:warnings -v
+notifications:
+  email:
+    recipients:
+      - jessime.kirk@gmail.com
+      - dsprague@med.unc.edu
+      - mauro_calabrese@med.unc.edu
