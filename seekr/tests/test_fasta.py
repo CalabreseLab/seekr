@@ -27,7 +27,7 @@ class TestMaker:
         infasta = 'tests/data/example2.fa'
         infasta = pkg_resources.resource_filename('seekr', infasta)
         maker = fasta.Maker(infasta, str(Path(tmpdir, 'out.fa')))
-        names = maker.filter1(one_per_gene=True)
+        names = maker.filter1(unique_per_gene=True)
         assert names == ['JK-001', 'JK2-001']
         captured = capsys.readouterr()
         expected = ('Gene ENSG1 has at least two viable isoforms. '
