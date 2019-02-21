@@ -134,9 +134,12 @@ This can be useful for determining a threshold for the adjacency matrix.
 
 Examples
 --------
-There are no optional flags for this utility. 
 You must pass an adjacency matrix and an output path.
     $ seekr_visualize_distro adj.csv adj.pdf
+    
+For large arrays, it's likely sufficient to visualize a portion of the adjacency matrix.
+You can pass a float between 0 and 1 to the `-s` flag:
+    $ seekr_visualize_distro adj.csv adj.pdf -s .1
 
 Notes
 -----
@@ -427,8 +430,10 @@ def console_pearson():
                  args.binary_input, args.binary_output)
 
 
-def _run_visualize_distro(adj, out_path):
-    mean, std = pearson.visualize_distro(adj, out_path)
+def _run_visualize_distro(adj, out_path, sample):
+    if sample is not None:
+        sample = float(sample)
+    mean, std = pearson.visualize_distro(adj, out_path, sample)
     print('Mean: ', mean)
     print('Std. Dev.: ', std)
 
@@ -440,8 +445,10 @@ def console_visualize_distro():
     parser.add_argument('adj',
                         help='Path to either .csv or .npy file, representing adjacency matrix')
     parser.add_argument('out_path', help='Full path of a output image.')
+    parser.add_argument('-s', '--sample', default=None,
+                        help='Float representing random portion of adj to visualize.')
     args = _parse_args_or_exit(parser)
-    _run_visualize_distro(args.adj, args.out_path)
+    _run_visualize_distro(args.adj, args.out_path, args.sample)
 
 
 def _run_norm_vectors(fasta, mean_vector, std_vector, kmer):

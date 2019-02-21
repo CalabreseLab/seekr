@@ -25,9 +25,11 @@ class Maker:
     adj: str | ndarray | DataFrame
         (Path to) adjacency matrix describing weighted edges between nodes.
     gml_path: str
-        Path to output file for new network
+        Path to output file for new network.
     csv_path: str
-        Path to two column file storing transcript name and membership
+        Path to two column file storing transcript name and membership.
+    leiden: bool (default=True)
+        If set to False, use the Louvain algorithm for detection instead of Leiden.
     threshold: float (default=0)
         Value for thresholding adjacency matrix. Below this threshold, all edges are 0.
     gamma: float (default=1)

@@ -60,16 +60,23 @@ def pearson(counts1, counts2, row_standardize=True, outfile=None):
     return dist
 
 
-def visualize_distro(adj, out_path):
+def visualize_distro(adj, out_path, sample=None):
     adj = get_adj(adj)
     if isinstance(adj, pd.DataFrame):
         adj = adj.values
-    flat = adj.flatten()
+    if sample is not None:
+        if not 0 < sample <= 1:
+            raise ValueError('Value of sample must satisfy: 0 < sample <= 1')
+        size = int(len(adj) * sample)
+        rows = np.random.choice(len(adj), size, replace=False)
+        cols = np.random.choice(len(adj), size, replace=False)
+        adj = adj[rows][:, cols]
+    flat = adj.ravel()
     mean = flat.mean()
     std = flat.std()
     std1 = mean + std
     std2 = mean + (2*std)
-    ax = sns.distplot(flat, label='Distribution')
+    ax = sns.distplot(flat, label=f'Distro (n={flat.size})')
     y_max = ax.get_ylim()[1]
     plt.plot((mean, mean), (0, y_max/2), label='Mean')
     plt.plot((std1, std1), (0, y_max/2), label='Mean + 1 std. dev.')
