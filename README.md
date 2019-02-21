@@ -48,15 +48,16 @@ $ seekr
 ### Quickstart
 
 To get a .csv file of communities for every transcript in a small .fa file called  `example.fa`,
-(where RNAs have been normalized to a dataset from [GENCODE](https://www.gencodegenes.org/),
+(where RNAs have been normalized to a data set of canonical transcripts from [GENCODE](https://www.gencodegenes.org/),
 we would run:
 
 ```commandline
 $ seekr_download lncRNA
-$ seekr_norm_vectors gencode.v29.lncRNA_transcripts.fa  # Name may change with GENCODE updates.
-$ seekr_kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy -lb
+$ seekr_canonical_gencode v29_lncRNA.fa v29-01.fa # Name may change with GENCODE updates.
+$ seekr_norm_vectors v29-01.fa
+$ seekr_kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy
 $ seekr_pearson 6mers.csv 6mers.csv -o example_vs_self.csv
-$ seekr_graph example_vs_self.csv -g example_vs_self.gml -c communities.csv
+$ seekr_graph example_vs_self.csv 0.13 -g example_vs_self.gml -c communities.csv
 $ cat example_vs_self.csv
 ```
 
@@ -136,7 +137,7 @@ We'll set a couple flags:
 * `--label` so there are column and row labels
 
 ```commandline
-$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nb -lb
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nb
 $ cat out_counts.csv
 
 ```
@@ -146,10 +147,10 @@ You can also see the output of this command
 
 
 If we want a more compact, efficient numpy file,
-we can add the `--binary` and remove the `--label` flag:
+we can add the `--binary` and `--remove_label` flags:
 
 ```commandline
-$ seekr_kmer_counts example.fa -o out_counts.npy -k 2 --binary
+$ seekr_kmer_counts example.fa -o out_counts.npy -k 2 --binary --remove_label
 ```
 
 **Note:** This numpy file is binary, so you won't be able to view it directly.

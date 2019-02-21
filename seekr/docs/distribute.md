@@ -3,10 +3,17 @@
 Before distributing, the test suite should pass all tests. Run:
 
 ```
+$ cd /path/to/seekr/
 $ pytest -p no:warnings -v
 ```
 
-to generate a report. 
+to generate a report. And 
+
+```
+$./seekr/tests/integration.sh
+```
+
+to make sure the main pipeline runs without errors.
 
 # Create new PYPI version
 
