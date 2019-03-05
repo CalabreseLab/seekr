@@ -121,6 +121,9 @@ class DomainPearson:
         Path to fasta file containing transcripts of interest (e.g. Xist-2kb).
     target_path: str (default=None)
         Path to second fasta file which will be tiled to find domains similar to query transcripts.
+    reference_path: str (default=None)
+        Path to third fasta file containing sequences to be used for comparison when calculating
+        percentile values of the r-values between the query and targets (e.g. mouse transcriptome).
     r_values_path: str (default=None)
         Path to csv file containing pairwise comparisons between queries and target tiles.
     percentiles_path: str (default=None)
@@ -148,7 +151,7 @@ class DomainPearson:
         Names of query transcripts from fasta file.
     column_labels List[str]
         Names of tiles as created at "{target fasta header}_{tile number}".
-    r_values: List[ndarray] | DataFrame
+    r_values: DataFrame
         n by m array of Pearson r-values.
         n is the number of query transcripts and m is the total number of target tiles/domains.
     percentiles: DataFrame
@@ -161,10 +164,15 @@ class DomainPearson:
     There are 'clever' ways of doing this that are a lot messier and harder to maintain.
     """
 
-    def __init__(self, query_path=None, target_path=None, r_values_path=None, percentiles_path=None,
-                 mean=True, std=True, log2=True, k=6, window=1000, slide=100):
+    def __init__(self, query_path=None, target_path=None, reference_path=None, r_values_path=None,
+                 percentiles_path=None, mean=True, std=True, log2=True,
+                 k=6, window=1000, slide=100):
         self.query_path = query_path
         self.target_path = target_path
+        if reference_path is None and percentiles_path is not None:
+            msg = "To calculate percentiles, pass a path to a reference fasta file."
+            raise ValueError(msg)
+        self.reference_path = reference_path
         self.r_values_path = r_values_path
         self.percentiles_path = percentiles_path
         self.mean = mean
@@ -176,7 +184,7 @@ class DomainPearson:
 
         self.row_labels = []
         self.column_labels = []
-        self.r_values = []
+        self.r_values = None
         self.percentiles = None
 
     def make_query_counts(self):
@@ -210,8 +218,10 @@ class DomainPearson:
         tiles = []
         upper = max(1, len(target) - self.window + 1)
         for i in range(0, upper, self.slide):
-            tiles.append(target[i:i + self.window])
-        counter = BasicCounter(k=self.k, mean=self.mean, std=self.std, log2=self.log2, silent=True)
+            end = i + self.window
+            tiles.append(target[i: end])
+        tiles[-1] += target[end:]
+        counter = BasicCounter(k=self.k, mean=self.mean, std=self.std, log2=self.log2)
         counter.seqs = tiles
         counter.get_counts()
         return counter.counts
@@ -233,17 +243,64 @@ class DomainPearson:
         target_counts = self.get_target_tile_counts(target)
         self.update_column_labels(target_header, target_counts)
         r_vals = pearson(query_counts, target_counts)
-        self.r_values.append(r_vals)
+        return r_vals
 
-    def r_values2df(self):
+    def r_values2df(self, r_values):
         """Convert r_values from list of numpy arrays to a labeled DataFrame."""
-        self.r_values = np.hstack(self.r_values)
+        self.r_values = np.hstack(r_values)
         self.r_values = pd.DataFrame(data=self.r_values,
                                      index=self.row_labels,
                                      columns=self.column_labels)
 
-    def calc_percentiles(self):
+    def percentileofscore(self, a, score):
+        """Same as scipy's percentileofscore where kind='rank'.
+
+        See: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py#L1846
+
+        Notes
+        -----
+        This is copied here to avoid another large dependency.
+        If scipy eventually becomes necessary, remove this code.
+        """
+        left = np.count_nonzero(a < score)
+        right = np.count_nonzero(a <= score)
+        pct = (right + left + (1 if right > left else 0)) * 50.0/len(a)
+        return pct
+
+    def calc_percentiles(self, query_counts):
+        """Find percentiles of elements in r_values, across each row/query, relative to a reference.
+
+        Notes
+        -----
+        Repeatedly calling `percentileofscore` is probably really slow.
+        There should be some way of speeding things up, similar to `calc_internal_percentiles`.
+        I don't have enough time to look into it now.
+
+        Returns
+        -------
+        percentiles_df: DataFame
+            Percentile equivalent of each element in r_values, across each row.
+        """
+        counter = BasicCounter(infasta=self.reference_path, k=self.k, mean=self.mean, std=self.std,
+                               log2=self.log2)
+        counter.get_counts()
+        query_vs_ref_rvals = pearson(query_counts, counter.counts)[0]
+        percentiles_df = pd.DataFrame(columns=self.r_values.columns)
+        for index, row in self.r_values.iterrows():
+            percentiles = []
+            for query_vs_tile_rval in row:
+                percentiles.append(self.percentileofscore(query_vs_ref_rvals,
+                                                          query_vs_tile_rval))
+            percentiles_df.loc[index] = percentiles
+        return percentiles_df
+
+    def calc_internal_percentiles(self):
         """Calculate percentile scores of each element in r_values, across each row/query.
+
+        Notes
+        -----
+        This method doesn't need a reference to calculate percentiles.
+        It currently isn't called durning DomainPearson.run()
 
         Returns
         -------
@@ -265,146 +322,9 @@ class DomainPearson:
         query_counts = self.make_query_counts()
         target_reader = Reader(self.target_path)
         target_headers_seqs = target_reader.get_data(tuples_only=True)
+        r_values = []
         for target_header, target in my_tqdm()(target_headers_seqs):
-            self.compare_query_target(query_counts, target_header, target)
-        self.r_values2df()
-        self.percentiles = self.calc_percentiles()
-        self.save()
-
-
-class StreamDist:
-    """Pearson's R from fasta files too large for memory."""
-
-    def __init__(self, infasta=None, query=None, outfile=None,
-                 mean=None, std_dev=None, k=6, n=0,
-                 norm=True, binary=True, nb=False):
-        self.infasta = infasta
-        self.query = query
-        self.outfile = outfile
-        self.mean = mean
-        self.std_dev = std_dev
-        self.k = k
-        self.norm = norm
-        self.binary = binary
-        self.nb = nb
-
-        self.counter = BasicCounter(k=self.k, silent=True)
-        self.query_counts = None
-        self.dist = None
-        self.names = None
-        self.n = n
-        self.i = 0
-
-        #Annoying, but necessary for init of self.dist
-        if self.mean is not None or self.std_dev is not None:
-            assert self.n > 0, 'Please provide number of sequences in fasta.'
-
-    def get_names(self):
-        """Stream over the file again and pull out header lines."""
-        names = []
-        with open(self.infasta) as infile:
-            bar = self._progress()
-            for line in bar(infile):
-                if line[0] == '>':
-                    names.append(line.strip())
-        self.names = names
-
-    def _progress(self):
-        if self.nb:
-            return tqdm_notebook
-        else:
-            return tqdm
-
-    def _single_count(self, line):
-        seq = line.strip().upper()
-        row = np.zeros(4**self.k, dtype=np.float32)
-        self.counter.seqs = seq
-        row = self.counter.occurrences(row, seq)
-        return row
-
-    def _stream_seqs(self, func):
-        """Perform a function on the counts of each fasta sequence"""
-        with open(self.infasta) as infasta:
-            bar = self._progress()
-            if self.n == 0:
-                total = None
-            else:
-                total = self.n * 2
-            for line in bar(infasta, total=total):
-                if line[0] != '>':
-                    counts = self._single_count(line)
-                    func(counts)
-
-    def make_query_counts(self):
-        with open(self.query) as query:
-            seq = query.readlines()[1].strip().upper()
-        self.query_counts = self._single_count(seq)
-        if self.norm:
-            self.query_counts = self.col_norm(self.query_counts)
-        self.query_counts = self.row_norm(self.query_counts)
-
-    def online_moments(self, counts):
-        """Update the mean and std. vectors"""
-        self.n += 1
-        delta = counts - self.mean
-        self.mean = self.mean + delta/self.n
-        self.std_dev = self.std_dev + delta*(counts - self.mean)
-
-    def calc_norm_vectors(self):
-        self.mean = np.zeros(4**self.k, dtype=np.float32)
-        self.std_dev = np.zeros(4**self.k, dtype=np.float32)
-        self._stream_seqs(self.online_moments)
-        self.std_dev = self.std_dev /self.n
-        self.std_dev = np.sqrt(self.std_dev)
-
-    def norm_vectors(self):
-        """Either load or count norm vectors if they are not passed as arrays."""
-        if self.mean is None and self.std_dev is None:
-            self.calc_norm_vectors()
-        elif isinstance(self.mean, str) and isinstance(self.std_dev, str):
-            self.mean = np.load(self.mean).astype(dtype=np.float32)
-            self.std_dev = np.load(self.std_dev).astype(dtype=np.float32)
-        else:
-            pass
-
-    def col_norm(self, counts):
-        """Column normalize"""
-        counts = counts - self.mean
-        counts = counts / self.std_dev
-        return counts
-
-    def row_norm(self, counts):
-        """Row normalize"""
-        counts = (counts.T - np.mean(counts)).T
-        counts = (counts.T / np.std(counts)).T
-        return counts
-
-    def calc_dist(self, counts):
-        if self.norm:
-            counts = self.col_norm(counts)
-        counts = self.row_norm(counts)
-        #self.dist[self.i] = np.inner(self.query_counts, counts)/len(counts)
-        self.dist[self.i] = np.sum(self.query_counts * counts)/len(counts)
-        self.i += 1
-
-    def save(self):
-        """Saves the counts appropriately based on current settings"""
-        if self.outfile is not None:
-            if not self.binary:
-                np.savetxt(self.outfile, self.dist, delimiter=',')
-            else:
-                try:
-                    np.save(self.outfile, self.dist)
-                except AttributeError:
-                    outfile = open(self.outfile, 'w+b')
-                    dump(self.dist.tolist(), outfile)
-                    outfile.close()
-
-    def make_dist(self):
-        """Main"""
-        if self.norm:
-            self.norm_vectors()
-        self.make_query_counts()
-        self.dist = np.zeros(self.n, dtype=np.float32)
-        self._stream_seqs(self.calc_dist)
+            r_values.append(self.compare_query_target(query_counts, target_header, target))
+        self.r_values2df(r_values)
+        self.percentiles = self.calc_percentiles(query_counts)
         self.save()

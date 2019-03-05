@@ -14,14 +14,16 @@ They will be shuttled into a version number just before the version is released.
 
 ### Added
 
-*
+* seekr_pwms is now callable from the command line
+
 ### Fixed
 
-*
+* 
 
 ### Changed
 
-*
+* In `seekr_domain_pearson`, change the way percentiles are calculated, to now be relative to a reference fasta.
+* Improve error when passing a bad release to `seekr_download_gencode`.
 
 ---
 

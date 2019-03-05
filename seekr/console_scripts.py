@@ -229,7 +229,7 @@ Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 PWM_DOC = """
 Description
 -----------
-# TODO (Dan) Add a one line description of this tool.
+Weight kmer profiles by protein binding PWMs to infer protein binding likelihood.
 
 Examples
 --------
@@ -237,7 +237,6 @@ A standard run of this tool needs three things:
 1. A directory of PWM files
 2. A counts file (produced from seekr_kmer_counts)
 3. An output path
-    # TODO (DAN) update script name here too. And consider changing output name?
     $ seekr_pwm path/to/pwms/ kc_out.csv -o pwm_weight_sums.csv
 
 Numpy files can also be passed as input, but .csv files are the only output:
@@ -276,8 +275,9 @@ we will assume that these required data have been stored in a variable:
 To see the r-values, pass a location for storing them in a csv file.
     $ seekr_domain_pearson $REQUIRED -r r_values.csv
     
-Intepretation of r-value elements can be aided by viewing them as percentiles:
-    $ seekr_domain_pearson $REQUIRED -r r_values.csv -p percentiles.csv
+Intepretation of r-value elements can be aided by viewing them as percentiles.
+If you want percentiles, you must also pass a reference fasta path:
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv -p percentiles.csv -rp reference.fa
 
 Parameters you might pass to `seekr_kmer_counts` can also be passed.
 If you change --kmer, ensure that your mean.npy and std.npy files match:
@@ -542,7 +542,7 @@ def _run_pwms(pwm_dir, counts, kmer, out_path):
     counts_weighter.run()
 
 
-def console_pwms():
+def console_pwm():
     # TODO (Dan) name this function
     assert sys.version_info[0] == 3, 'Python version must be 3.x'
     parser = argparse.ArgumentParser(usage=PWM_DOC,
@@ -558,11 +558,11 @@ def console_pwms():
     _run_pwms(args.pwm_dir, args.counts, int(args.kmer), args.out_path)
 
 
-def _run_domain_pearson(query_path, target_path, mean, std, r_values,
+def _run_domain_pearson(query_path, target_path, reference_path, mean, std, r_values,
                         percentiles, kmer, log2, window, slide):
-    # Note: This function is separated for testing purposes.
-    domain_pearson = pearson.DomainPearson(query_path, target_path, r_values, percentiles, mean,
-                                           std, log2, kmer, window, slide)
+    # Note: This function is separated for testing
+    domain_pearson = pearson.DomainPearson(query_path, target_path, reference_path, r_values,
+                                           percentiles, mean, std, log2, kmer, window, slide)
     domain_pearson.run()
 
 
@@ -576,22 +576,26 @@ def console_domain_pearson():
                                              'domains similar to query transcripts.'))
     parser.add_argument('mean', help='Path to npy file containing mean array for normalization.')
     parser.add_argument('std', help='Path to npy file containing std array for standardization.')
-    parser.add_argument('--r_values', '-r', help='Path to new csv file for storing r-values.')
-    parser.add_argument('--percentiles', '-p', help='Path to new csv file for storing percentiles.')
+    parser.add_argument('-rp', '--reference_path', default=None,
+                        help=('Path to third fasta file containing sequences to be used for '
+                              'comparison when calculating percentile values of the r-values '
+                              'between the query and targets (e.g. mouse transcriptome).'))
+    parser.add_argument('-r', '--r_values', help='Path to new csv file for storing r-values.')
+    parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
     parser.add_argument('-nl', '--no_log2', action='store_false',
                         help='Select if kmer counts should not be log2 transformed.')
-    parser.add_argument('--window', '-w', default=1000,
+    parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
                               'comparison against queries.'))
-    parser.add_argument('--slide', '-s', default=100,
+    parser.add_argument('-s', '--slide', default=100,
                         help=('Number of basepairs to move along target transcript before creating '
                               'another tile/domain.'))
     args = _parse_args_or_exit(parser)
-    _run_domain_pearson(args.query_path, args.target_path, args.mean, args.std, args.r_values,
-                        args.percentiles, int(args.kmer), args.no_log2, int(args.window),
-                        args.slide)
+    _run_domain_pearson(args.query_path, args.target_path, args.reference_path, args.mean, args.std,
+                        args.r_values, args.percentiles, int(args.kmer), args.no_log2,
+                        int(args.window), args.slide)
 
 
 def console_seekr_help():
@@ -600,13 +604,14 @@ def console_seekr_help():
              'For additional help see the README at: \n'
              'https://github.com/CalabreseLab/seekr.\n\n')
     print(intro)
-    cmds2doc = {'seekr_download': DOWNLOAD_GENCODE_DOC,
+    cmds2doc = {'seekr_download_gencode': DOWNLOAD_GENCODE_DOC,
                 'seekr_canonical_gencode': CANONICAL_GENCODE_DOC,
                 'seekr_norm_vectors': NORM_VECTORS_DOC,
                 'seekr_kmer_counts': KMER_COUNTS_DOC,
                 'seekr_pearson': PEARSON_DOC,
                 'seekr_visualize_distro': VISUALIZE_DISTRO_DOC,
                 'seekr_graph': GRAPH_DOC,
+                'seekr_pmw': PWM_DOC,
                 'seekr_domain_pearson': DOMAIN_PEARSON_DOC}
     for c, d in cmds2doc.items():
         print(f"{'='*25}\n{c}\n{'='*25}\n{d}")

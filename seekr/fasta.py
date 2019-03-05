@@ -20,8 +20,9 @@ Issues
 import os
 import gzip
 import pickle
-import requests
 import shutil
+import ftplib
+import requests
 import urllib.request
 import numpy as np
 
@@ -436,10 +437,17 @@ class Downloader:
         if out_path is not None:
             error_msg = "Even if unzipping, 'out_path' must end with '.gz'."
             assert out_path.endswith('.gz'), error_msg
-        with closing(urllib.request.urlopen(url)) as r:
-            if out_path is None:
-                out_path = f'v{release}_{biotype}.fa.gz'
-            with open(out_path, 'wb') as out_file:
-                shutil.copyfileobj(r, out_file)
-        if unzip:
-            self.gunzip(out_path)
+        try:
+            with closing(urllib.request.urlopen(url)) as r:
+                if out_path is None:
+                    out_path = f'v{release}_{biotype}.fa.gz'
+                with open(out_path, 'wb') as out_file:
+                    shutil.copyfileobj(r, out_file)
+            if unzip:
+                self.gunzip(out_path)
+        except urllib.error.URLError as url_error:
+            print('The file failed to download because:\n', url_error)
+            cd_err = "<urlopen error ftp error: error_perm('550 Failed to change directory.',)>"
+            if str(url_error) == cd_err:
+                print('Did you pass a valid `--release` value (e.g. M14, 22)?')
+

@@ -146,7 +146,7 @@ class CountsWeighter:
     def save(self):
         """Save df to csv file."""
         if self.out_path is not None:
-            self.df.to_csv(self.out_path)
+            self.df.to_csv(self.out_path, float_format='%.4f')
 
     def run(self):
         """TODO (Dan) Update based on description of self.df"""

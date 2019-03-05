@@ -76,5 +76,6 @@ setup(name=about['__title__'],
            'seekr_norm_vectors = seekr.console_scripts:console_norm_vectors',
            'seekr_rand_rnas = seekr.console_scripts:console_gen_rand_rnas',
            'seekr_graph = seekr.console_scripts:console_graph',
+           'seekr_pwm = seekr.console_scripts:console_pwm',
            'seekr_domain_pearson = seekr.console_scripts:console_domain_pearson',
            'seekr = seekr.console_scripts:console_seekr_help']})
