@@ -1,6 +1,8 @@
 os:
   - linux
-  - osx
+  # Travis doesn't support Python on OSX, apparently
+  # https://docs.travis-ci.com/user/languages/python
+  # - osx
 language: python
 cache: pip
 python:
