@@ -9,12 +9,10 @@ A web portal is available at [seekr.org](http://seekr.org).
 ## Installation
 
  To use this library, you have to have Python3.x on your computer.
- If you don't have it installed, the easiest place to get it is from the
- [Anaconda distribution](https://www.continuum.io/downloads).
 
  Once you have Python, run:
 
- ```commandline
+ ```
  $ pip install seekr
  ```
 
@@ -35,7 +33,7 @@ We're working to fix this issue ASAP.
 You can either use SEEKR from the command line or as a python module.
 The package is broken up into a set of tools, each of which perform a single task.
 From the command line, all of the functions will begin with `seekr_`.
-For example, you can use `seekr_kmer_counts` to generate a kmer count matrix of `m` rows by `n` columns,
+For example, you can use `seekr_kmer_counts` to generate a normalized kmer count matrix of `m` rows by `n` columns,
 where `m` is the number of transcripts in a fasta file and `n` is 4^kmer.
 Then  `seekr_pearson` can be used to calculate how well correlated all pairwise combinations of sequences are.
 
@@ -47,12 +45,12 @@ $ seekr
 
 ### Quickstart
 
-To get a .csv file of communities for every transcript in a small .fa file called  `example.fa`,
+To get a .csv file of communities for every transcript in a small .fa file called  [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa),
 (where RNAs have been normalized to a data set of canonical transcripts from [GENCODE](https://www.gencodegenes.org/),
 we would run:
 
-```commandline
-$ seekr_download lncRNA
+```
+$ seekr_download_gencode lncRNA
 $ seekr_canonical_gencode v29_lncRNA.fa v29-01.fa # Name may change with GENCODE updates.
 $ seekr_norm_vectors v29-01.fa
 $ seekr_kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy
@@ -69,7 +67,7 @@ See below to learn about the other files produced along the way.
 * Some advanced usages are not available from the command line and require that you import the module.
 * We'll use [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa)
 as a small sample set,
-if you want to open that file and follow along.
+if you want to download that file and follow along.
 * GENCODE is a high quality source for human and mouse lncRNA annotation.
 Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
   * In the examples below we'll generically refer to `gencode.fa`.
@@ -90,7 +88,7 @@ Here are some examples if you just want to get going.
 
 #### seekr_download
 
-Browsing [GENCODE](https://www.gencodegenes.org/)) is nice if you want to explore fasta file options.
+Browsing [GENCODE](https://www.gencodegenes.org/) is nice if you want to explore fasta file options.
 But if you know what you want, you can just download it from the command line.
 This tool is also helpful on remote clusters.
 
@@ -100,19 +98,19 @@ To download all human transcripts of the latest release into a fasta file, run:
     $ seekr_download_gencode all
 ```
 
-GENCODE also stores mouse sequences:
+GENCODE also stores mouse sequences. You can select mouse using the `--species` flag:
 
 ```
     $ seekr_download_gencode all -s mouse
 ```
 
-For consistency across experiments, you may want to stick to a particular release of GENCODE. To get lncRNAs from the M5 release of mouse:
+For consistency across experiments, you may want to stick to a particular release of GENCODE. To get lncRNAs from the M5 release of mouse, use `--release`:
 
 ```
     $ seekr_download_gencode lncRNA -s mouse -r M5
 ```
 
-Finally, if you do not want the script to automatically unzip the file, you can leave the fasta file gzipped:
+Finally, if you do not want the script to automatically unzip the file, you can leave the fasta file gzipped with `--zip`:
 
 ```
     $ seekr_download_gencode all -z
@@ -120,7 +118,7 @@ Finally, if you do not want the script to automatically unzip the file, you can 
 
 #### seekr_canonical_gencode
 
-Gencode fasta files provide multiple transcripts per genomic loci.
+GENCODE fasta files provide multiple transcripts per genomic loci.
 To reduce kmer redundancy due to these isoforms,
 we can filter for transcripts ending in "01",
 as indicated by the sequence headers:
@@ -134,12 +132,11 @@ $ seekr_canonical_gencode v22_lncRNAs.fa v22-01.fa
 Let's make a small `.csv` file of counts.
 We'll set a couple flags:
 * `--kmer 2` so we only have 16 kmers
-* `--label` so there are column and row labels
+* `--outfile out_counts.csv`. This file will contain the log2 transformed z-scores of all kmer counts.
 
-```commandline
-$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nb
+```
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2
 $ cat out_counts.csv
-
 ```
 
 You can also see the output of this command
@@ -149,7 +146,7 @@ You can also see the output of this command
 If we want a more compact, efficient numpy file,
 we can add the `--binary` and `--remove_label` flags:
 
-```commandline
+```
 $ seekr_kmer_counts example.fa -o out_counts.npy -k 2 --binary --remove_label
 ```
 
@@ -157,7 +154,7 @@ $ seekr_kmer_counts example.fa -o out_counts.npy -k 2 --binary --remove_label
 
 What happens if we also remove the `--kmer 2` option?
 
-```commandline
+```
 $ seekr_kmer_counts example.fa -o out_counts.npy
 ~/seekr/seekr/kmer_counts.py:143: RuntimeWarning: invalid value encountered in true_divide
   self.counts /= self.std
@@ -177,7 +174,7 @@ This necessarily results in division by 0.
 If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.lncRNA_transcripts.fa.gz),
 this same line works fine:
 
-```commandline
+```
 $ kmer_counts gencode.fa -o gencode_counts.npy
 ```
 
@@ -191,7 +188,7 @@ standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
 
-```commandline
+```
 $ seekr_norm_vectors gencode.fa
 ```
 
@@ -200,13 +197,13 @@ If you run `ls`, you should see `mean.npy` and `std.npy` in your directory.
 To specify the path of these output files,
 use the `--mean_vector` and `--std_vector` flags:
 
-```commandline
+```
 $ seekr_norm_vectors gencode.fa -k 5 -mv mean_5mers.npy -sv std_5mers.npy
 ```
 
 Now, we can use these vectors to analyze our RNAs of interest:
 
-```commandline
+```
 $ kmer_counts example.fa -o out_5mers_gencode_norm.csv -k 5 -mv mean_5mers.npy -sv std_5mers.npy
 ```
 
@@ -218,16 +215,16 @@ Input files for `seekr_pearson` will always be the output files from
 one or more runs of `kmer_counts`.
 The default settings accept two csv files and output a third csv file.
 
-```commandline
+```
 $ seekr_pearson out_counts.csv out_counts.csv -o example_vs_self.csv
 $ cat example_vs_self.csv
 ```
 
 The only other options besides the `-o` flag control binary versus plain text input and output.
 If you have a binary input file (i.e. a .npy file),
-and also want a binary output file, you can do:
+and also want a binary output file, you can use the `--binary_input` and `--binary_output` flags:
 
-```commandline
+```
 $ seekr_pearson out_counts.npy out_counts.npy -o example_vs_self.npy -bi -bo
 ```
 
@@ -235,7 +232,7 @@ If we want to compare counts between two files
 (e.g. RNAs between mouse and human),
 that is also possible:
 
-```commandline
+```
 $ seekr_pearson human_6mers.npy mouse_6mers.npy -o human_vs_mouse.npy
 ```
 
