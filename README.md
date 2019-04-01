@@ -132,7 +132,8 @@ $ seekr_canonical_gencode v22_lncRNAs.fa v22-01.fa
 Let's make a small `.csv` file of counts.
 We'll set a couple flags:
 * `--kmer 2` so we only have 16 kmers
-* `--outfile out_counts.csv`. This file will contain the log2 transformed z-scores of all kmer counts.
+* `--outfile out_counts.csv`.
+This file will contain the log2-transformed z-scores of kmer counts per kb.
 
 ```
 $ seekr_kmer_counts example.fa -o out_counts.csv -k 2
@@ -142,8 +143,13 @@ $ cat out_counts.csv
 You can also see the output of this command
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
+If we want to avoid normalization, we can produce kmer counts per kb by setting the `--no_log2`, `--uncentered` and `--unstandardized` flags:
 
-If we want a more compact, efficient numpy file,
+```
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nl -uc -us
+```
+
+Similarly, if we want a more compact, efficient numpy file,
 we can add the `--binary` and `--remove_label` flags:
 
 ```
