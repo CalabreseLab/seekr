@@ -185,7 +185,10 @@ class BasicCounter:
         names : [str] (default=None)
             Unique names for rows of the Dataframe.
         """
-        err_msg = 'You cannot label a binary file. Set only one of "binary" or "label" as True.'
+        err_msg = ('You cannot label a binary file. '
+                   'Set only one of "binary" or "label" as True. '
+                   'If you used `-b` from the command line, '
+                   'try also using `-rl`.')
         assert not (self.binary and self.label), err_msg
         assert self.outfile is not None, 'Please provide an outfile location.'
         if self.binary:

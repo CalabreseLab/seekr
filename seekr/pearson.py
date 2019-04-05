@@ -69,7 +69,7 @@ def visualize_distro(adj, out_path, sample=None):
             raise ValueError('Value of sample must satisfy: 0 < sample <= 1')
         size = int(len(adj) * sample)
         rows = np.random.choice(len(adj), size, replace=False)
-        cols = np.random.choice(len(adj), size, replace=False)
+        cols = np.random.choice(adj.shape[1], size, replace=False)
         adj = adj[rows][:, cols]
     flat = adj.ravel()
     mean = flat.mean()

@@ -26,13 +26,13 @@ Examples
 --------
 To download all human transcripts of the latest release into a fasta file:
     $ seekr_download_gencode all
-    
+
 To do the same for mouse:
     $ seekr_download_gencode all -s mouse
-    
+
 To get lncRNAs from the M5 release of mouse:
     $ seekr_download_gencode lncRNA -s mouse -r M5
-    
+
 If you want to leave the fasta file gzipped:
     $ seekr_download_gencode all -z
 
@@ -58,7 +58,7 @@ To filter transcripts ending in 01, an input and output fasta file are required:
 
 If you want to specifically find transcripts with the ending 001:
     $ seekr_canonical_gencode rnas.fa rnas01.fa -z 2
-    
+
 To enforce one isoform per ENSG id (specifically, the smallest 01 isoform):
     $ seekr_canonical_gencode rnas.fa rnas01_1per.fa -u
 
@@ -85,7 +85,7 @@ To get a compact and efficient .npy file, set the binary flag:
 
 You can change also change the size of the kmer you're using, and prevent normalization:
     $ seekr_kmer_counts rnas.fa -o out.csv -k 4 -uc -us -nl
-    
+
 If you ever do not want labels on a csv file:
     $ seekr_kmer_counts rnas.fa -o out.csv -rl
 
@@ -110,7 +110,7 @@ Examples
 The default settings accept two csv files and output a third csv file.
     $ seekr_pearson kc_out.csv kc_out.csv -o out.csv
 
-The only other options besides the `-o` flag control binary versus plain text input and output. 
+The only other options besides the `-o` flag control binary versus plain text input and output.
 If you have a binary input file (i.e. a .npy file) and also want a binary output file, you can do:
     $ seekr_pearson kc_out.npy kc_out.npy -o out.npy -bi -bo
 
@@ -136,7 +136,7 @@ Examples
 --------
 You must pass an adjacency matrix and an output path.
     $ seekr_visualize_distro adj.csv adj.pdf
-    
+
 For large arrays, it's likely sufficient to visualize a portion of the adjacency matrix.
 You can pass a float between 0 and 1 to the `-s` flag:
     $ seekr_visualize_distro adj.csv adj.pdf -s .1
@@ -211,10 +211,10 @@ For a cleaner csv file of just community information:
 
 To change the resolution parameter (gamma) for louvain/leidenalg:
     $ seekr_graph adj.csv .1 -g graph.gml -r 1.5
-    
+
 To change the cap of the number of communities found, and set the seed:
     $ seekr_graph adj.csv .1 -g graph.gml -n 10 -s 0
-    
+
 Numpy files are also valid input:
     $ seekr_graph adj.npy .1 -g graph.gml
 
@@ -242,7 +242,7 @@ A standard run of this tool needs three things:
 Numpy files can also be passed as input, but .csv files are the only output:
     $ seekr_pwm path/to/pwms/ kc_out.npy -o pwm_weight_sums.csv
 
-The kmer size can also be passed. 
+The kmer size can also be passed.
 It should match the counts file.
 Unlike most other seekr tools k=5 is the default for this tool.
     $ seekr_pwm path/to/pwms/ kc_out.npy -k 6 -o pwm_weight_sums.csv
@@ -268,13 +268,13 @@ This tool requires several pieces of data:
 3. A mean vector for normalization (e.g. from `seekr_norm_vectors`).
 4. A std vector for standardization (e.g. from `seekr_norm_vectors`).
 
-For brevity in the documentation below, 
+For brevity in the documentation below,
 we will assume that these required data have been stored in a variable:
     $ REQUIRED="queries.fa targets.fa mean.npy std.npy"
-    
+
 To see the r-values, pass a location for storing them in a csv file.
     $ seekr_domain_pearson $REQUIRED -r r_values.csv
-    
+
 Intepretation of r-value elements can be aided by viewing them as percentiles.
 If you want percentiles, you must also pass a reference fasta path:
     $ seekr_domain_pearson $REQUIRED -r r_values.csv -p percentiles.csv -rp reference.fa
@@ -282,7 +282,7 @@ If you want percentiles, you must also pass a reference fasta path:
 Parameters you might pass to `seekr_kmer_counts` can also be passed.
 If you change --kmer, ensure that your mean.npy and std.npy files match:
     $ seekr_domain_pearson $REQUIRED -r r_values.csv -nl -k 5
-    
+
 You can also change the size of the domain,
 and how far you slide along the target sequence before creating another domain:
     $ seekr_domain_pearson $REQUIRED -r r_values.csv -w 1200 -s 150
@@ -370,15 +370,15 @@ def console_kmer_counts():
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
     parser.add_argument('-b', '--binary', action='store_true',
-                        help='Select if output should be a .npy file.')
+                        help='Set if output should be a .npy file.')
     parser.add_argument('-uc', '--uncentered', action='store_false',
-                        help='Select if output should not have the mean subtracted.')
+                        help='Set if output should not have the mean subtracted.')
     parser.add_argument('-us', '--unstandardized', action='store_false',
-                        help='Select if output should not be divided by the standard deviation.')
+                        help='Set if output should not be divided by the standard deviation.')
     parser.add_argument('-nl', '--no_log2', action='store_false',
-                        help='Select if output should not be log2 transformed.')
+                        help='Set if output should not be log2 transformed.')
     parser.add_argument('-rl', '--remove_labels', action='store_true',
-                        help='Select to save without index and column labels.')
+                        help='Set to save without index and column labels.')
     parser.add_argument('-mv', '--mean_vector', default=None,
                         help='Optional path to mean vector numpy file.')
     parser.add_argument('-sv', '--std_vector', default=None,
@@ -422,9 +422,9 @@ def console_pearson():
     parser.add_argument('-o', '--outfile', default='pearson.seekr',
                         help='Path of file to save similarities to.')
     parser.add_argument('-bi', '--binary_input', action='store_true',
-                        help='Select if the input will be a .npy file.')
+                        help='Set if the input will be a .npy file.')
     parser.add_argument('-bo', '--binary_output', action='store_true',
-                        help='Select if output should be a .npy file.')
+                        help='Set if output should be a .npy file.')
     args = _parse_args_or_exit(parser)
     _run_pearson(args.counts1, args.counts2, args.outfile,
                  args.binary_input, args.binary_output)
@@ -585,7 +585,7 @@ def console_domain_pearson():
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
     parser.add_argument('-nl', '--no_log2', action='store_false',
-                        help='Select if kmer counts should not be log2 transformed.')
+                        help='Set if kmer counts should not be log2 transformed.')
     parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
                               'comparison against queries.'))
