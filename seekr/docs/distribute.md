@@ -7,10 +7,11 @@ Here's one beginner tutorial:
 https://git-scm.com/docs/gittutorial
 
 You should read the tutorial above before proceeding,
-but here's a oneliner for saving any changes and adding them to Github:
+but here's a one liner for saving any changes and adding them to Github
 
 ```
- $ git add . && git commit -m "Replace this with a clear description of changes." && git push 
+ $ cd ~/seekr  # Navigate to the cloned seekr repository
+ $ git add . && git commit -m "Replace this with a clear description of changes." && git push
 ```
 # Testing
 
@@ -21,7 +22,7 @@ $ cd /path/to/seekr/
 $ pytest -p no:warnings -v
 ```
 
-to generate a report. 
+to generate a report.
 
 After you've added the new version to PyPI, run:
 
@@ -33,7 +34,7 @@ to make sure the main pipeline runs without errors.
 
 # Create new PYPI version
 
-You must have a pypi account, and be a collaborator. 
+You must have a pypi account, and be a collaborator.
 Sign up [here](https://pypi.org/account/register/) if necessary.
 
 Install `twine` with:
