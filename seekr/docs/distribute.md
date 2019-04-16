@@ -1,3 +1,17 @@
+# Saving changes
+
+Before distributing, you need to save your changes.
+Git can be a lot to learn, but there are good resources on the internet.
+Here's one beginner tutorial:
+
+https://git-scm.com/docs/gittutorial
+
+You should read the tutorial above before proceeding,
+but here's a oneliner for saving any changes and adding them to Github:
+
+```
+ $ git add . && git commit -m "Replace this with a clear description of changes." && git push 
+```
 # Testing
 
 Before distributing, the test suite should pass all tests. Run:
@@ -7,7 +21,9 @@ $ cd /path/to/seekr/
 $ pytest -p no:warnings -v
 ```
 
-to generate a report. And 
+to generate a report. 
+
+After you've added the new version to PyPI, run:
 
 ```
 $./seekr/tests/integration.sh
