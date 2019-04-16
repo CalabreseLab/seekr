@@ -213,6 +213,7 @@ Issues
 ------
 Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 
+* Example bug. This script fails if k=3...
 ---
 """
 
@@ -536,6 +537,7 @@ def _run_gen_rand_rnas(in_fasta, out_fasta, kmer, mutations, seed, group):
     # Note: This function is separated for testing purposes.
     # TODO do something with group?
     kmer = int(kmer)
+    assert kmer != 3, "Example bug. Why does this fail on k=3?"
     mutations = int(mutations)
     if seed is not None:
         seed = int(seed)
