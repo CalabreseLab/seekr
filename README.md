@@ -1,6 +1,7 @@
 # SEEKR
 
 [![Build Status](https://travis-ci.com/CalabreseLab/seekr.svg?branch=master)](https://travis-ci.com/CalabreseLab/seekr)
+[![Build Status](https://img.shields.io/pypi/v/seekr.svg)](https://pypi.python.org/pypi/seekr)
 
 Find communities of nucleotide sequences based on kmer frequencies.
 
@@ -252,13 +253,13 @@ The threshold is the value below which edges are removed from the graph.
 A [gml](https://gephi.org/users/supported-graph-formats/gml-format/) file contain the graph and communities will be produced.
 
 ```
-    $ seekr_graph example_vs_self.csv .13 -g example.gml
+$ seekr_graph example_vs_self.csv .13 -g example.gml
 ```
 
 Numpy files are also valid input:
 
 ```
-    $ seekr_graph example_vs_self.npy .13 -g graph.gml
+$ seekr_graph example_vs_self.npy .13 -g graph.gml
 ```
 
 GML files are plain text, so you can view them if you want.
@@ -267,7 +268,7 @@ Often you just want to know what transcripts belong to what community.
 To get a csv file mapping transcripts to communities, run:
 
 ```
-    $ seekr_graph example_vs_self.csv .13 -g example.gml -c communities.csv
+$ seekr_graph example_vs_self.csv .13 -g example.gml -c communities.csv
 ```
 
 The value for thresholding the adjacency matrix is very experiment dependent.
@@ -288,6 +289,23 @@ you can make your results reproducible by setting a seed value:
 ```
     $ seekr_graph example_vs_self.csv .13 -g graph.gml -n 10 -s 0
 ```
+
+#### seekr_gen_rand_rnas
+
+It's often useful to understand what we might expect "at random".
+One way to think about "random" with respect to kmers and RNA sequences,
+is to think about what would happen if the nucleotide or kmer contents was conserved, but shuffled.
+`seekr_gen_rand_rnas` provides a way to conserve but shuffle kmers.
+
+To conserve dinucleotide content, for example, run:
+
+```
+$ seekr_gen_rand_rnas example.fa example_rand.fa -k 2 -s 0
+```
+
+The `--kmer` flag sets the size of the kmer,
+and the `--seed` flag makes sure you can reproduce the resulting sequences.
+We could now repeat our experiment with the new `example_rand.fa` file.
 
 ### Module example
 

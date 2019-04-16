@@ -3,6 +3,7 @@ import gzip
 import pkg_resources
 
 from pathlib import Path
+from collections import Counter
 
 from seekr import fasta
 
@@ -38,8 +39,94 @@ class TestMaker:
 
 
 class TestRandomMaker:
-    pass
-    # TODO Add testing
+
+    def test_shuffle1(self):
+        rand_maker = fasta.RandomMaker(seed=1)
+        rand_seq = rand_maker.shuffle('AGTCAGTC')
+        assert rand_seq == 'TTGGACAC'
+
+    def test_shuffle2(self):
+        rand_maker = fasta.RandomMaker(k=2, seed=1)
+        rand_seq = rand_maker.shuffle('AGTCAGTCAGTCAGTC')
+        assert rand_seq == 'AGTCAGTCAGTCAGTC'
+        kmer_counts = {
+            'AA': 0,
+            'AG': 4,
+            'AT': 0,
+            'AC': 0,
+            'GA': 0,
+            'GG': 0,
+            'GT': 4,
+            'GC': 0,
+            'TA': 0,
+            'TG': 0,
+            'TT': 0,
+            'TC': 4,
+            'CA': 3,
+            'CG': 0,
+            'CT': 0,
+            'CC': 0
+        }
+        rand_kmer_counts = {k:rand_seq.count(k) for k in kmer_counts}
+        assert kmer_counts == rand_kmer_counts
+
+    def test_mutations(self):
+        rand_maker = fasta.RandomMaker(seed=1)
+        rand_maker.mutations = 2
+        rand_seq = rand_maker.shuffle('AAAAAA')
+        assert rand_seq == 'ACGAAA'
+
+    def test_get_random_seqs(self):
+        rand_maker = fasta.RandomMaker(k=2, seed=1)
+        seqs = [
+            'AGTCAGTCAGTCAGTC',
+            'ATGATATATATATGAT',
+            'ATGCATAGTTTTTTTTTCTGC'
+        ]
+        rand_seqs = rand_maker.get_random_seqs(seqs)
+        expected = ['AGTCAGTCAGTCAGTC',
+                    'ATGATGATATATATAT',
+                    'ATTGCTTTGTTTAGCATTTTC']
+        assert rand_seqs == expected
+
+    def test_split(self):
+        rand_maker = fasta.RandomMaker(k=2, seed=1)
+        seqs = [
+            'this sentence is 35 characters long',
+            'this one is 14'
+        ]
+        rand_maker.seqs = seqs
+        seq = 'TCATTAAGCGCGTCGGTCTCTGTGTACGTCATCTCCATTTTTTTTCGTG'
+        rand_seqs = rand_maker.split(seq)
+        expected = ['TCATTAAGCGCGTCGGTCTCTGTGTACGTCATCTC',
+                    'CATTTTTTTTCGTG']
+        assert rand_seqs == expected
+        assert len(expected[0]) == 35
+        assert len(expected[1]) == 14
+
+    def test_inject_seqs(self):
+        rand_maker = fasta.RandomMaker()
+        rand_maker.names = ['>seq1', '>seq2']
+        new_seqs = ['this is new', 'also new']
+        new_fasta_seqs = rand_maker.inject_seqs(new_seqs)
+        expected = ['>seq1', 'this is new', '>seq2', 'also new']
+        assert new_fasta_seqs == expected
+
+    def test_synthesize_random(self, tmpdir):
+        infasta = 'tests/data/example.fa'
+        infasta = pkg_resources.resource_filename('seekr', infasta)
+        outfasta = str(tmpdir.join('rand.fa'))
+        rand_maker = fasta.RandomMaker(infasta, outfasta, seed=1)
+        rand_maker.synthesize_random()
+        with open(outfasta) as outfasta:
+            rand_fasta = ''.join(next(outfasta) for i in range(6))
+        expected = ('>SEQ1\n'
+                    'AAAAAA\n'
+                    '>SEQ2\n'
+                    'GTGTGTGTGTTG\n'
+                    '>SEQ3\n'
+                    'ATTACTTGGCACCGGA\n')
+        assert rand_fasta == expected
 
 
 class TestDownloader:

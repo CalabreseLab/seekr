@@ -30,6 +30,7 @@ from contextlib import closing
 from os.path import exists, join
 from os import makedirs
 from ushuffle import shuffle
+from ushuffle import set_seed
 
 from seekr.my_tqdm import my_tqdm, my_trange
 from seekr.fasta_reader import Reader
@@ -260,10 +261,12 @@ class RandomMaker(Maker):
         super(RandomMaker, self).__init__(infasta=infasta, outfasta=outfasta)
         self.k = k
         self.mutations = mutations
-        self.seed = seed
         self.individual = individual
         self.weights = None
         self.new_fasta_seqs = None
+        if seed is not None:
+            set_seed(seed)
+            np.random.seed(seed)
 
     def shuffle(self, seq):
         rand_seq = shuffle(seq.encode(), self.k).decode('utf-8')

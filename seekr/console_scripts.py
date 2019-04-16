@@ -182,7 +182,32 @@ Users control how similar the synthetic RNAs are to the originals.
 Gross scale of kmer content can be controlled by setting kmer conservation size.
 Fine scale control of similarity can be set by number of SNP mutations.
 
-# TODO Add examples.
+Examples
+--------
+The two required positional arguments are an input and output path to fasta files.
+This will shuffle the nucleotides for each RNA:
+    $ seekr_gen_rand_rnas rnas.fa rnas_rand.fa
+
+To conserve kmer content for k > 1, choose a different kmer size:
+    $ seekr_gen_rand_rnas rnas.fa rnas_rand.fa -k 2
+
+Shuffling kmers is random. To reproduce output between runs, set a seed:
+    $ seekr_gen_rand_rnas rnas.fa rnas_rand.fa -s 0
+
+It may be useful to conserve the kmer content of the whole fasta file.
+Setting the `--group` flag loses conservation of individual sequences,
+in preference for producing RNAs with a kmer frequency equal to background frequency.
+Using `--group` still produces the same number of output RNAs as input.
+Note: this may segfault on large fasta files.
+    $ seekr_gen_rand_rnas rnas.fa rnas_rand.fa -k 2 -g
+
+In some cases, it is useful to have more fine-grained control over final kmer content.
+Ex: when conserving large kmers, it may be impossible to shuffle shorter seqs.
+Ex: if you want to produce a sequence with an exact Pearson's r-value to the original.
+A number of random SNP mutations can be made in addition to shuffling.
+Use the --mutation flag to set the approximate number of SNP mutations.
+Note: Because the new nucleotide may be the same as the old, -m is approximate.
+    $ seekr_gen_rand_rnas rnas.fa rnas_rand.fa -m 100
 
 Issues
 ------
@@ -510,9 +535,12 @@ def console_graph():
 def _run_gen_rand_rnas(in_fasta, out_fasta, kmer, mutations, seed, group):
     # Note: This function is separated for testing purposes.
     # TODO do something with group?
+    kmer = int(kmer)
+    mutations = int(mutations)
     if seed is not None:
         seed = int(seed)
-    rand_maker = fasta.RandomMaker(in_fasta, out_fasta, kmer, mutations, seed, group)
+    individual = not group
+    rand_maker = fasta.RandomMaker(in_fasta, out_fasta, kmer, mutations, seed, individual)
     rand_maker.synthesize_random()
 
 
@@ -528,11 +556,11 @@ def console_gen_rand_rnas():
                         help='Number of SNP mutations to make in RNA')
     parser.add_argument('-s', '--seed', default=None,
                         help='An integer to create reproducible results between runs.')
-    parser.add_argument('-g', '--group', action='store_false',
+    parser.add_argument('-g', '--group', action='store_true',
                         help='Set to concatenate RNAs before shuffling and mutating.')
     args = _parse_args_or_exit(parser)
-    _run_norm_vectors(args.in_fasta, args.out_fasta, int(args.kmer), int(args.mutations), args.seed,
-                      args.group)
+    _run_gen_rand_rnas(args.in_fasta, args.out_fasta, int(args.kmer), int(args.mutations),
+                       args.seed, args.group)
 
 
 def _run_pwms(pwm_dir, counts, kmer, out_path):
@@ -611,6 +639,7 @@ def console_seekr_help():
                 'seekr_pearson': PEARSON_DOC,
                 'seekr_visualize_distro': VISUALIZE_DISTRO_DOC,
                 'seekr_graph': GRAPH_DOC,
+                'seekr_gen_rand_rnas': GEN_RAND_RNAS_DOC,
                 'seekr_pmw': PWM_DOC,
                 'seekr_domain_pearson': DOMAIN_PEARSON_DOC}
     for c, d in cmds2doc.items():
