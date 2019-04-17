@@ -375,13 +375,13 @@ def console_canonical_gencode():
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     log2, remove_labels, mean_vector, std_vector):
+                     log2, remove_labels, mean_vector, std_vector, alphabet):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
     label = not remove_labels
     counter = BasicCounter(fasta, outfile, kmer, binary,
-                           mean, std, log2, label=label)
+                           mean, std, log2, label=label, alphabet=alphabet)
     counter.make_count_file()
 
 
@@ -408,10 +408,12 @@ def console_kmer_counts():
                         help='Optional path to mean vector numpy file.')
     parser.add_argument('-sv', '--std_vector', default=None,
                         help='Optional path to std vector numpy file.')
+    parser.add_argument('-a', '--alphabet', default='AGTC',
+                        help='Valid letters to include in kmer.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
                      args.unstandardized, args.no_log2, args.remove_labels, args.mean_vector,
-                     args.std_vector)
+                     args.std_vector, args.alphabet)
 
 
 def _run_pearson(counts1, counts2, outfile, binary_input, binary_output):

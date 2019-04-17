@@ -66,6 +66,8 @@ class BasicCounter:
         Set to False if get_counts is used within another tqdm loop
     silent: bool (default=False)
         Set to True to turn off tqdm progress bar
+    alphabet: str (default='AGTC')
+        Valid letters to include in kmer.
 
     Attributes
     ----------
@@ -75,10 +77,12 @@ class BasicCounter:
         Str elements of all kmers of size k
     map: dict
         Mapping of kmers to column values
+    alpha_len: int
+        Length of alphabet
     """
     def __init__(self, infasta=None, outfile=None, k=6,
                  binary=True, mean=True, std=True, log2=True,
-                 leave=True, silent=False, label=False):
+                 leave=True, silent=False, label=False, alphabet='AGTC'):
         self.infasta = infasta
         self.seqs = None
         if infasta is not None:
@@ -98,8 +102,9 @@ class BasicCounter:
         self.label = label
 
         self.counts = None
-        self.kmers = [''.join(i) for i in product('AGTC', repeat=k)]
-        self.map = {k:i for k,i in zip(self.kmers, range(4**k))}
+        self.alpha_len = len(alphabet)
+        self.kmers = [''.join(i) for i in product(alphabet, repeat=k)]
+        self.map = {k:i for k,i in zip(self.kmers, range(self.alpha_len**k))}
 
         if self.seqs is not None:
             if len(self.seqs) == 1 and self.std is True:
@@ -160,7 +165,7 @@ class BasicCounter:
 
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
-        self.counts = np.zeros([len(self.seqs), 4**self.k], dtype=np.float32)
+        self.counts = np.zeros([len(self.seqs), self.alpha_len**self.k], dtype=np.float32)
         seqs = self._progress()
         for i, seq in enumerate(seqs):
             self.counts[i] = self.occurrences(self.counts[i], seq)

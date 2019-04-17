@@ -14,7 +14,7 @@ They will be shuttled into a version number just before the version is released.
 
 ### Added
 
-* 
+* Unofficial support for different alphabets
 
 ### Fixed
 
