@@ -40,7 +40,8 @@ class TestConsoleScripts:
                                          log2=True,
                                          remove_labels=True,
                                          mean_vector=None,
-                                         std_vector=None)
+                                         std_vector=None,
+                                         alphabet='AGTC')
         kmers = np.load(outfile)
         expected = 'tests/data/example_2mers.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
@@ -60,7 +61,8 @@ class TestConsoleScripts:
                                          log2=False,
                                          remove_labels=True,
                                          mean_vector=None,
-                                         std_vector=None)
+                                         std_vector=None,
+                                         alphabet='AGTC')
         kmers = pd.read_csv(outfile, header=None)
         expected = 'tests/data/example_3mers_raw.csv'
         expected = pkg_resources.resource_filename('seekr', expected)
@@ -84,7 +86,8 @@ class TestConsoleScripts:
                                          log2=True,
                                          remove_labels=True,
                                          mean_vector=mean_vector,
-                                         std_vector=std_vector)
+                                         std_vector=std_vector,
+                                         alphabet='AGTC')
         kmers = np.load(outfile)
         expected = 'tests/data/example_2mers.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
