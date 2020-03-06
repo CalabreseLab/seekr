@@ -37,7 +37,7 @@ requirements = [
     'numpy',
     'pandas',
     'requests',
-    'networkx',
+    'networkx<=2.3',
     'python-igraph',
     'louvain',
     'leidenalg',
