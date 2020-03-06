@@ -27,7 +27,20 @@ A web portal is available at [seekr.org](http://seekr.org).
 $ MACOSX_DEPLOYMENT_TARGET=10.14 pip install seekr
  ```
 
-We're working to fix this issue ASAP.
+### CentOS
+
+Users have been successful in installing `seekr` from source on CentOS:
+
+```
+conda create --name seekr_source python=3.8
+conda activate seekr_source
+git clone https://github.com/CalabreseLab/seekr.git
+python3 setup.py install
+conda install python-igraph
+conda install louvain
+```
+
+See [this issue](https://github.com/CalabreseLab/seekr/issues/10) for further discussion.
 
 ## Usage
 
