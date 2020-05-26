@@ -9,7 +9,7 @@ A web portal is available at [seekr.org](http://seekr.org).
 
 ## Installation
 
- To use this library, you have to have Python3.x on your computer.
+ To use this library, you have to have >Python3.6 on your computer.
 
  Once you have Python, run:
 

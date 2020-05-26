@@ -51,6 +51,7 @@ test_requirements = [
 ]
 
 setup(name=about['__title__'],
+      python_requires='>3.6',
       version=about['__version__'],
       install_requires=requirements,
       tests_require=test_requirements,
