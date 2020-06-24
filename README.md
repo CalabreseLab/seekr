@@ -19,14 +19,6 @@ A web portal is available at [seekr.org](http://seekr.org).
 
  which will make both the command line tool and the python module available.
 
- ### OSX and Anaconda
-
- If you're running OSX and Anaconda, there is a known issue with compliation of several of the dependencies. You should be able to fix it by running:
-
- ```
-$ MACOSX_DEPLOYMENT_TARGET=10.14 pip install seekr
- ```
-
 ### CentOS
 
 Users have been successful in installing `seekr` from source on CentOS:
