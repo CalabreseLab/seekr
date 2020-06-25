@@ -3,9 +3,9 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from seekr import fasta
-from seekr import graph
-from seekr import pearson
+import seekr.fasta
+import seekr.graph
+import seekr.pearson
 from seekr.kmer_counts import BasicCounter
 
 # TODO (Dan) fix names
@@ -375,7 +375,9 @@ def console_canonical_gencode():
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     log2, remove_labels, mean_vector, std_vector, alphabet):
+                     clog2,zlog2,nolog2,remove_labels, mean_vector, std_vector, alphabet):
+    #check to see if one and only one log argument was passed
+    assert clog2 +zlog2 + nolog2 == 1, 'Must pass 1 and only 1 of the pre-standardization log, post-standardization log, and no-log arguments'
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
@@ -400,8 +402,21 @@ def console_kmer_counts():
                         help='Set if output should not have the mean subtracted.')
     parser.add_argument('-us', '--unstandardized', action='store_false',
                         help='Set if output should not be divided by the standard deviation.')
-    parser.add_argument('-nl', '--no_log2', action='store_false',
-                        help='Set if output should not be log2 transformed.')
+
+    '''Dan S. Changes
+    Add arguments for log transforming pre standardize, log transforming post standardize, or no log
+    Check to see that only 1 of the three arguments is passed
+    If none passed, stop program
+    '''
+    parser.add_argument('-cl', '--count_log2', action='store_true',
+                        help='Set if length normalized counts should be log transformed')
+    parser.add_argument('-zl','--z_log2',action='store_true',
+                        help='Set if z-scores should be log transformed')
+    parser.add_argument('nl','--no_log2',action='store_true',
+                        help='Set if no log transform should be performed')
+
+
+    '''End Dan Changes '''
     parser.add_argument('-rl', '--remove_labels', action='store_true',
                         help='Set to save without index and column labels.')
     parser.add_argument('-mv', '--mean_vector', default=None,
@@ -412,7 +427,7 @@ def console_kmer_counts():
                         help='Valid letters to include in kmer.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
-                     args.unstandardized, args.no_log2, args.remove_labels, args.mean_vector,
+                     args.unstandardized,args.count_log2,args.z_log2,args.no_log2, args.remove_labels, args.mean_vector,
                      args.std_vector, args.alphabet)
 
 
@@ -478,8 +493,13 @@ def console_visualize_distro():
     _run_visualize_distro(args.adj, args.out_path, args.sample)
 
 
-def _run_norm_vectors(fasta, mean_vector, std_vector, kmer):
-    counter = BasicCounter(fasta, k=int(kmer))
+'''Dan Change: Include argument for pre-standardization log transform -- raw reference counts must be 
+log transformed if this analysis is chosen
+
+'''
+
+def _run_norm_vectors(fasta, mean_vector, std_vector,count_log2, kmer):
+    counter = BasicCounter(fasta, k=int(kmer),log2=count_log2)
     counter.get_counts()
     np.save(mean_vector, counter.mean)
     np.save(std_vector, counter.std)
@@ -494,6 +514,12 @@ def console_norm_vectors():
                         help='path to output mean vector')
     parser.add_argument('-sv', '--std_vector', default='std.npy',
                         help='path to output standard deviation vector')
+
+    # Dan added argument for pre-standardization log transform.... this must be done in this step if the main analysis
+    # step is also going to log transform raw counts
+
+    parser.add_argument('-cl','--count_log2',action='store_true',
+                        help='Set if length normalized counts should be log transformed')
     parser.add_argument('-k', '--kmer', default=6,
                         help='length of kmers you want to count')
     args = _parse_args_or_exit(parser)
