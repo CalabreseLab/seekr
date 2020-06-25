@@ -8,7 +8,7 @@ import pkg_resources
 from pathlib import Path
 
 from seekr import console_scripts
-
+from seekr import graph
 
 class TestConsoleScripts:
 
@@ -37,7 +37,7 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=True,
                                          standardized=True,
-                                         log2=True,
+                                         log2=1,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
@@ -58,7 +58,7 @@ class TestConsoleScripts:
                                          binary=False,
                                          centered=False,
                                          standardized=False,
-                                         log2=False,
+                                         log2=1,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
@@ -83,7 +83,7 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=False,
                                          standardized=False,
-                                         log2=True,
+                                         log2=1,
                                          remove_labels=True,
                                          mean_vector=mean_vector,
                                          std_vector=std_vector,
@@ -102,6 +102,7 @@ class TestConsoleScripts:
         console_scripts._run_norm_vectors(fasta=infasta,
                                           mean_vector=mean,
                                           std_vector=std,
+                                          count_log2=True,
                                           kmer=2)
         mean = np.load(mean)
         std = np.load(std)

@@ -83,7 +83,7 @@ class BasicCounter:
 
     #Dan Changes to arguments
     def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True, clog2=True,zlog2=False,nolog2=False,
+                 binary=True, mean=True, std=True, log2=1,
                  leave=True, silent=False, label=False, alphabet='AGTC'):
         self.infasta = infasta
         self.seqs = None
@@ -98,7 +98,7 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
-        self.clog2,self.zlog2,self.nolog2 = clog2,zlog2,nolog2  # Dan added arguments
+        self.log2 = log2 # Dan added arguments
         self.leave = leave
         self.silent = silent
         self.label = label
@@ -162,7 +162,7 @@ class BasicCounter:
 
     def log2_norm(self):
         """Apply a log2 transform to the count matrix"""
-        self.counts += abs(self.counts.min()) + 1
+        self.counts += 1
         self.counts = np.log2(self.counts)
 
 # Dan Added if states to account for 3 possibilities -- pre/post standardization log, or no log
@@ -172,23 +172,20 @@ class BasicCounter:
         seqs = self._progress()
         for i, seq in enumerate(seqs):
             self.counts[i] = self.occurrences(self.counts[i], seq)
-        if self.clog2: 
+        if self.log2 == 1: 
             self.log2_norm()
             if self.mean is not False:
                 self.center()
             if self.std is not False:
                 self.standardize()
-        elif self.zlog2:
+        else:
             if self.mean is not False:
                 self.center()
             if self.std is not False:
                 self.standardize()
-            self.log2_norm()
-        elif self.nolog2:
-            if self.mean is not False:
-                self.center()
-            if self.std is not False:
-                self.standardize()            
+            if self.log2 ==2:
+                self.counts+=abs(min(self.counts))
+                self.log2_norm()      
 
     def save(self, names=None):
         """Saves the counts appropriately based on current settings.

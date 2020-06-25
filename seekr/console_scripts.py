@@ -375,15 +375,13 @@ def console_canonical_gencode():
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     clog2,zlog2,nolog2,remove_labels, mean_vector, std_vector, alphabet):
-    #check to see if one and only one log argument was passed
-    assert clog2 +zlog2 + nolog2 == 1, 'Must pass 1 and only 1 of the pre-standardization log, post-standardization log, and no-log arguments'
+                     log2,remove_labels, mean_vector, std_vector, alphabet):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
     label = not remove_labels
     counter = BasicCounter(fasta, outfile, kmer, binary,
-                           mean, std, log2, label=label, alphabet=alphabet)
+                           mean, std,log2, label=label, alphabet=alphabet)
     counter.make_count_file()
 
 
@@ -408,12 +406,8 @@ def console_kmer_counts():
     Check to see that only 1 of the three arguments is passed
     If none passed, stop program
     '''
-    parser.add_argument('-cl', '--count_log2', action='store_true',
-                        help='Set if length normalized counts should be log transformed')
-    parser.add_argument('-zl','--z_log2',action='store_true',
-                        help='Set if z-scores should be log transformed')
-    parser.add_argument('nl','--no_log2',action='store_true',
-                        help='Set if no log transform should be performed')
+    parser.add_argument('-l', '--log2', type=int,default=1,
+                        help='Pass 1 for pre-standardization log transform, 2 post-standardization, 3 no log')
 
 
     '''End Dan Changes '''
@@ -427,7 +421,7 @@ def console_kmer_counts():
                         help='Valid letters to include in kmer.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
-                     args.unstandardized,args.count_log2,args.z_log2,args.no_log2, args.remove_labels, args.mean_vector,
+                     args.unstandardized,args.log2, args.remove_labels, args.mean_vector,
                      args.std_vector, args.alphabet)
 
 
@@ -499,7 +493,7 @@ log transformed if this analysis is chosen
 '''
 
 def _run_norm_vectors(fasta, mean_vector, std_vector,count_log2, kmer):
-    counter = BasicCounter(fasta, k=int(kmer),log2=count_log2)
+    counter = BasicCounter(fasta, k=int(kmer),count_log2=count_log2)
     counter.get_counts()
     np.save(mean_vector, counter.mean)
     np.save(std_vector, counter.std)
