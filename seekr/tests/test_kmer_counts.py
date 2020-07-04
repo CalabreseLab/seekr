@@ -11,6 +11,7 @@ class TestBasicCounter:
         infasta = pkg_resources.resource_filename('seekr', infasta)
         counter = kmer_counts.BasicCounter(infasta=infasta,
                                            silent=True,
+                                           log2=2,
                                            **kwargs)
         return counter
 
@@ -87,8 +88,9 @@ class TestBasicCounter:
         counts+= np.abs(np.min(counts))
         counter.counts = counts
         counter.log2_norm()
-        expected = np.log2(counts+1)
-        print(counter,expected)
+        expected = np.array([[1, 2, 3, 4], [0, -2, 5, 10]], dtype=np.float32)
+        expected+=np.abs(np.min(expected))
+        expected = np.log2(expected+1)
         assert np.allclose(counter.counts, expected)
 
     def test_get_counts(self):

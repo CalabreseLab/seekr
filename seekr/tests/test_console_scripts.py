@@ -4,7 +4,8 @@ import networkx
 import numpy as np
 import pandas as pd
 import pkg_resources
-
+import pytest
+import sys
 from pathlib import Path
 
 from seekr import console_scripts
