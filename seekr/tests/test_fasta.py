@@ -1,9 +1,11 @@
+import sys
 import requests
 import gzip
 import pkg_resources
 
 from pathlib import Path
-from collections import Counter
+
+import pytest
 
 from seekr import fasta
 
@@ -40,6 +42,7 @@ class TestMaker:
 
 class TestRandomMaker:
 
+    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
     def test_shuffle1(self):
         rand_maker = fasta.RandomMaker(seed=1)
         rand_seq = rand_maker.shuffle('AGTCAGTC')
@@ -76,6 +79,7 @@ class TestRandomMaker:
         rand_seq = rand_maker.shuffle('AAAAAA')
         assert rand_seq == 'ACGAAA'
 
+    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
     def test_get_random_seqs(self):
         rand_maker = fasta.RandomMaker(k=2, seed=1)
         seqs = [
@@ -112,6 +116,7 @@ class TestRandomMaker:
         expected = ['>seq1', 'this is new', '>seq2', 'also new']
         assert new_fasta_seqs == expected
 
+    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
     def test_synthesize_random(self, tmpdir):
         infasta = 'tests/data/example.fa'
         infasta = pkg_resources.resource_filename('seekr', infasta)
