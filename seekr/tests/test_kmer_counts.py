@@ -84,11 +84,11 @@ class TestBasicCounter:
     def test_log2_norm(self):
         counter = self._create_basic_counter_with_data(k=1)
         counts = np.array([[1, 2, 3, 4], [0, -2, 5, 10]], dtype=np.float32)
+        counts+= np.abs(np.min(counts))
+        print(counts)
         counter.counts = counts
         counter.log2_norm()
-        expected = np.array([[2.       , 2.321928 , 2.5849624, 2.807355 ],
-                             [1.5849625, 0.       , 3.       , 3.7004397]],
-                            dtype=np.float32)
+        expected = np.log2(counts+1)
         assert np.allclose(counter.counts, expected)
 
     def test_get_counts(self):

@@ -3,9 +3,9 @@ import argparse
 import numpy as np
 import pandas as pd
 
-import seekr.fasta
-import seekr.graph
-import seekr.pearson
+from seekr import fasta
+from seekr import graph	
+from seekr import pearson
 from seekr.kmer_counts import BasicCounter
 
 # TODO (Dan) fix names
@@ -93,6 +93,9 @@ Notes
 -----
 For more sophisticated options, you cannot use the command line, but need python instead.
 
+To pass --log 1 argument for pre-zscore log-transform of k-mer counts, seekr_norm_vectors MUST be
+    run with the -cl flag. This log transforms the reference counts for appropriate mean and std calcs
+
 Issues
 ------
 Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
@@ -165,6 +168,9 @@ The default setting accept a single fasta file.
 
 If you want to specify paths for the output files, or choose a different kmer size:
     $ seekr_norm_vectors gencode.fa -k 5 -mv mean_5mers.npy -sv std_5mers.npy
+
+If pre-zscore log transform is desired, you must pass the -cl flag to log transform
+    the reference k-mer counts 
 
 Issues
 ------
@@ -406,7 +412,7 @@ def console_kmer_counts():
     Check to see that only 1 of the three arguments is passed
     If none passed, stop program
     '''
-    parser.add_argument('-l', '--log2', type=int,default=1,
+    parser.add_argument('-l', '--log2', type=int,default=2,
                         help='Pass 1 for pre-standardization log transform, 2 post-standardization, 3 no log')
 
 
@@ -493,7 +499,10 @@ log transformed if this analysis is chosen
 '''
 
 def _run_norm_vectors(fasta, mean_vector, std_vector,count_log2, kmer):
-    counter = BasicCounter(fasta, k=int(kmer),count_log2=count_log2)
+    if count_log2 == True:
+        counter = BasicCounter(fasta, k=int(kmer),log2=1)
+    else:
+        counter = BasicCounter(fasta,k=int(kmer),log2=3)
     counter.get_counts()
     np.save(mean_vector, counter.mean)
     np.save(std_vector, counter.std)
@@ -517,7 +526,7 @@ def console_norm_vectors():
     parser.add_argument('-k', '--kmer', default=6,
                         help='length of kmers you want to count')
     args = _parse_args_or_exit(parser)
-    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, int(args.kmer))
+    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector,args.count_log2, int(args.kmer))
 
 
 def _run_graph(adj, threshold, gml_path, csv_path, louvain, resolution, n_comms, seed):
@@ -634,7 +643,7 @@ def console_domain_pearson():
     parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
-    parser.add_argument('-nl', '--no_log2', action='store_false',
+    parser.add_argument('-l', '--log2', action='store_false',
                         help='Set if kmer counts should not be log2 transformed.')
     parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
@@ -644,7 +653,7 @@ def console_domain_pearson():
                               'another tile/domain.'))
     args = _parse_args_or_exit(parser)
     _run_domain_pearson(args.query_path, args.target_path, args.reference_path, args.mean, args.std,
-                        args.r_values, args.percentiles, int(args.kmer), args.no_log2,
+                        args.r_values, args.percentiles, int(args.kmer), args.log2,
                         int(args.window), args.slide)
 
 

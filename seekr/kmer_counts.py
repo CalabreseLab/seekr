@@ -83,7 +83,7 @@ class BasicCounter:
 
     #Dan Changes to arguments
     def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True, log2=1,
+                 binary=True, mean=True, std=True, log2=2,
                  leave=True, silent=False, label=False, alphabet='AGTC'):
         self.infasta = infasta
         self.seqs = None
@@ -98,11 +98,10 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
-        self.log2 = log2 # Dan added arguments
+        self.log2 = int(log2) # Dan added arguments
         self.leave = leave
         self.silent = silent
         self.label = label
-
         self.counts = None
         self.alpha_len = len(alphabet)
         self.kmers = [''.join(i) for i in product(alphabet, repeat=k)]
@@ -115,11 +114,15 @@ class BasicCounter:
                        'or use raw counts by setting std=False.')
                 raise ValueError(err)
 
+        if self.log2 not in [1,2,3]:
+            err=('Please provide a value of 1,2, or 3 for the log2 argument')
+            raise ValueError(err)
+
     def occurrences(self, row, seq):
         """Counts kmers on a per kilobase scale"""
         counts = defaultdict(int)
         length = len(seq)
-        increment = 1000/(length-self.k+1) #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
+        increment = 1000/length #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
         for c in range(length-self.k+1):
             kmer = seq[c:c+self.k]
             counts[kmer] += increment
@@ -170,22 +173,18 @@ class BasicCounter:
         """Generates kmer counts for a fasta file"""
         self.counts = np.zeros([len(self.seqs), self.alpha_len**self.k], dtype=np.float32)
         seqs = self._progress()
+
         for i, seq in enumerate(seqs):
             self.counts[i] = self.occurrences(self.counts[i], seq)
         if self.log2 == 1: 
             self.log2_norm()
-            if self.mean is not False:
-                self.center()
-            if self.std is not False:
-                self.standardize()
-        else:
-            if self.mean is not False:
-                self.center()
-            if self.std is not False:
-                self.standardize()
-            if self.log2 ==2:
-                self.counts+=abs(min(self.counts))
-                self.log2_norm()      
+        if self.mean is not False:
+            self.center()
+        if self.std is not False:
+            self.standardize()
+        if self.log2 == 2:
+            self.counts+=np.abs(np.min(self.counts)) 
+            self.log2_norm()
 
     def save(self, names=None):
         """Saves the counts appropriately based on current settings.
