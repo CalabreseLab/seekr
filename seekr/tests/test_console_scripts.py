@@ -140,22 +140,22 @@ class TestConsoleScripts:
         expected_weight = in_graph.edges()[('0', '2')]['weight']
         assert np.isclose(expected_weight, 0.5278957407763157)
         assert np.alltrue(in_df['Group'].values == np.array([0, 1, 0, 0, 1]))
-
-    # def test_run_gen_rand_rnas(self, tmpdir):
-    #     infasta = 'tests/data/example2.fa'
-    #     infasta = pkg_resources.resource_filename('seekr', infasta)
-    #     outfasta = str(tmpdir.join('rand.fa'))
-    #     k = '2'
-    #     mutations = '5'
-    #     seed = '0'
-    #     group = False
-    #     console_scripts._run_gen_rand_rnas(infasta, outfasta, k, mutations, seed, group)
-    #     with open(outfasta) as outfasta:
-    #         rand_fasta = ''.join(next(outfasta) for i in range(6))
-    #     expected = ('>ENST1|ENSG1|OTTHUMG1|OTTHUMT1|JK-001|JK|918|CDS:1-918|\n'
-    #                 'TATCAG\n'
-    #                 '>ENST2|ENSG1|OTTHUMG1|OTTHUMT2|JK-201|JK|918|CDS:1-918|\n'
-    #                 'ATACGCA\n'
-    #                 '>ENST3|ENSG2|OTTHUMG2|OTTHUMT3|JK2-201|JK2|918|CDS:1-918|\n'
-    #                 'CTACGCT\n')
-    #     assert rand_fasta == expected
+    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
+    def test_run_gen_rand_rnas(self, tmpdir):
+        infasta = 'tests/data/example2.fa'
+        infasta = pkg_resources.resource_filename('seekr', infasta)
+        outfasta = str(tmpdir.join('rand.fa'))
+        k = '2'
+        mutations = '5'
+        seed = '0'
+        group = False
+        console_scripts._run_gen_rand_rnas(infasta, outfasta, k, mutations, seed, group)
+        with open(outfasta) as outfasta:
+            rand_fasta = ''.join(next(outfasta) for i in range(6))
+        expected = ('>ENST1|ENSG1|OTTHUMG1|OTTHUMT1|JK-001|JK|918|CDS:1-918|\n'
+                    'TATCAG\n'
+                    '>ENST2|ENSG1|OTTHUMG1|OTTHUMT2|JK-201|JK|918|CDS:1-918|\n'
+                    'ATACGCA\n'
+                    '>ENST3|ENSG2|OTTHUMG2|OTTHUMT3|JK2-201|JK2|918|CDS:1-918|\n'
+                    'CTACGCT\n')
+        assert rand_fasta == expected
