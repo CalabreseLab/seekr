@@ -122,7 +122,7 @@ class BasicCounter:
         """Counts kmers on a per kilobase scale"""
         counts = defaultdict(int)
         length = len(seq)
-        increment = 1000/length #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
+        increment = 1000/(length-self.k+1) #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
         for c in range(length-self.k+1):
             kmer = seq[c:c+self.k]
             counts[kmer] += increment
