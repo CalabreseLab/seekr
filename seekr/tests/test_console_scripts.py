@@ -27,7 +27,7 @@ class TestConsoleScripts:
     #     with unzipped.open() as in_file:
     #         count = len(in_file.readlines())
     #         assert count == 48978
-    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
+    @pytest.mark.skip()
 
     def test_run_kmer_counts(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -49,7 +49,7 @@ class TestConsoleScripts:
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
-    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
+    @pytest.mark.skip()
 
     def test_run_kmer_counts_raw_csv(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -71,7 +71,7 @@ class TestConsoleScripts:
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = pd.read_csv(expected, header=None)
         assert np.allclose(kmers.values, expected.values)
-    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
+    @pytest.mark.skip()
 
     def test_run_kmer_counts_vectors(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -97,7 +97,7 @@ class TestConsoleScripts:
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
-    @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
+    @pytest.mark.skip()
 
     def test_run_norm_vectors(self, tmpdir):
         infasta = 'tests/data/example.fa'
