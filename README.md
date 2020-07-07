@@ -7,11 +7,7 @@ Find communities of nucleotide sequences based on kmer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
 
----
-**NOTE**
-
-This update (v1.0.1) adds an additional option for log-transformation of *k*-mer counts, and fixes an issue with length normalization
----
+`The v1.0.1 update contains additional log transformation options and a tweak for length normalization`
 
 
 ## Installation
