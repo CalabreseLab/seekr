@@ -7,6 +7,9 @@ Find communities of nucleotide sequences based on kmer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
 
+`The v1.0.1 update contains additional log transformation options and a tweak for length normalization`
+
+
 ## Installation
 
  To use this library, you have to have >Python3.6 on your computer.
@@ -149,10 +152,12 @@ $ cat out_counts.csv
 You can also see the output of this command
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
-If we want to avoid normalization, we can produce kmer counts per kb by setting the `--no_log2`, `--uncentered` and `--unstandardized` flags:
+Three options are available for log transformation, using the --log2 flag. Pass `--log2 1` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count, pass `--log2 2` for log transformation of z-scores following count standardization (default), and pass `--log2 3` for no log transformation.
+
+If we want to avoid normalization, we can produce kmer counts per kb by setting the `--log2 3`, `--uncentered` and `--unstandardized` flags:
 
 ```
-$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nl -uc -us
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 3 -uc -us
 ```
 
 Similarly, if we want a more compact, efficient numpy file,
@@ -199,6 +204,8 @@ count their kmers, but normalize their counts to mean and
 standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
+
+**Note** If --log2 1 is passed in *seekr_kmer_counts*, then the -cl flag must be passed to *seekr_norm_vectors*. This is so that the log-transformed *k*-mer counts are standardized against reference *k*-mer counts that are also log transformed. 
 
 ```
 $ seekr_norm_vectors gencode.fa
