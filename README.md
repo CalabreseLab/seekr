@@ -9,6 +9,19 @@ A web portal is available at [seekr.org](http://seekr.org).
 
 `The v1.0.1 update contains additional log transformation options and a tweak for length normalization`
 
+## Updates
+Includes a redesigned flag to indicate the method of k-mer standardization, and an additional option for k-mer standardization: --log2 [1,2,3] or -l [1,2,3]
+
+1.	Default standardizationmethod is --log2 2. This is the same default standardization method used in SEEKR v1.0.0. For a given set of sequences, k-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each k-mer are calculated, and then these z-scores are log2-tranformed. See PMID 31097619 for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
+
+2.	--log2 3 is the same as the no-log transformation option (-nl) of seekr v1.0.0. Here, after k-mers are counted and length-normalized, z-scores are calculated and used without any transformation. This was the approached used in our original SEEKR publication (PMID 30224646).
+
+3. --log2 1 is the additional/new option for standardization. In this approach, k-mers are counted across a set of sequences and then length normalized (counts per kb of sequence). For each k-mer that has a zero-count value in each sequence, a pseudo-count of 1 is added; this allows the k-mer count values to be log2 transformed. Z-scores are calculated after log2-transformation of k-mer counts, and these z-scores can then be used directly for comparisons. In effect, this standardization method is not much different from the default option of --log2 2 (users can compare for themselves). It is, however, a slightly cleaner heuristic. In the time since our original two publications using seekr, we have noted that k-mer counts in the mouse and human transcriptomes tend to follow a log-normal distribution; thus, we currently favor this method of standardization. 
+
+4. Includes small updates to “notes” and “Help” sections of README.md
+
+5. Includes a small fix to the length normalization step of the core k-mer counting code. In v1.0.0, k-mer counts were normalized to the number of basepairs in each input sequence. In v1.0.1, k-mer counts are normalized to the number of k-mers in each input sequence ([length_of_sequence] -[k-mer_length]+1). This is a minor change for correctness that should not meaningfully affect results.
+
 
 ## Installation
 
@@ -81,11 +94,21 @@ if you want to download that file and follow along.
 Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
   * In the examples below we'll generically refer to `gencode.fa`.
     Any sufficiently large fasta file can be used, as needed.
+ 
+Some general advice for thinking about how to use SEEKR. One challenge that we continually face in the lab is there are few ground truths in the lncRNA field and thus it is often unclear how to decide on the best parameters for sequence comparisons using SEEKR. Below are two points that may be useful – these are also discussed in the conclusions of PMID 31097619:
+
+*	On the selection of a set of sequences to use for the calculation of standardization vectors: In our experience, one of the most useful features of SEEKR is that it provides a metric of relative similarity. “At the level of k-mers, sequence X is more similar to sequence Y than it is similar to 99% of other mouse lncRNAs”. Here, k-mer counts in sequence X and Y are being compared relative to the background k-mer frequencies found in all mouse lncRNAs. The calculated similarity of sequence X and Y derives from the standardization vectors used to calculate z-scores; in this example, those standardization vectors are the mean and standard deviation of the k-mer counts found all mouse lncRNAs. If users are trying to use SEEKR to determine how similar are two sets of sequences to each other, the key question to ask is, “how similar relative to what”? What set of sequences would be the most appropriate reference for the comparison? In many cases, using a large set of reference sequences to calculate standardization vectors is ideal (e.g. all mouse lncRNAs). However, by changing the set of reference sequences, users can change the question being asked. For example, if a scientist wanted to determine the similarity between sequences X and Y relative to sequence Z, then rather than all mouse lncRNAs, sequence Z should be used as a reference sequence. The reference sequence(s) can be controlled by using “seekr_norm_vectors” prior to “seekr_kmer_counts”.
+
+*	On the selection of k-mer length: In our experience, the most robust biological trends have been relatively insensitive to the length of k-mer used in SEEKR. Still, when deciding on a length of k to use for comparisons, we recommend using a k-mer length for which 4^k is similar to the length of the average feature or key feature that is being compared. The reason for this is that as the length of k increases, so does the number of zero values for k-mer counts in a given sequence. For example, there are 16384 possible 7-mers. If users were interested in finding lncRNAs that are similar to lncRNA-X, which is 500 nucleotides long, a k-mer length of 7 would not be ideal, because the vector of 7-mer counts that corresponds to lncRNA-X would be dominated by zero values. In this example, unless users had a specific rationale for searching 7-mers, a k-mer length of 4 (256 possible k-mers) or 5 (1024 possible k-mers) would provide the basis for a stronger comparison.
+
 
 ### Help
 
-For full documentation of the parameters and flags, you can run any of the commands without any arguments.
-For example:
+Please also see a pre-print to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed. 
+
+If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
+
+For full documentation, type...
 
 ```
 $ seekr_kmer_counts
