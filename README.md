@@ -12,7 +12,7 @@ A web portal is available at [seekr.org](http://seekr.org).
 ## Updates
 Includes a redesigned flag to indicate the method of k-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]
 
-1.	Default standardizatio nmethod is --log2 2. This is the same default standardization method used in SEEKR v1.0.0. For a given set of sequences, k-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each k-mer are calculated, and then these z-scores are log2-tranformed. See [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/) for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
+1.	Default standardization method is --log2 2. This is the same default standardization method used in SEEKR v1.0.0. For a given set of sequences, k-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each k-mer are calculated, and then these z-scores are log2-tranformed. See [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/) for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
 
 2.	--log2 3 is the same as the no-log transformation option (-nl) of seekr v1.0.0. Here, after k-mers are counted and length-normalized, z-scores are calculated and used without any transformation. This was the approached used in our original SEEKR publication ([PMID 30224646](https://pubmed.ncbi.nlm.nih.gov/30224646/).
 
