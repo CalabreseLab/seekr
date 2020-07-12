@@ -104,7 +104,7 @@ Some general advice for thinking about how to use SEEKR. One challenge that we c
 
 ### Help
 
-Please also see a pre-print to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed. 
+Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logchanges/methods_mol_bio_seekr-v20.pdf) to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed. 
 
 If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
 
