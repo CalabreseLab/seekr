@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/CalabreseLab/seekr.svg?branch=master)](https://travis-ci.com/CalabreseLab/seekr)
 [![Build Status](https://img.shields.io/pypi/v/seekr.svg)](https://pypi.python.org/pypi/seekr)
 
-Find communities of nucleotide sequences based on kmer frequencies.
+Find communities of nucleotide sequences based on *k*-mer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
 
@@ -55,8 +55,8 @@ See [this issue](https://github.com/CalabreseLab/seekr/issues/10) for further di
 You can either use SEEKR from the command line or as a python module.
 The package is broken up into a set of tools, each of which perform a single task.
 From the command line, all of the functions will begin with `seekr_`.
-For example, you can use `seekr_kmer_counts` to generate a normalized kmer count matrix of `m` rows by `n` columns,
-where `m` is the number of transcripts in a fasta file and `n` is 4^kmer.
+For example, you can use `seekr_kmer_counts` to generate a normalized k-mer count matrix of `m` rows by `n` columns,
+where `m` is the number of transcripts in a fasta file and `n` is 4^k-mer.
 Then  `seekr_pearson` can be used to calculate how well correlated all pairwise combinations of sequences are.
 
 To see all tools and some examples, run:
@@ -151,7 +151,7 @@ Finally, if you do not want the script to automatically unzip the file, you can 
 #### seekr_canonical_gencode
 
 GENCODE fasta files provide multiple transcripts per genomic loci.
-To reduce kmer redundancy due to these isoforms,
+To reduce *k*-mer redundancy due to these isoforms,
 we can filter for transcripts ending in "01",
 as indicated by the sequence headers:
 
@@ -163,9 +163,9 @@ $ seekr_canonical_gencode v22_lncRNAs.fa v22-01.fa
 
 Let's make a small `.csv` file of counts.
 We'll set a couple flags:
-* `--kmer 2` so we only have 16 kmers
+* `--kmer 2` so we only have 16 *k*-mers
 * `--outfile out_counts.csv`.
-This file will contain the log2-transformed z-scores of kmer counts per kb.
+This file will contain the log2-transformed z-scores of *k*-mer counts per kb.
 
 ```
 $ seekr_kmer_counts example.fa -o out_counts.csv -k 2
@@ -177,7 +177,7 @@ You can also see the output of this command
 
 Three options are available for log transformation, using the --log2 flag. Pass `--log2 1` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count, pass `--log2 2` for log transformation of z-scores following count standardization (default), and pass `--log2 3` for no log transformation.
 
-If we want to avoid normalization, we can produce kmer counts per kb by setting the `--log2 3`, `--uncentered` and `--unstandardized` flags:
+If we want to avoid normalization, we can produce *k*-mer counts per kb by setting the `--log2 3`, `--uncentered` and `--unstandardized` flags:
 
 ```
 $ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 3 -uc -us
@@ -200,16 +200,16 @@ $ seekr_kmer_counts example.fa -o out_counts.npy
   self.counts /= self.std
 
 WARNING: You have `np.nan` values in your counts after standardization.
-This is likely due to a kmer not appearing in any of your sequences. Try:
-1) using a smaller kmer size,
+This is likely due to a *k*-mer not appearing in any of your sequences. Try:
+1) using a smaller *k*-mer size,
 2) beginning with a larger set of sequences,
 3) passing precomputed normalization vectors from a larger data set (e.g. GENCODE).
 
 ```
 
 The code runs, but we get a warning.
-That's because we're normalizing 4096 columns of kmers.
-Most of those kmers never appear in any of our 5 lncRNAs.
+That's because we're normalizing 4096 columns of *k*-mers.
+Most of those *k*-mers never appear in any of our 5 lncRNAs.
 This necessarily results in division by 0.
 If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.lncRNA_transcripts.fa.gz),
 this same line works fine:
@@ -222,8 +222,8 @@ But what should you do if you're only interested in specific sequences?
 
 #### seekr_norm_vectors
 
-An effective way to find important kmers in a small number of RNAs is to
-count their kmers, but normalize their counts to mean and
+An effective way to find important *k*-mers in a small number of RNAs is to
+count their *k*-mers, but normalize their counts to mean and
 standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
@@ -251,7 +251,7 @@ $ kmer_counts example.fa -o out_5mers_gencode_norm.csv -k 5 -mv mean_5mers.npy -
 
 #### seekr_pearson
 
-To find Pearson correlations between kmer count profiles, run `seekr_pearson`.
+To find Pearson correlations between *k*-mer count profiles, run `seekr_pearson`.
 Running the program and options are similar to `seekr_kmers_counts`.
 Input files for `seekr_pearson` will always be the output files from
 one or more runs of `kmer_counts`.
@@ -328,9 +328,9 @@ you can make your results reproducible by setting a seed value:
 #### seekr_gen_rand_rnas
 
 It's often useful to understand what we might expect "at random".
-One way to think about "random" with respect to kmers and RNA sequences,
-is to think about what would happen if the nucleotide or kmer contents was conserved, but shuffled.
-`seekr_gen_rand_rnas` provides a way to conserve but shuffle kmers.
+One way to think about "random" with respect to *k*-mers and RNA sequences,
+is to think about what would happen if the nucleotide or *k*-mer contents was conserved, but shuffled.
+`seekr_gen_rand_rnas` provides a way to conserve but shuffle *k*-mers.
 
 To conserve dinucleotide content, for example, run:
 
@@ -338,7 +338,7 @@ To conserve dinucleotide content, for example, run:
 $ seekr_gen_rand_rnas example.fa example_rand.fa -k 2 -s 0
 ```
 
-The `--kmer` flag sets the size of the kmer,
+The `--kmer` flag sets the size of the *k*-mer,
 and the `--seed` flag makes sure you can reproduce the resulting sequences.
 We could now repeat our experiment with the new `example_rand.fa` file.
 
@@ -348,7 +348,7 @@ For larger or more specific workloads, it may be better to use the `seekr` modul
 In this example, we'll calculate similarities between two example fasta files,
 (e.g., XIST and a set of RNAs we think could be similar to XIST)
 using the normalization vectors from the human GENCODE set.
-We'll use all kmers from 3 to 6, and label transcripts with unique labels.
+We'll use all *k*-mers from 3 to 6, and label transcripts with unique labels.
 
 ```python
 import numpy as np
@@ -375,7 +375,7 @@ for k in range(3, 7):
     np.save(mean_path, gencode_counter.mean)
     np.save(std_path, gencode_counter.std)
 
-    # Count kmers
+    # Count *k*-mers
     xist_counter = BasicCounter(xist,
                                 outfile=f'{k}mers_xist.npy',
                                 mean=mean_path,
@@ -405,8 +405,8 @@ Each loop will write six files to disk:
 * `mean_{k}mers.npy`: Mean vector for GENCODE human lncRNAs.
 Once this has been saved, the first portion of the code doesn't need to be run again.
 * `std_{k}mers.npy`: Standard deviation vector for GENCODE human lncRNAs.
-* `{k}mers_xist.npy`: Normalized kmer profile for Xist.
-* `{k}mers_lncs.npy`: Normalized kmer profile for other lncRNAs of interest.
+* `{k}mers_xist.npy`: Normalized *k*-mer profile for Xist.
+* `{k}mers_lncs.npy`: Normalized *k*-mer profile for other lncRNAs of interest.
 * `xist_vs_lncs_{k}mers.npy`: Pearson's r values for all pairwise comparisons between Xist and the other lncRNAs.
 * `xist_vs_lncs_{k}mers.csv`: Labeled, plain text version of pairwise comparisons.
 
