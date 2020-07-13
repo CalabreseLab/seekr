@@ -49,7 +49,6 @@ class TestConsoleScripts:
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
-    @pytest.mark.skip()
 
     def test_run_kmer_counts_raw_csv(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -70,9 +69,9 @@ class TestConsoleScripts:
         expected = 'tests/data/example_3mers_raw.csv'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = pd.read_csv(expected, header=None)
+        print(kmers.values)
+        print(expected)
         assert np.allclose(kmers.values, expected.values)
-    @pytest.mark.skip()
-
     def test_run_kmer_counts_vectors(self, tmpdir):
         infasta = 'tests/data/example.fa'
         infasta = pkg_resources.resource_filename('seekr', infasta)
@@ -93,7 +92,7 @@ class TestConsoleScripts:
                                          std_vector=std_vector,
                                          alphabet='AGTC')
         kmers = np.load(outfile)
-        expected = 'tests/data/example_2mers.npy'
+        expected = 'tests/data/example_2mers_count.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
