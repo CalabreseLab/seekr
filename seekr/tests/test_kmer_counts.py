@@ -20,7 +20,6 @@ class TestBasicCounter:
         counter = self._create_basic_counter_with_data()
         assert len(counter.seqs) == 5
         assert counter.seqs[0] == 'AAAAAA'
-    @pytest.mark.skip()
 
     def test_occurrences_k1(self):
         counter = self._create_basic_counter_with_data(k=1)
@@ -36,15 +35,15 @@ class TestBasicCounter:
         expected[2] = 500
         row = counter.occurrences(row, counter.seqs[1])
         assert np.allclose(row, expected)
-    @pytest.mark.skip()
 
     def test_occurrences_k2(self):
         counter = self._create_basic_counter_with_data(k=2)
         row = np.zeros(16)
         expected=row.copy()
-        expected[5] = 416.666666666666
-        expected[9] = 83.333333333333
-        expected[10] = 416.666666666666
+
+        expected[5] = 454.545
+        expected[9] = 90.909
+        expected[10] = 454.545
         row = counter.occurrences(row, counter.seqs[1])
         assert np.allclose(row, expected)
 

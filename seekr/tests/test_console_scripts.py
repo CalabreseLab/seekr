@@ -27,7 +27,6 @@ class TestConsoleScripts:
     #     with unzipped.open() as in_file:
     #         count = len(in_file.readlines())
     #         assert count == 48978
-    @pytest.mark.skip()
 
     def test_run_kmer_counts(self, tmpdir):
         infasta = 'tests/data/example.fa'
@@ -45,7 +44,7 @@ class TestConsoleScripts:
                                          std_vector=None,
                                          alphabet='AGTC')
         kmers = np.load(outfile)
-        expected = 'tests/data/example_2mers.npy'
+        expected = 'tests/data/example_2mers_counts.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
@@ -96,7 +95,6 @@ class TestConsoleScripts:
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
-    @pytest.mark.skip()
 
     def test_run_norm_vectors(self, tmpdir):
         infasta = 'tests/data/example.fa'
