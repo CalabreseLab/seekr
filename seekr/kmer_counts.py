@@ -60,8 +60,8 @@ class BasicCounter:
     std: bool, np.array, str (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
-    log2: bool (default=True)
-        If False, do not apply a log2 transform to the count matrix
+    log2: bool (default=2)
+        Pass 1,2 or 3 for different log transformation options.
     leave: bool (default=True)
         Set to False if get_counts is used within another tqdm loop
     silent: bool (default=False)

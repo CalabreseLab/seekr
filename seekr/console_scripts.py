@@ -643,8 +643,8 @@ def console_domain_pearson():
     parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
-    parser.add_argument('-l', '--log2', action='store_false',
-                        help='Set if kmer counts should not be log2 transformed.')
+    parser.add_argument('-l', '--log2',
+                        help='Choose a value of 1,2, or 3 for different log transformation options')
     parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
                               'comparison against queries.'))

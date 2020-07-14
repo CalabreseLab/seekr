@@ -165,7 +165,7 @@ class DomainPearson:
     """
 
     def __init__(self, query_path=None, target_path=None, reference_path=None, r_values_path=None,
-                 percentiles_path=None, mean=True, std=True, log2=True,
+                 percentiles_path=None, mean=True, std=True, log2=2,
                  k=6, window=1000, slide=100):
         self.query_path = query_path
         self.target_path = target_path
