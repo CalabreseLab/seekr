@@ -60,8 +60,9 @@ class BasicCounter:
     std: bool, np.array, str (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
-    log2: bool (default=2)
-        Pass 1,2 or 3 for different log transformation options.
+    log2: int (default=2)
+        Pass 1,2 or 3 for pre-standardization log transform, post-standardization log transform, 
+        or no log-transform respectively. 
     leave: bool (default=True)
         Set to False if get_counts is used within another tqdm loop
     silent: bool (default=False)
@@ -81,7 +82,6 @@ class BasicCounter:
         Length of alphabet
     """
 
-    #Dan Changes to arguments
     def __init__(self, infasta=None, outfile=None, k=6,
                  binary=True, mean=True, std=True, log2=2,
                  leave=True, silent=False, label=False, alphabet='AGTC'):
@@ -98,7 +98,7 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
-        self.log2 = int(log2) # Dan added arguments
+        self.log2 = log2 
         self.leave = leave
         self.silent = silent
         self.label = label
@@ -168,7 +168,6 @@ class BasicCounter:
         self.counts += 1
         self.counts = np.log2(self.counts)
 
-# Dan Added if states to account for 3 possibilities -- pre/post standardization log, or no log
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
         self.counts = np.zeros([len(self.seqs), self.alpha_len**self.k], dtype=np.float32)

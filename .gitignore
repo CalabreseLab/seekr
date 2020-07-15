@@ -9,7 +9,7 @@ __pycache__/
 
 # MAC
 
-*.DS_store
+*.DS_Store
 
 # C extensions
 *.so

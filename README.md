@@ -8,7 +8,8 @@ Find communities of nucleotide sequences based on *k*-mer frequencies.
 A web portal is available at [seekr.org](http://seekr.org).
 
 ## Updates
-Includes a redesigned flag to indicate the method of *k*-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]
+Includes a redesigned flag to indicate the method of *k*-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]. These options correspond to log-transforming pre-standardization, post-standardization, or no log-transform,
+respectively. 
 
 1.	Default standardization method is --log2 2. This is the same default standardization method used in SEEKR v1.0.0. For a given set of sequences, *k*-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each *k*-mer are calculated, and then these z-scores are log2-tranformed. See [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/) for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
 

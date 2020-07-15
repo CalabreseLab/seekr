@@ -1,7 +1,5 @@
 import numpy as np
 import pkg_resources
-import sys 
-import pytest
 from seekr import kmer_counts
 
 

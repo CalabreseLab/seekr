@@ -407,16 +407,9 @@ def console_kmer_counts():
     parser.add_argument('-us', '--unstandardized', action='store_false',
                         help='Set if output should not be divided by the standard deviation.')
 
-    '''Dan S. Changes
-    Add arguments for log transforming pre standardize, log transforming post standardize, or no log
-    Check to see that only 1 of the three arguments is passed
-    If none passed, stop program
-    '''
     parser.add_argument('-l', '--log2', type=int,default=2,
                         help='Pass 1 for pre-standardization log transform, 2 post-standardization, 3 no log')
 
-
-    '''End Dan Changes '''
     parser.add_argument('-rl', '--remove_labels', action='store_true',
                         help='Set to save without index and column labels.')
     parser.add_argument('-mv', '--mean_vector', default=None,
@@ -492,12 +485,6 @@ def console_visualize_distro():
     args = _parse_args_or_exit(parser)
     _run_visualize_distro(args.adj, args.out_path, args.sample)
 
-
-'''Dan Change: Include argument for pre-standardization log transform -- raw reference counts must be 
-log transformed if this analysis is chosen
-
-'''
-
 def _run_norm_vectors(fasta, mean_vector, std_vector,count_log2, kmer):
     if count_log2 == True:
         counter = BasicCounter(fasta, k=int(kmer),log2=1)
@@ -518,8 +505,6 @@ def console_norm_vectors():
     parser.add_argument('-sv', '--std_vector', default='std.npy',
                         help='path to output standard deviation vector')
 
-    # Dan added argument for pre-standardization log transform.... this must be done in this step if the main analysis
-    # step is also going to log transform raw counts
 
     parser.add_argument('-cl','--count_log2',action='store_true',
                         help='Set if length normalized counts should be log transformed')
