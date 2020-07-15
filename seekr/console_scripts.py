@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from seekr import fasta
-from seekr import graph
+from seekr import graph	
 from seekr import pearson
 from seekr.kmer_counts import BasicCounter
 
@@ -93,6 +93,9 @@ Notes
 -----
 For more sophisticated options, you cannot use the command line, but need python instead.
 
+To pass --log 1 argument for pre-zscore log-transform of k-mer counts, seekr_norm_vectors MUST be
+    run with the -cl flag. This log transforms the reference counts for appropriate mean and std calcs
+
 Issues
 ------
 Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
@@ -165,6 +168,9 @@ The default setting accept a single fasta file.
 
 If you want to specify paths for the output files, or choose a different kmer size:
     $ seekr_norm_vectors gencode.fa -k 5 -mv mean_5mers.npy -sv std_5mers.npy
+
+If pre-zscore log transform is desired, you must pass the -cl flag to log transform
+    the reference k-mer counts 
 
 Issues
 ------
@@ -375,13 +381,13 @@ def console_canonical_gencode():
 
 
 def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     log2, remove_labels, mean_vector, std_vector, alphabet):
+                     log2,remove_labels, mean_vector, std_vector, alphabet):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
     label = not remove_labels
     counter = BasicCounter(fasta, outfile, kmer, binary,
-                           mean, std, log2, label=label, alphabet=alphabet)
+                           mean, std,log2, label=label, alphabet=alphabet)
     counter.make_count_file()
 
 
@@ -400,8 +406,10 @@ def console_kmer_counts():
                         help='Set if output should not have the mean subtracted.')
     parser.add_argument('-us', '--unstandardized', action='store_false',
                         help='Set if output should not be divided by the standard deviation.')
-    parser.add_argument('-nl', '--no_log2', action='store_false',
-                        help='Set if output should not be log2 transformed.')
+
+    parser.add_argument('-l', '--log2', type=int,default=2,
+                        help='Pass 1 for pre-standardization log transform, 2 post-standardization, 3 no log')
+
     parser.add_argument('-rl', '--remove_labels', action='store_true',
                         help='Set to save without index and column labels.')
     parser.add_argument('-mv', '--mean_vector', default=None,
@@ -412,7 +420,7 @@ def console_kmer_counts():
                         help='Valid letters to include in kmer.')
     args = _parse_args_or_exit(parser)
     _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
-                     args.unstandardized, args.no_log2, args.remove_labels, args.mean_vector,
+                     args.unstandardized,args.log2, args.remove_labels, args.mean_vector,
                      args.std_vector, args.alphabet)
 
 
@@ -477,9 +485,11 @@ def console_visualize_distro():
     args = _parse_args_or_exit(parser)
     _run_visualize_distro(args.adj, args.out_path, args.sample)
 
-
-def _run_norm_vectors(fasta, mean_vector, std_vector, kmer):
-    counter = BasicCounter(fasta, k=int(kmer))
+def _run_norm_vectors(fasta, mean_vector, std_vector,count_log2, kmer):
+    if count_log2 == True:
+        counter = BasicCounter(fasta, k=int(kmer),log2=1)
+    else:
+        counter = BasicCounter(fasta,k=int(kmer),log2=3)
     counter.get_counts()
     np.save(mean_vector, counter.mean)
     np.save(std_vector, counter.std)
@@ -494,10 +504,14 @@ def console_norm_vectors():
                         help='path to output mean vector')
     parser.add_argument('-sv', '--std_vector', default='std.npy',
                         help='path to output standard deviation vector')
+
+
+    parser.add_argument('-cl','--count_log2',action='store_true',
+                        help='Set if length normalized counts should be log transformed')
     parser.add_argument('-k', '--kmer', default=6,
                         help='length of kmers you want to count')
     args = _parse_args_or_exit(parser)
-    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, int(args.kmer))
+    _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector,args.count_log2, int(args.kmer))
 
 
 def _run_graph(adj, threshold, gml_path, csv_path, louvain, resolution, n_comms, seed):
@@ -614,8 +628,8 @@ def console_domain_pearson():
     parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
-    parser.add_argument('-nl', '--no_log2', action='store_false',
-                        help='Set if kmer counts should not be log2 transformed.')
+    parser.add_argument('-l', '--log2',
+                        help='Choose a value of 1,2, or 3 for different log transformation options')
     parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
                               'comparison against queries.'))
@@ -624,7 +638,7 @@ def console_domain_pearson():
                               'another tile/domain.'))
     args = _parse_args_or_exit(parser)
     _run_domain_pearson(args.query_path, args.target_path, args.reference_path, args.mean, args.std,
-                        args.r_values, args.percentiles, int(args.kmer), args.no_log2,
+                        args.r_values, args.percentiles, int(args.kmer), args.log2,
                         int(args.window), args.slide)
 
 

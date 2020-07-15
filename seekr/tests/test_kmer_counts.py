@@ -1,6 +1,5 @@
 import numpy as np
 import pkg_resources
-
 from seekr import kmer_counts
 
 
@@ -11,6 +10,7 @@ class TestBasicCounter:
         infasta = pkg_resources.resource_filename('seekr', infasta)
         counter = kmer_counts.BasicCounter(infasta=infasta,
                                            silent=True,
+                                           log2=2,
                                            **kwargs)
         return counter
 
@@ -38,9 +38,10 @@ class TestBasicCounter:
         counter = self._create_basic_counter_with_data(k=2)
         row = np.zeros(16)
         expected=row.copy()
-        expected[5] = 416.666666666666
-        expected[9] = 83.333333333333
-        expected[10] = 416.666666666666
+
+        expected[5] = 454.545
+        expected[9] = 90.909
+        expected[10] = 454.545
         row = counter.occurrences(row, counter.seqs[1])
         assert np.allclose(row, expected)
 
@@ -84,11 +85,12 @@ class TestBasicCounter:
     def test_log2_norm(self):
         counter = self._create_basic_counter_with_data(k=1)
         counts = np.array([[1, 2, 3, 4], [0, -2, 5, 10]], dtype=np.float32)
+        counts+= np.abs(np.min(counts))
         counter.counts = counts
         counter.log2_norm()
-        expected = np.array([[2.       , 2.321928 , 2.5849624, 2.807355 ],
-                             [1.5849625, 0.       , 3.       , 3.7004397]],
-                            dtype=np.float32)
+        expected = np.array([[1, 2, 3, 4], [0, -2, 5, 10]], dtype=np.float32)
+        expected+=np.abs(np.min(expected))
+        expected = np.log2(expected+1)
         assert np.allclose(counter.counts, expected)
 
     def test_get_counts(self):

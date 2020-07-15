@@ -6,10 +6,11 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
+
 import pytest
 
 from seekr import console_scripts
-
+from seekr import graph
 
 class TestConsoleScripts:
 
@@ -38,13 +39,13 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=True,
                                          standardized=True,
-                                         log2=True,
+                                         log2=2,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
                                          alphabet='AGTC')
         kmers = np.load(outfile)
-        expected = 'tests/data/example_2mers.npy'
+        expected = 'tests/data/example_2mers_counts.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
@@ -59,7 +60,7 @@ class TestConsoleScripts:
                                          binary=False,
                                          centered=False,
                                          standardized=False,
-                                         log2=False,
+                                         log2=3,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
@@ -68,8 +69,9 @@ class TestConsoleScripts:
         expected = 'tests/data/example_3mers_raw.csv'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = pd.read_csv(expected, header=None)
+        print(kmers.values)
+        print(expected)
         assert np.allclose(kmers.values, expected.values)
-
     def test_run_kmer_counts_vectors(self, tmpdir):
         infasta = 'tests/data/example.fa'
         infasta = pkg_resources.resource_filename('seekr', infasta)
@@ -84,13 +86,13 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=False,
                                          standardized=False,
-                                         log2=True,
+                                         log2=2,
                                          remove_labels=True,
                                          mean_vector=mean_vector,
                                          std_vector=std_vector,
                                          alphabet='AGTC')
         kmers = np.load(outfile)
-        expected = 'tests/data/example_2mers.npy'
+        expected = 'tests/data/example_2mers_count.npy'
         expected = pkg_resources.resource_filename('seekr', expected)
         expected = np.load(expected)
         assert np.allclose(kmers, expected)
@@ -103,6 +105,7 @@ class TestConsoleScripts:
         console_scripts._run_norm_vectors(fasta=infasta,
                                           mean_vector=mean,
                                           std_vector=std,
+                                          count_log2=False,
                                           kmer=2)
         mean = np.load(mean)
         std = np.load(std)

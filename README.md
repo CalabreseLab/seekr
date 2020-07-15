@@ -3,9 +3,24 @@
 [![Build Status](https://travis-ci.com/CalabreseLab/seekr.svg?branch=master)](https://travis-ci.com/CalabreseLab/seekr)
 [![Build Status](https://img.shields.io/pypi/v/seekr.svg)](https://pypi.python.org/pypi/seekr)
 
-Find communities of nucleotide sequences based on kmer frequencies.
+Find communities of nucleotide sequences based on *k*-mer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
+
+## Updates
+Includes a redesigned flag to indicate the method of *k*-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]. These options correspond to log-transforming pre-standardization, post-standardization, or no log-transform,
+respectively. 
+
+1.	Default standardization method is --log2 2. This is the same default standardization method used in SEEKR v1.0.0. For a given set of sequences, *k*-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each *k*-mer are calculated, and then these z-scores are log2-tranformed. See [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/) for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
+
+2.	--log2 3 is the same as the no-log transformation option (-nl) of seekr v1.0.0. Here, after *k*-mers are counted and length-normalized, z-scores are calculated and used without any transformation. This was the approached used in our original SEEKR publication ([PMID 30224646](https://pubmed.ncbi.nlm.nih.gov/30224646/)).
+
+3. --log2 1 is the additional/new option for standardization. In this approach, *k*-mers are counted across a set of sequences and then length normalized (counts per kb of sequence). For each *k*-mer that has a zero-count value in each sequence, a pseudo-count of 1 is added; this allows the *k*-mer count values to be log2 transformed. Z-scores are calculated after log2-transformation of *k*-mer counts, and these z-scores can then be used directly for comparisons. In effect, this standardization method is not much different from the default option of --log2 2 (users can compare for themselves). It is, however, a slightly cleaner heuristic. In the time since our original two publications using seekr, we have noted that *k*-mer counts in the mouse and human transcriptomes tend to follow a log-normal distribution; thus, we currently favor this method of standardization. 
+
+4. Includes small updates to “notes” and “Help” sections of README.md
+
+5. Includes a small fix to the length normalization step of the core *k*-mer counting code. In v1.0.0, *k*-mer counts were normalized to the number of basepairs in each input sequence. In v1.0.1, *k*-mer counts are normalized to the number of *k*-mers in each input sequence ([length_of_sequence] -[*k*-mer_length]+1). This is a minor change for correctness that should not meaningfully affect results.
+
 
 ## Installation
 
@@ -39,8 +54,8 @@ See [this issue](https://github.com/CalabreseLab/seekr/issues/10) for further di
 You can either use SEEKR from the command line or as a python module.
 The package is broken up into a set of tools, each of which perform a single task.
 From the command line, all of the functions will begin with `seekr_`.
-For example, you can use `seekr_kmer_counts` to generate a normalized kmer count matrix of `m` rows by `n` columns,
-where `m` is the number of transcripts in a fasta file and `n` is 4^kmer.
+For example, you can use `seekr_kmer_counts` to generate a normalized *k*-mer count matrix of `m` rows by `n` columns,
+where `m` is the number of transcripts in a fasta file and `n` is 4^*k*-mer.
 Then  `seekr_pearson` can be used to calculate how well correlated all pairwise combinations of sequences are.
 
 To see all tools and some examples, run:
@@ -78,11 +93,20 @@ if you want to download that file and follow along.
 Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
   * In the examples below we'll generically refer to `gencode.fa`.
     Any sufficiently large fasta file can be used, as needed.
+ 
+Some general advice for thinking about how to use SEEKR. One challenge that we continually face in the lab is there are few ground truths in the lncRNA field and thus it is often unclear how to decide on the best parameters for sequence comparisons using SEEKR. Below are two points that may be useful – these are also discussed in the conclusions of [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/):
+
+* On the selection of a set of sequences to use for the calculation of standardization vectors: In our experience, one of the most useful features of SEEKR is that it provides a metric of relative similarity. Consider two lncRNAs, lncRNA-X, which is from mouse, and lncRNA-Y, which is from human. One way to compare these two lncRNAs using SEEKR would be to calculate their *k*-mer profiles and compare these profiles in relation to all known mouse lncRNAs. To do this, one would first use all mouse lncRNAs as an input for the "seekr_norm_vectors" script, to determine the mean and standard deviation of counts for all *k*-mers in all mouse lncRNAs. Then, users would take those standardization vectors along with the sequences of lncRNA-X and lncRNA-Y and use them in the “kmer_counts” script to calculate *k*-mer profiles of lncRNA-X and lncRNA-Y in relation to all mouse lncRNAs. Finally, users would employ the “seekr_pearson” script to determine how similar lncRNA-X and lncRNA-Y were to each other relative to all other mouse lncRNAs. The point here is that the set of sequences used to calculate standardization vectors is a key variable – perhaps analogous to a reference gene in a quantitative PCR experiment or a loading control in a western blot. Users should think through what comparison they are interested in performing and choose their set of standardization sequences accordingly. In the example above, where all mouse lncRNAs were used for standardization, users might discover that “At the level of *k*-mers, lncRNA-X is more similar to lncRNA-Y than it is similar to 99% of other mouse lncRNAs”. But changing the set of sequences for standardization can change the question being asked. For example, users might be interested in comparing lncRNA-X and lncRNA-Y relative to all known human enhancer RNAs (eRNAs). Here, using all human eRNAs as the standardization set, users might make an additional insightful discovery, perhaps: “At the level of *k*-mers, lncRNA-X is no more similar to lncRNA-Y than it is similar to the average human eRNA”. Relatedly, when users are comparing two large groups of sequences (let us call these “set A” and “set B”), we again recommend thinking about what set of reference sequences would be best for standardization. In most cases, users will probably want to use the same set of reference sequences to standardize *k*-mer counts in set A and in set B.  Perhaps set A and set B should again be standardized relative to all mouse lncRNAs; or, both set A and set B be should be standardized relative to the sequences in set B. But standardizing set A relative to itself, then standardizing set B relative to itself, then using “seekr_pearson” to compare the two sets of sequences might yield a non-sensical comparison.
+*	On the selection of *k*-mer length: In our experience, the most robust biological trends have been relatively insensitive to the length of *k*-mer used in SEEKR. Still, when deciding on a length of k to use for comparisons, we recommend using a *k*-mer length for which 4^k is similar to the length of the average feature or key feature that is being compared. The reason for this is that as the length of k increases, so does the number of zero values for *k*-mer counts in a given sequence. For example, there are 16384 possible 7-mers. If users were interested in finding lncRNAs that are similar to lncRNA-X, which is 500 nucleotides long, a *k*-mer length of 7 would not be ideal, because the vector of 7-mer counts that corresponds to lncRNA-X would be dominated by zero values. In this example, unless users had a specific rationale for searching 7-mers, a *k*-mer length of 4 (256 possible *k*-mers) or 5 (1024 possible *k*-mers) would provide the basis for a stronger comparison.
+
 
 ### Help
 
-For full documentation of the parameters and flags, you can run any of the commands without any arguments.
-For example:
+Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logchanges/methods_mol_bio_seekr-v20.pdf) to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed. 
+
+If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
+
+For full documentation, type:
 
 ```
 $ seekr_kmer_counts
@@ -125,7 +149,7 @@ Finally, if you do not want the script to automatically unzip the file, you can 
 #### seekr_canonical_gencode
 
 GENCODE fasta files provide multiple transcripts per genomic loci.
-To reduce kmer redundancy due to these isoforms,
+To reduce *k*-mer redundancy due to these isoforms,
 we can filter for transcripts ending in "01",
 as indicated by the sequence headers:
 
@@ -137,9 +161,9 @@ $ seekr_canonical_gencode v22_lncRNAs.fa v22-01.fa
 
 Let's make a small `.csv` file of counts.
 We'll set a couple flags:
-* `--kmer 2` so we only have 16 kmers
+* `--kmer 2` so we only have 16 *k*-mers
 * `--outfile out_counts.csv`.
-This file will contain the log2-transformed z-scores of kmer counts per kb.
+This file will contain the log2-transformed z-scores of *k*-mer counts per kb.
 
 ```
 $ seekr_kmer_counts example.fa -o out_counts.csv -k 2
@@ -149,10 +173,12 @@ $ cat out_counts.csv
 You can also see the output of this command
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
-If we want to avoid normalization, we can produce kmer counts per kb by setting the `--no_log2`, `--uncentered` and `--unstandardized` flags:
+Three options are available for log transformation, using the --log2 flag. Pass `--log2 1` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count, pass `--log2 2` for log transformation of z-scores following count standardization (default), and pass `--log2 3` for no log transformation.
+
+If we want to avoid normalization, we can produce *k*-mer counts per kb by setting the `--log2 3`, `--uncentered` and `--unstandardized` flags:
 
 ```
-$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 -nl -uc -us
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 3 -uc -us
 ```
 
 Similarly, if we want a more compact, efficient numpy file,
@@ -172,16 +198,16 @@ $ seekr_kmer_counts example.fa -o out_counts.npy
   self.counts /= self.std
 
 WARNING: You have `np.nan` values in your counts after standardization.
-This is likely due to a kmer not appearing in any of your sequences. Try:
-1) using a smaller kmer size,
+This is likely due to a *k*-mer not appearing in any of your sequences. Try:
+1) using a smaller *k*-mer size,
 2) beginning with a larger set of sequences,
 3) passing precomputed normalization vectors from a larger data set (e.g. GENCODE).
 
 ```
 
 The code runs, but we get a warning.
-That's because we're normalizing 4096 columns of kmers.
-Most of those kmers never appear in any of our 5 lncRNAs.
+That's because we're normalizing 4096 columns of *k*-mers.
+Most of those *k*-mers never appear in any of our 5 lncRNAs.
 This necessarily results in division by 0.
 If we use a much larger set of [sequences](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_28/gencode.v28.lncRNA_transcripts.fa.gz),
 this same line works fine:
@@ -194,11 +220,13 @@ But what should you do if you're only interested in specific sequences?
 
 #### seekr_norm_vectors
 
-An effective way to find important kmers in a small number of RNAs is to
-count their kmers, but normalize their counts to mean and
+An effective way to find important *k*-mers in a small number of RNAs is to
+count their *k*-mers, but normalize their counts to mean and
 standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
+
+**Note** If --log2 1 is passed in *seekr_kmer_counts*, then the -cl flag must be passed to *seekr_norm_vectors*. This is so that the log-transformed *k*-mer counts are standardized against reference *k*-mer counts that are also log transformed. 
 
 ```
 $ seekr_norm_vectors gencode.fa
@@ -221,7 +249,7 @@ $ kmer_counts example.fa -o out_5mers_gencode_norm.csv -k 5 -mv mean_5mers.npy -
 
 #### seekr_pearson
 
-To find Pearson correlations between kmer count profiles, run `seekr_pearson`.
+To find Pearson correlations between *k*-mer count profiles, run `seekr_pearson`.
 Running the program and options are similar to `seekr_kmers_counts`.
 Input files for `seekr_pearson` will always be the output files from
 one or more runs of `kmer_counts`.
@@ -298,9 +326,9 @@ you can make your results reproducible by setting a seed value:
 #### seekr_gen_rand_rnas
 
 It's often useful to understand what we might expect "at random".
-One way to think about "random" with respect to kmers and RNA sequences,
-is to think about what would happen if the nucleotide or kmer contents was conserved, but shuffled.
-`seekr_gen_rand_rnas` provides a way to conserve but shuffle kmers.
+One way to think about "random" with respect to *k*-mers and RNA sequences,
+is to think about what would happen if the nucleotide or *k*-mer contents was conserved, but shuffled.
+`seekr_gen_rand_rnas` provides a way to conserve but shuffle *k*-mers.
 
 To conserve dinucleotide content, for example, run:
 
@@ -308,7 +336,7 @@ To conserve dinucleotide content, for example, run:
 $ seekr_gen_rand_rnas example.fa example_rand.fa -k 2 -s 0
 ```
 
-The `--kmer` flag sets the size of the kmer,
+The `--kmer` flag sets the size of the *k*-mer,
 and the `--seed` flag makes sure you can reproduce the resulting sequences.
 We could now repeat our experiment with the new `example_rand.fa` file.
 
@@ -318,7 +346,7 @@ For larger or more specific workloads, it may be better to use the `seekr` modul
 In this example, we'll calculate similarities between two example fasta files,
 (e.g., XIST and a set of RNAs we think could be similar to XIST)
 using the normalization vectors from the human GENCODE set.
-We'll use all kmers from 3 to 6, and label transcripts with unique labels.
+We'll use all *k*-mers from 3 to 6, and label transcripts with unique labels.
 
 ```python
 import numpy as np
@@ -345,7 +373,7 @@ for k in range(3, 7):
     np.save(mean_path, gencode_counter.mean)
     np.save(std_path, gencode_counter.std)
 
-    # Count kmers
+    # Count *k*-mers
     xist_counter = BasicCounter(xist,
                                 outfile=f'{k}mers_xist.npy',
                                 mean=mean_path,
@@ -375,8 +403,8 @@ Each loop will write six files to disk:
 * `mean_{k}mers.npy`: Mean vector for GENCODE human lncRNAs.
 Once this has been saved, the first portion of the code doesn't need to be run again.
 * `std_{k}mers.npy`: Standard deviation vector for GENCODE human lncRNAs.
-* `{k}mers_xist.npy`: Normalized kmer profile for Xist.
-* `{k}mers_lncs.npy`: Normalized kmer profile for other lncRNAs of interest.
+* `{k}mers_xist.npy`: Normalized *k*-mer profile for Xist.
+* `{k}mers_lncs.npy`: Normalized *k*-mer profile for other lncRNAs of interest.
 * `xist_vs_lncs_{k}mers.npy`: Pearson's r values for all pairwise comparisons between Xist and the other lncRNAs.
 * `xist_vs_lncs_{k}mers.csv`: Labeled, plain text version of pairwise comparisons.
 

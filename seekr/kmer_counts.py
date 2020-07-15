@@ -60,8 +60,9 @@ class BasicCounter:
     std: bool, np.array, str (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
-    log2: bool (default=True)
-        If False, do not apply a log2 transform to the count matrix
+    log2: int (default=2)
+        Pass 1,2 or 3 for pre-standardization log transform, post-standardization log transform, 
+        or no log-transform respectively. 
     leave: bool (default=True)
         Set to False if get_counts is used within another tqdm loop
     silent: bool (default=False)
@@ -80,8 +81,9 @@ class BasicCounter:
     alpha_len: int
         Length of alphabet
     """
+
     def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True, log2=True,
+                 binary=True, mean=True, std=True, log2=2,
                  leave=True, silent=False, label=False, alphabet='AGTC'):
         self.infasta = infasta
         self.seqs = None
@@ -96,11 +98,10 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
-        self.log2 = log2
+        self.log2 = log2 
         self.leave = leave
         self.silent = silent
         self.label = label
-
         self.counts = None
         self.alpha_len = len(alphabet)
         self.kmers = [''.join(i) for i in product(alphabet, repeat=k)]
@@ -113,11 +114,15 @@ class BasicCounter:
                        'or use raw counts by setting std=False.')
                 raise ValueError(err)
 
+        if self.log2 not in [1,2,3]:
+            err=('Please provide a value of 1,2, or 3 for the log2 argument')
+            raise ValueError(err)
+
     def occurrences(self, row, seq):
         """Counts kmers on a per kilobase scale"""
         counts = defaultdict(int)
         length = len(seq)
-        increment = 1000/length
+        increment = 1000/(length-self.k+1) #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
         for c in range(length-self.k+1):
             kmer = seq[c:c+self.k]
             counts[kmer] += increment
@@ -160,20 +165,24 @@ class BasicCounter:
 
     def log2_norm(self):
         """Apply a log2 transform to the count matrix"""
-        self.counts += abs(self.counts.min()) + 1
+        self.counts += 1
         self.counts = np.log2(self.counts)
 
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
         self.counts = np.zeros([len(self.seqs), self.alpha_len**self.k], dtype=np.float32)
         seqs = self._progress()
+
         for i, seq in enumerate(seqs):
             self.counts[i] = self.occurrences(self.counts[i], seq)
+        if self.log2 == 1: 
+            self.log2_norm()
         if self.mean is not False:
             self.center()
         if self.std is not False:
             self.standardize()
-        if self.log2:
+        if self.log2 == 2:
+            self.counts+=np.abs(np.min(self.counts)) 
             self.log2_norm()
 
     def save(self, names=None):
