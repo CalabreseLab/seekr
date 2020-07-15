@@ -1,12 +1,13 @@
 """These tests are treated a little like integration tests."""
 
+import sys
 import networkx
 import numpy as np
 import pandas as pd
 import pkg_resources
+
+
 import pytest
-import sys
-from pathlib import Path
 
 from seekr import console_scripts
 from seekr import graph
@@ -142,6 +143,7 @@ class TestConsoleScripts:
         expected_weight = in_graph.edges()[('0', '2')]['weight']
         assert np.isclose(expected_weight, 0.5278957407763157)
         assert np.alltrue(in_df['Group'].values == np.array([0, 1, 0, 0, 1]))
+
     @pytest.mark.skipif(sys.platform == 'darwin', reason='Random seed fails on Mac')
     def test_run_gen_rand_rnas(self, tmpdir):
         infasta = 'tests/data/example2.fa'

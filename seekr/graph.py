@@ -90,7 +90,7 @@ class Maker:
         -----
         https://en.wikipedia.org/wiki/Connected_component_(graph_theory)
         """
-        subgraphs = list(networkx.connected_component_subgraphs(self.graph))
+        subgraphs = [self.graph.subgraph(c) for c in networkx.connected_components(self.graph)]
         graph_sizes = [sub.size() for sub in subgraphs]
         self.main_sub = subgraphs[graph_sizes.index(max(graph_sizes))]
 
