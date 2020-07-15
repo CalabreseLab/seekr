@@ -9,20 +9,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Current]
 
-This is where you should add changes as you go along.
-They will be shuttled into a version number just before the version is released.
-
 ### Added
 
 * Unofficial support for different alphabets
+* Additional log transformation option
 
 ### Fixed
 
-* 
+* Length normalization divisor (length to [length -k +1])
 
 ### Changed
 
-* 
+* Behavior of --log2 argument
 
 ---
 
