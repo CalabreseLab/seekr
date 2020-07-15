@@ -7,8 +7,6 @@ Find communities of nucleotide sequences based on *k*-mer frequencies.
 
 A web portal is available at [seekr.org](http://seekr.org).
 
-`The v1.0.1 update contains additional log transformation options and a tweak for length normalization`
-
 ## Updates
 Includes a redesigned flag to indicate the method of *k*-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]
 
