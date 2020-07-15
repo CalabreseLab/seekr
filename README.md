@@ -105,7 +105,7 @@ Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logch
 
 If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
 
-For full documentation, type...
+For full documentation, type:
 
 ```
 $ seekr_kmer_counts
