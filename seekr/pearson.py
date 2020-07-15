@@ -136,8 +136,9 @@ class DomainPearson:
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
         Can be produced by `seekr_norm_vectors`.
-    log2: bool (default=True)
-        If False, do not apply a log2 transform to the count matrix.
+    log2: int (default=2)
+        Pass 1,2, or 3 for pre-standardization log-transform, post-standardization log transform, or
+        no log transform, respectively. 
     k: int (default=6)
         Size of kmer to be counted.
     window: int (default=1000)
