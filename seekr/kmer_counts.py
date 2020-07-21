@@ -33,12 +33,16 @@ Any issues can be reported to https://github.com/CalabreseLab
 
 import numpy as np
 
+from enum import Enum
 from collections import defaultdict
 from itertools import product
 from pandas import DataFrame
 
 from seekr.my_tqdm import my_tqdm
 from seekr.fasta_reader import Reader
+
+
+Log2 = Enum('Log2', ('pre', 'post', 'none'))
 
 
 class BasicCounter:
@@ -60,9 +64,8 @@ class BasicCounter:
     std: bool, np.array, str (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
-    log2: int (default=2)
-        Pass 1,2 or 3 for pre-standardization log transform, post-standardization log transform, 
-        or no log-transform respectively. 
+    log2: Log2 (default=Log2.post)
+        Log2 transformation can occur pre- or post-standardization, or not at all.
     leave: bool (default=True)
         Set to False if get_counts is used within another tqdm loop
     silent: bool (default=False)
@@ -83,7 +86,7 @@ class BasicCounter:
     """
 
     def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True, log2=2,
+                 binary=True, mean=True, std=True, log2=Log2.post,
                  leave=True, silent=False, label=False, alphabet='AGTC'):
         self.infasta = infasta
         self.seqs = None
@@ -114,9 +117,8 @@ class BasicCounter:
                        'or use raw counts by setting std=False.')
                 raise ValueError(err)
 
-        if self.log2 not in [1,2,3]:
-            err=('Please provide a value of 1,2, or 3 for the log2 argument')
-            raise ValueError(err)
+        if not isinstance(self.log2, Log2):
+            raise TypeError(f'log2 must be one of {list(Log2)}')
 
     def occurrences(self, row, seq):
         """Counts kmers on a per kilobase scale"""
@@ -175,14 +177,14 @@ class BasicCounter:
 
         for i, seq in enumerate(seqs):
             self.counts[i] = self.occurrences(self.counts[i], seq)
-        if self.log2 == 1: 
+        if self.log2 == Log2.pre:
             self.log2_norm()
         if self.mean is not False:
             self.center()
         if self.std is not False:
             self.standardize()
-        if self.log2 == 2:
-            self.counts+=np.abs(np.min(self.counts)) 
+        if self.log2 == Log2.post:
+            self.counts += np.abs(np.min(self.counts))
             self.log2_norm()
 
     def save(self, names=None):

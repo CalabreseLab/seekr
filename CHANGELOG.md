@@ -11,16 +11,41 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* 
+
+### Fixed
+
+* 
+
+### Changed
+
+* 
+---
+
+## 1.5.0
+
+### Added
+
 * Unofficial support for different alphabets
 * Additional log transformation option
 
 ### Fixed
 
 * Length normalization divisor (length to [length -k +1])
+  * Includes a small fix to the length normalization step of the core *k*-mer counting code. In v1.4.2, *k*-mer counts were normalized to the number of basepairs in each input sequence. In v1.4.3, *k*-mer counts are normalized to the number of *k*-mers in each input sequence ([length_of_sequence] -[*k*-mer_length]+1). This is a minor change for correctness that should not meaningfully affect results.
+
 
 ### Changed
 
 * Behavior of --log2 argument
+  * Includes a redesigned flag to indicate the method of *k*-mer standardization, and an additional option for *k*-mer standardization: --log2 [1,2,3] or -l [1,2,3]. These options correspond to log-transforming pre-standardization, post-standardization, or no log-transform,
+respectively. 
+  * `--log2 post` (Default standardization method). This is the same default standardization method used in SEEKR v1.4.2. For a given set of sequences, *k*-mers are counted, then length normalized (counts per kb of sequence), then z-scores for each *k*-mer are calculated, and then these z-scores are log2-tranformed. See [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/) for examples and an in-depth description of the rationale for using log2-transformed z-scores as a default.
+  * `--log2 none` is the same as the no-log transformation option (-nl) of seekr v1.4.2. Here, after *k*-mers are counted and length-normalized, z-scores are calculated and used without any transformation. This was the approached used in our original SEEKR publication ([PMID 30224646](https://pubmed.ncbi.nlm.nih.gov/30224646/)).
+  * `--log2 pre` is the additional/new option for standardization. In this approach, *k*-mers are counted across a set of sequences and then length normalized (counts per kb of sequence). For each *k*-mer that has a zero-count value in each sequence, a pseudo-count of 1 is added; this allows the *k*-mer count values to be log2 transformed. Z-scores are calculated after log2-transformation of *k*-mer counts, and these z-scores can then be used directly for comparisons. In effect, this standardization method is not much different from the default option of --log2 2 (users can compare for themselves). It is, however, a slightly cleaner heuristic. In the time since our original two publications using seekr, we have noted that *k*-mer counts in the mouse and human transcriptomes tend to follow a log-normal distribution; thus, we currently favor this method of standardization. 
+* Includes small updates to “notes” and “Help” sections of README.md
+
+
 
 ---
 
