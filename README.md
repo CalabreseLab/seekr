@@ -79,24 +79,6 @@ Fasta files can be found [here](https://www.gencodegenes.org/releases/current.ht
   * In the examples below we'll generically refer to `gencode.fa`.
     Any sufficiently large fasta file can be used, as needed.
  
-Some general advice for thinking about how to use SEEKR. One challenge that we continually face in the lab is there are few ground truths in the lncRNA field and thus it is often unclear how to decide on the best parameters for sequence comparisons using SEEKR. Below are two points that may be useful – these are also discussed in the conclusions of [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/):
-
-* On the selection of a set of sequences to use for the calculation of standardization vectors: In our experience, one of the most useful features of SEEKR is that it provides a metric of relative similarity. Consider two lncRNAs, lncRNA-X, which is from mouse, and lncRNA-Y, which is from human. One way to compare these two lncRNAs using SEEKR would be to calculate their *k*-mer profiles and compare these profiles in relation to all known mouse lncRNAs. To do this, one would first use all mouse lncRNAs as an input for the "seekr_norm_vectors" script, to determine the mean and standard deviation of counts for all *k*-mers in all mouse lncRNAs. Then, users would take those standardization vectors along with the sequences of lncRNA-X and lncRNA-Y and use them in the “kmer_counts” script to calculate *k*-mer profiles of lncRNA-X and lncRNA-Y in relation to all mouse lncRNAs. Finally, users would employ the “seekr_pearson” script to determine how similar lncRNA-X and lncRNA-Y were to each other relative to all other mouse lncRNAs. The point here is that the set of sequences used to calculate standardization vectors is a key variable – perhaps analogous to a reference gene in a quantitative PCR experiment or a loading control in a western blot. Users should think through what comparison they are interested in performing and choose their set of standardization sequences accordingly. In the example above, where all mouse lncRNAs were used for standardization, users might discover that “At the level of *k*-mers, lncRNA-X is more similar to lncRNA-Y than it is similar to 99% of other mouse lncRNAs”. But changing the set of sequences for standardization can change the question being asked. For example, users might be interested in comparing lncRNA-X and lncRNA-Y relative to all known human enhancer RNAs (eRNAs). Here, using all human eRNAs as the standardization set, users might make an additional insightful discovery, perhaps: “At the level of *k*-mers, lncRNA-X is no more similar to lncRNA-Y than it is similar to the average human eRNA”. Relatedly, when users are comparing two large groups of sequences (let us call these “set A” and “set B”), we again recommend thinking about what set of reference sequences would be best for standardization. In most cases, users will probably want to use the same set of reference sequences to standardize *k*-mer counts in set A and in set B.  Perhaps set A and set B should again be standardized relative to all mouse lncRNAs; or, both set A and set B be should be standardized relative to the sequences in set B. But standardizing set A relative to itself, then standardizing set B relative to itself, then using “seekr_pearson” to compare the two sets of sequences might yield a non-sensical comparison.
-*	On the selection of *k*-mer length: In our experience, the most robust biological trends have been relatively insensitive to the length of *k*-mer used in SEEKR. Still, when deciding on a length of k to use for comparisons, we recommend using a *k*-mer length for which 4^k is similar to the length of the average feature or key feature that is being compared. The reason for this is that as the length of k increases, so does the number of zero values for *k*-mer counts in a given sequence. For example, there are 16384 possible 7-mers. If users were interested in finding lncRNAs that are similar to lncRNA-X, which is 500 nucleotides long, a *k*-mer length of 7 would not be ideal, because the vector of 7-mer counts that corresponds to lncRNA-X would be dominated by zero values. In this example, unless users had a specific rationale for searching 7-mers, a *k*-mer length of 4 (256 possible *k*-mers) or 5 (1024 possible *k*-mers) would provide the basis for a stronger comparison.
-
-
-### Help
-
-Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logchanges/methods_mol_bio_seekr-v20.pdf) to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed. 
-
-If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
-
-For full documentation, type:
-
-```
-$ seekr_kmer_counts
-```
-
 Here are some examples if you just want to get going.
 
 ### Command line examples
@@ -158,12 +140,15 @@ $ cat out_counts.csv
 You can also see the output of this command
 [here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
 
-Three options are available for log transformation, using the --log2 flag. Pass `--log2 1` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count, pass `--log2 2` for log transformation of z-scores following count standardization (default), and pass `--log2 3` for no log transformation.
+Three options are available for log transformation, using the `--log2` flag. 
+Pass `--log2 pre` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count, 
+pass `--log2 post` for log transformation of z-scores following count standardization (this is the default), 
+and pass `--log2 none` for no log transformation.
 
-If we want to avoid normalization, we can produce *k*-mer counts per kb by setting the `--log2 3`, `--uncentered` and `--unstandardized` flags:
+If we want to avoid normalization, we can produce *k*-mer counts per kb by setting the `--log2 non`, `--uncentered` and `--unstandardized` flags:
 
 ```
-$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 3 -uc -us
+$ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 none -uc -us
 ```
 
 Similarly, if we want a more compact, efficient numpy file,
@@ -211,7 +196,8 @@ standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
 
-**Note** If --log2 1 is passed in *seekr_kmer_counts*, then the -cl flag must be passed to *seekr_norm_vectors*. This is so that the log-transformed *k*-mer counts are standardized against reference *k*-mer counts that are also log transformed. 
+**Note:** If `--log2 post` is passed in *seekr_kmer_counts*, then the -cl flag must be passed to *seekr_norm_vectors*. 
+This is so that the log-transformed *k*-mer counts are standardized against reference *k*-mer counts that are also log transformed. 
 
 ```
 $ seekr_norm_vectors gencode.fa
@@ -393,10 +379,56 @@ Once this has been saved, the first portion of the code doesn't need to be run a
 * `xist_vs_lncs_{k}mers.npy`: Pearson's r values for all pairwise comparisons between Xist and the other lncRNAs.
 * `xist_vs_lncs_{k}mers.csv`: Labeled, plain text version of pairwise comparisons.
 
-## Issues
+## Additional considerations
+
+This section is a "not-so-quickstart", providing more complete views on selection of input data and parameter selection.
+
+Some general advice for thinking about how to use SEEKR. 
+One challenge that we continually face in the lab is there are few ground truths in the lncRNA field and thus it is often unclear how to decide on the best parameters for sequence comparisons using SEEKR. 
+Below are some points that may be useful – these are also discussed in the conclusions of [PMID 31097619](https://pubmed.ncbi.nlm.nih.gov/31097619/)
+
+### Selection of a set of sequences to use for the calculation of standardization vectors
+
+In our experience, one of the most useful features of SEEKR is that it provides a metric of relative similarity. 
+Consider two lncRNAs, lncRNA-X, which is from mouse, and lncRNA-Y, which is from human. 
+One way to compare these two lncRNAs using SEEKR would be to calculate their *k*-mer profiles and compare these profiles in relation to all known mouse lncRNAs. 
+To do this, one would first use all mouse lncRNAs as an input for the "seekr_norm_vectors" script, to determine the mean and standard deviation of counts for all *k*-mers in all mouse lncRNAs. 
+Then, users would take those standardization vectors along with the sequences of lncRNA-X and lncRNA-Y and use them in the “kmer_counts” script to calculate *k*-mer profiles of lncRNA-X and lncRNA-Y in relation to all mouse lncRNAs. 
+Finally, users would employ the “seekr_pearson” script to determine how similar lncRNA-X and lncRNA-Y were to each other relative to all other mouse lncRNAs. 
+The point here is that the set of sequences used to calculate standardization vectors is a key variable – perhaps analogous to a reference gene in a quantitative PCR experiment or a loading control in a western blot. 
+Users should think through what comparison they are interested in performing and choose their set of standardization sequences accordingly. 
+In the example above, where all mouse lncRNAs were used for standardization, users might discover that “At the level of *k*-mers, lncRNA-X is more similar to lncRNA-Y than it is similar to 99% of other mouse lncRNAs”. 
+But changing the set of sequences for standardization can change the question being asked. 
+For example, users might be interested in comparing lncRNA-X and lncRNA-Y relative to all known human enhancer RNAs (eRNAs). 
+Here, using all human eRNAs as the standardization set, users might make an additional insightful discovery, perhaps: “At the level of *k*-mers, lncRNA-X is no more similar to lncRNA-Y than it is similar to the average human eRNA”. 
+Relatedly, when users are comparing two large groups of sequences (let us call these “set A” and “set B”), we again recommend thinking about what set of reference sequences would be best for standardization. 
+In most cases, users will probably want to use the same set of reference sequences to standardize *k*-mer counts in set A and in set B.  
+Perhaps set A and set B should again be standardized relative to all mouse lncRNAs; or, both set A and set B be should be standardized relative to the sequences in set B. 
+But standardizing set A relative to itself, then standardizing set B relative to itself, then using “seekr_pearson” to compare the two sets of sequences might yield a non-sensical comparison.
+
+### Selection of *k*-mer length
+
+In our experience, the most robust biological trends have been relatively insensitive to the length of *k*-mer used in SEEKR. 
+Still, when deciding on a length of k to use for comparisons, we recommend using a *k*-mer length for which 4^k is similar to the length of the average feature or key feature that is being compared. 
+The reason for this is that as the length of k increases, so does the number of zero values for *k*-mer counts in a given sequence. 
+For example, there are 16384 possible 7-mers. 
+If users were interested in finding lncRNAs that are similar to lncRNA-X, which is 500 nucleotides long, a *k*-mer length of 7 would not be ideal, because the vector of 7-mer counts that corresponds to lncRNA-X would be dominated by zero values. 
+In this example, unless users had a specific rationale for searching 7-mers, a *k*-mer length of 4 (256 possible *k*-mers) or 5 (1024 possible *k*-mers) would provide the basis for a stronger comparison.
+ 
+## Issues and Help 
+
+If you have questions about how you can use seekr in your own research, please send an email to jmcalabr@med.unc.edu
+
+For full documentation, run:
+
+```
+$ seekr
+```
 
 Any suggestions, questions, or problems can be directed to our
 [GitHub Issues page](https://github.com/CalabreseLab/seekr/issues).
+
+Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logchanges/methods_mol_bio_seekr-v20.pdf) to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed.
 
 ## Citation
 
