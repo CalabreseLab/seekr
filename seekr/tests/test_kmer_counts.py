@@ -10,7 +10,7 @@ class TestBasicCounter:
         infasta = pkg_resources.resource_filename('seekr', infasta)
         counter = kmer_counts.BasicCounter(infasta=infasta,
                                            silent=True,
-                                           log2=2,
+                                           log2=kmer_counts.Log2.post,
                                            **kwargs)
         return counter
 

@@ -10,6 +10,7 @@ import pkg_resources
 import pytest
 
 from seekr import console_scripts
+from seekr.kmer_counts import Log2
 from seekr import graph
 
 class TestConsoleScripts:
@@ -39,7 +40,7 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=True,
                                          standardized=True,
-                                         log2=2,
+                                         log2=Log2.post.name,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
@@ -60,7 +61,7 @@ class TestConsoleScripts:
                                          binary=False,
                                          centered=False,
                                          standardized=False,
-                                         log2=3,
+                                         log2=Log2.none.name,
                                          remove_labels=True,
                                          mean_vector=None,
                                          std_vector=None,
@@ -86,7 +87,7 @@ class TestConsoleScripts:
                                          binary=True,
                                          centered=False,
                                          standardized=False,
-                                         log2=2,
+                                         log2=Log2.post.name,
                                          remove_labels=True,
                                          mean_vector=mean_vector,
                                          std_vector=std_vector,
@@ -105,7 +106,7 @@ class TestConsoleScripts:
         console_scripts._run_norm_vectors(fasta=infasta,
                                           mean_vector=mean,
                                           std_vector=std,
-                                          count_log2=False,
+                                          log2=Log2.none.name,
                                           kmer=2)
         mean = np.load(mean)
         std = np.load(std)

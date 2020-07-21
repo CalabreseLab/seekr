@@ -41,7 +41,7 @@ except ImportError:
 
 from seekr.my_tqdm import my_tqdm
 from seekr.fasta_reader import Reader
-from seekr.kmer_counts import BasicCounter
+from seekr.kmer_counts import BasicCounter, Log2
 from seekr.utils import get_adj
 
 
@@ -136,9 +136,8 @@ class DomainPearson:
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
         Can be produced by `seekr_norm_vectors`.
-    log2: int (default=2)
-        Pass 1,2, or 3 for pre-standardization log-transform, post-standardization log transform, or
-        no log transform, respectively. 
+    log2: Log2 (default=Log2.post)
+        Log2 transformation can occur pre- or post-standardization, or not at all.
     k: int (default=6)
         Size of kmer to be counted.
     window: int (default=1000)
@@ -166,7 +165,7 @@ class DomainPearson:
     """
 
     def __init__(self, query_path=None, target_path=None, reference_path=None, r_values_path=None,
-                 percentiles_path=None, mean=True, std=True, log2=2,
+                 percentiles_path=None, mean=True, std=True, log2=Log2.post,
                  k=6, window=1000, slide=100):
         self.query_path = query_path
         self.target_path = target_path
