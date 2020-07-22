@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from seekr import fasta
-from seekr import graph	
+from seekr import graph
 from seekr import pearson
 from seekr.kmer_counts import BasicCounter, Log2
 
@@ -169,8 +169,8 @@ The default setting accept a single fasta file.
 If you want to specify paths for the output files, or choose a different kmer size:
     $ seekr_norm_vectors gencode.fa -k 5 -mv mean_5mers.npy -sv std_5mers.npy
 
-If pre-zscore log transform is desired, you must pass the -cl flag to log transform
-    the reference k-mer counts 
+If pre-zscore log transform is desired, you must pass the `--log2 pre` flag to log transform
+    the reference k-mer counts
 
 Issues
 ------
