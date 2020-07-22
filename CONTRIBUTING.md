@@ -29,4 +29,6 @@ You'll need `twine` installed via `pip install twine`.
 Once changes have been approved and are in master
 
 1. Bump the version in `__version__.py`
-2. TODO
+2. Build the package: `python setup.py sdist bdist_wheel`
+3. Upload to pypi: `twine upload dist/*`
+4. ... Pass the username and password... Right now this is tide to my private account. If someone makes it this far, email me at jessime.kirk@gmail.com and we'll figure out what we need to do. :)
