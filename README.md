@@ -5,8 +5,6 @@
 
 Find communities of nucleotide sequences based on *k*-mer frequencies.
 
-A web portal is available at [seekr.org](http://seekr.org).
-
 ## Installation
 
  To use this library, you have to have >Python3.6 on your computer.
