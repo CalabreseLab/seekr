@@ -138,7 +138,7 @@ $ cat out_counts.csv
 ```
 
 You can also see the output of this command
-[here](https://github.com/CalabreseLab/seekr/seekr/tests/data/example_2mers.csv).
+[here](https://github.com/CalabreseLab/seekr/blob/master/seekr/tests/data/example_2mers.csv).
 
 Three options are available for log transformation, using the `--log2` flag.
 Pass `--log2 pre` for log transformation of length normalized *k*-mer counts, with a +1 pseudo-count,
