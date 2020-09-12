@@ -84,7 +84,7 @@ To get a compact and efficient .npy file, set the binary flag:
     $ seekr_kmer_counts rnas.fa -o out.npy -b
 
 You can change also change the size of the kmer you're using, and prevent normalization:
-    $ seekr_kmer_counts rnas.fa -o out.csv -k 4 -uc -us -nl
+    $ seekr_kmer_counts rnas.fa -o out.csv -k 4 -uc -us -l none
 
 If you ever do not want labels on a csv file:
     $ seekr_kmer_counts rnas.fa -o out.csv -rl
@@ -312,7 +312,7 @@ If you want percentiles, you must also pass a reference fasta path:
 
 Parameters you might pass to `seekr_kmer_counts` can also be passed.
 If you change --kmer, ensure that your mean.npy and std.npy files match:
-    $ seekr_domain_pearson $REQUIRED -r r_values.csv -nl -k 5
+    $ seekr_domain_pearson $REQUIRED -r r_values.csv -l none -k 5
 
 You can also change the size of the domain,
 and how far you slide along the target sequence before creating another domain:
