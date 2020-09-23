@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 TEST_DIR="$HOME/Desktop/test_env/"
 rm -rf $TEST_DIR
 mkdir $TEST_DIR
@@ -20,3 +22,4 @@ seekr_visualize_distro example_vs_self.npy example_vs_self.pdf
 echo "Finding communities."
 seekr_graph example_vs_self.npy .1 -s 0 -g example_vs_self.gml -c communities.csv
 cat communities.csv
+printf "\nCompleted successfully!"

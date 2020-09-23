@@ -11,17 +11,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* 
+*
 
 ### Fixed
 
-* 
+*
 
 ### Changed
 
-* 
+*
 ---
 
+## 1.5.1
+
+### Fixed
+
+* --log2 compatibility in domain pearson. ([See Issue](https://github.com/CalabreseLab/seekr/issues/19))
+* Update examples. ([See Issue](https://github.com/CalabreseLab/seekr/issues/18))
+  
 ## 1.5.0
 
 ### Added
