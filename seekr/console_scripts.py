@@ -602,7 +602,7 @@ def _run_domain_pearson(query_path, target_path, reference_path, mean, std, r_va
                         percentiles, kmer, log2, window, slide):
     # Note: This function is separated for testing
     domain_pearson = pearson.DomainPearson(query_path, target_path, reference_path, r_values,
-                                           percentiles, mean, std, log2, kmer, window, slide)
+                                           percentiles, mean, std, Log2[log2], kmer, window, slide)
     domain_pearson.run()
 
 
@@ -624,8 +624,9 @@ def console_domain_pearson():
     parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
     parser.add_argument('-k', '--kmer', default=6,
                         help='Length of kmers you want to count.')
-    parser.add_argument('-l', '--log2',
-                        help='Choose a value of 1,2, or 3 for different log transformation options')
+    parser.add_argument('-l', '--log2', default=Log2.post.name,
+                        choices=[l2.name for l2 in Log2],
+                        help='Decided if and when to log transform counts')
     parser.add_argument('-w', '--window', default=1000,
                         help=('Size of tile/domain to be created from target transcripts for '
                               'comparison against queries.'))

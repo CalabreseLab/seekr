@@ -108,7 +108,7 @@ class BasicCounter:
         self.counts = None
         self.alpha_len = len(alphabet)
         self.kmers = [''.join(i) for i in product(alphabet, repeat=k)]
-        self.map = {k:i for k,i in zip(self.kmers, range(self.alpha_len**k))}
+        self.map = {k: i for k, i in zip(self.kmers, range(self.alpha_len**k))}
 
         if self.seqs is not None:
             if len(self.seqs) == 1 and self.std is True:
