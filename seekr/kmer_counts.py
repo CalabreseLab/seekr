@@ -42,7 +42,7 @@ from seekr.my_tqdm import my_tqdm
 from seekr.fasta_reader import Reader
 
 
-Log2 = Enum('Log2', ('pre', 'post', 'none'))
+Log2 = Enum("Log2", ("pre", "post", "none"))
 
 
 class BasicCounter:
@@ -85,9 +85,20 @@ class BasicCounter:
         Length of alphabet
     """
 
-    def __init__(self, infasta=None, outfile=None, k=6,
-                 binary=True, mean=True, std=True, log2=Log2.post,
-                 leave=True, silent=False, label=False, alphabet='AGTC'):
+    def __init__(
+        self,
+        infasta=None,
+        outfile=None,
+        k=6,
+        binary=True,
+        mean=True,
+        std=True,
+        log2=Log2.post,
+        leave=True,
+        silent=False,
+        label=False,
+        alphabet="AGTC",
+    ):
         self.infasta = infasta
         self.seqs = None
         if infasta is not None:
@@ -101,32 +112,34 @@ class BasicCounter:
         self.std = std
         if isinstance(std, str):
             self.std = np.load(std)
-        self.log2 = log2 
+        self.log2 = log2
         self.leave = leave
         self.silent = silent
         self.label = label
         self.counts = None
         self.alpha_len = len(alphabet)
-        self.kmers = [''.join(i) for i in product(alphabet, repeat=k)]
-        self.map = {k: i for k, i in zip(self.kmers, range(self.alpha_len**k))}
+        self.kmers = ["".join(i) for i in product(alphabet, repeat=k)]
+        self.map = {k: i for k, i in zip(self.kmers, range(self.alpha_len ** k))}
 
         if self.seqs is not None:
             if len(self.seqs) == 1 and self.std is True:
-                err = ('You cannot standardize a single sequence. '
-                       'Please pass the path to an std. dev. array, '
-                       'or use raw counts by setting std=False.')
+                err = (
+                    "You cannot standardize a single sequence. "
+                    "Please pass the path to an std. dev. array, "
+                    "or use raw counts by setting std=False."
+                )
                 raise ValueError(err)
 
         if not isinstance(self.log2, Log2):
-            raise TypeError(f'log2 must be one of {list(Log2)}')
+            raise TypeError(f"log2 must be one of {list(Log2)}")
 
     def occurrences(self, row, seq):
         """Counts kmers on a per kilobase scale"""
         counts = defaultdict(int)
         length = len(seq)
-        increment = 1000/(length-self.k+1) #fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
-        for c in range(length-self.k+1):
-            kmer = seq[c:c+self.k]
+        increment = 1000 / (length - self.k + 1)  # fix, original 1000/length, incorrect divisor, should be 1000/(l-k+1)
+        for c in range(length - self.k + 1):
+            kmer = seq[c : c + self.k]
             counts[kmer] += increment
         for kmer, n in counts.items():
             if kmer in self.map:
@@ -139,7 +152,7 @@ class BasicCounter:
             return self.seqs
 
         if not self.leave:
-            tqdm_seqs = my_tqdm()(self.seqs, desc='Kmers', leave=False)
+            tqdm_seqs = my_tqdm()(self.seqs, desc="Kmers", leave=False)
         else:
             tqdm_seqs = my_tqdm()(self.seqs)
 
@@ -148,7 +161,7 @@ class BasicCounter:
     def center(self):
         """Mean center counts by column"""
         if self.mean is True:
-            self.mean  = np.mean(self.counts, axis=0)
+            self.mean = np.mean(self.counts, axis=0)
         self.counts -= self.mean
 
     def standardize(self):
@@ -157,13 +170,17 @@ class BasicCounter:
             self.std = np.std(self.counts, axis=0)
         self.counts /= self.std
         if np.isnan(self.counts).any():
-            print(('\nWARNING: You have `np.nan` values in your counts '
-                   'after standardization. This is likely due to '
-                   'a kmer not appearing in any of your sequences. '
-                   'Try: \n1) using a smaller kmer size, \n2) beginning '
-                   'with a larger set of sequences, \n3) passing '
-                   'precomputed normalization vectors from a larger '
-                   'data set (e.g. GENCODE).'))
+            print(
+                (
+                    "\nWARNING: You have `np.nan` values in your counts "
+                    "after standardization. This is likely due to "
+                    "a kmer not appearing in any of your sequences. "
+                    "Try: \n1) using a smaller kmer size, \n2) beginning "
+                    "with a larger set of sequences, \n3) passing "
+                    "precomputed normalization vectors from a larger "
+                    "data set (e.g. GENCODE)."
+                )
+            )
 
     def log2_norm(self):
         """Apply a log2 transform to the count matrix"""
@@ -172,7 +189,7 @@ class BasicCounter:
 
     def get_counts(self):
         """Generates kmer counts for a fasta file"""
-        self.counts = np.zeros([len(self.seqs), self.alpha_len**self.k], dtype=np.float32)
+        self.counts = np.zeros([len(self.seqs), self.alpha_len ** self.k], dtype=np.float32)
         seqs = self._progress()
 
         for i, seq in enumerate(seqs):
@@ -201,12 +218,14 @@ class BasicCounter:
         names : [str] (default=None)
             Unique names for rows of the Dataframe.
         """
-        err_msg = ('You cannot label a binary file. '
-                   'Set only one of "binary" or "label" as True. '
-                   'If you used `-b` from the command line, '
-                   'try also using `-rl`.')
+        err_msg = (
+            "You cannot label a binary file. "
+            'Set only one of "binary" or "label" as True. '
+            "If you used `-b` from the command line, "
+            "try also using `-rl`."
+        )
         assert not (self.binary and self.label), err_msg
-        assert self.outfile is not None, 'Please provide an outfile location.'
+        assert self.outfile is not None, "Please provide an outfile location."
         if self.binary:
             np.save(self.outfile, self.counts)
         elif self.label:
@@ -215,7 +234,7 @@ class BasicCounter:
             df = DataFrame(data=self.counts, index=names, columns=self.kmers)
             df.to_csv(self.outfile)
         else:
-            np.savetxt(self.outfile, self.counts, delimiter=',', fmt='%1.6f')
+            np.savetxt(self.outfile, self.counts, delimiter=",", fmt="%1.6f")
 
     def make_count_file(self, names=None):
         """Wrapper function for the most common way to generate count files.

@@ -341,21 +341,24 @@ def _run_download_gencode(biotype, species, release, out_path, unzip):
 
 
 def console_download_gencode():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('biotype',
-                        help=("Name of Genocde set to download. "
-                              "Must be one of ('all', 'pc', 'lncRNA')."))
-    parser.add_argument('-s', '--species', default='human',
-                        help=" Name of species. Must be one of: ('human' or 'mouse').")
-    parser.add_argument('-r', '--release', default=None,
-                        help=("Name of specific release to download (e.g. 'M5'). "
-                              "If None, download latest release."))
-    parser.add_argument('-o', '--out_path', default=None,
-                        help="Path to location for fasta file. Default will save by release name.")
-    parser.add_argument('-z', '--zip', action='store_false',
-                        help="Set if you do not want to gunzip fasta file after downloading.")
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("biotype", help=("Name of Genocde set to download. " "Must be one of ('all', 'pc', 'lncRNA')."))
+    parser.add_argument(
+        "-s", "--species", default="human", help=" Name of species. Must be one of: ('human' or 'mouse')."
+    )
+    parser.add_argument(
+        "-r",
+        "--release",
+        default=None,
+        help=("Name of specific release to download (e.g. 'M5'). " "If None, download latest release."),
+    )
+    parser.add_argument(
+        "-o", "--out_path", default=None, help="Path to location for fasta file. Default will save by release name."
+    )
+    parser.add_argument(
+        "-z", "--zip", action="store_false", help="Set if you do not want to gunzip fasta file after downloading."
+    )
     args = _parse_args_or_exit(parser)
     _run_download_gencode(args.biotype, args.species, args.release, args.out_path, args.zip)
 
@@ -367,60 +370,74 @@ def _run_canonical_gencode(in_fasta, out_fasta, zeros, unique_per_gene):
 
 
 def console_canonical_gencode():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=CANONICAL_GENCODE_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('in_fasta', help='Full path of fasta file.')
-    parser.add_argument('out_fasta', help='Full path of filtered fasta file.')
-    parser.add_argument('-z', '--zeros', default=1,
-                        help='Number of zeroes needed to be considered canonical.')
-    parser.add_argument('-u', '--unique_per_gene', action='store_true',
-                        help='Set to enforce a limit of one isoform per ENSG id.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(
+        usage=CANONICAL_GENCODE_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument("in_fasta", help="Full path of fasta file.")
+    parser.add_argument("out_fasta", help="Full path of filtered fasta file.")
+    parser.add_argument("-z", "--zeros", default=1, help="Number of zeroes needed to be considered canonical.")
+    parser.add_argument(
+        "-u", "--unique_per_gene", action="store_true", help="Set to enforce a limit of one isoform per ENSG id."
+    )
     args = _parse_args_or_exit(parser)
     _run_canonical_gencode(args.in_fasta, args.out_fasta, args.zeros, args.unique_per_gene)
 
 
-def _run_kmer_counts(fasta, outfile, kmer, binary, centered, standardized,
-                     log2, remove_labels, mean_vector, std_vector, alphabet):
+def _run_kmer_counts(
+    fasta, outfile, kmer, binary, centered, standardized, log2, remove_labels, mean_vector, std_vector, alphabet
+):
     # Note: This function is separated from console_kmer_counts for testing purposes.
     mean = mean_vector or centered
     std = std_vector or standardized
     label = not remove_labels
-    counter = BasicCounter(fasta, outfile, kmer, binary,
-                           mean, std, Log2[log2], label=label, alphabet=alphabet)
+    counter = BasicCounter(fasta, outfile, kmer, binary, mean, std, Log2[log2], label=label, alphabet=alphabet)
     counter.make_count_file()
 
 
 def console_kmer_counts():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('fasta', help='Full path of fasta file.')
-    parser.add_argument('-o', '--outfile', default='counts.seekr',
-                        help='Name of file to save counts to.')
-    parser.add_argument('-k', '--kmer', default=6,
-                        help='Length of kmers you want to count.')
-    parser.add_argument('-b', '--binary', action='store_true',
-                        help='Set if output should be a .npy file.')
-    parser.add_argument('-uc', '--uncentered', action='store_false',
-                        help='Set if output should not have the mean subtracted.')
-    parser.add_argument('-us', '--unstandardized', action='store_false',
-                        help='Set if output should not be divided by the standard deviation.')
-    parser.add_argument('-l', '--log2', default=Log2.post.name,
-                        choices=[l2.name for l2 in Log2],
-                        help='Decided if and when to log transform counts')
-    parser.add_argument('-rl', '--remove_labels', action='store_true',
-                        help='Set to save without index and column labels.')
-    parser.add_argument('-mv', '--mean_vector', default=None,
-                        help='Optional path to mean vector numpy file.')
-    parser.add_argument('-sv', '--std_vector', default=None,
-                        help='Optional path to std vector numpy file.')
-    parser.add_argument('-a', '--alphabet', default='AGTC',
-                        help='Valid letters to include in kmer.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=KMER_COUNTS_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("fasta", help="Full path of fasta file.")
+    parser.add_argument("-o", "--outfile", default="counts.seekr", help="Name of file to save counts to.")
+    parser.add_argument("-k", "--kmer", default=6, help="Length of kmers you want to count.")
+    parser.add_argument("-b", "--binary", action="store_true", help="Set if output should be a .npy file.")
+    parser.add_argument(
+        "-uc", "--uncentered", action="store_false", help="Set if output should not have the mean subtracted."
+    )
+    parser.add_argument(
+        "-us",
+        "--unstandardized",
+        action="store_false",
+        help="Set if output should not be divided by the standard deviation.",
+    )
+    parser.add_argument(
+        "-l",
+        "--log2",
+        default=Log2.post.name,
+        choices=[l2.name for l2 in Log2],
+        help="Decided if and when to log transform counts",
+    )
+    parser.add_argument(
+        "-rl", "--remove_labels", action="store_true", help="Set to save without index and column labels."
+    )
+    parser.add_argument("-mv", "--mean_vector", default=None, help="Optional path to mean vector numpy file.")
+    parser.add_argument("-sv", "--std_vector", default=None, help="Optional path to std vector numpy file.")
+    parser.add_argument("-a", "--alphabet", default="AGTC", help="Valid letters to include in kmer.")
     args = _parse_args_or_exit(parser)
-    _run_kmer_counts(args.fasta, args.outfile, int(args.kmer), args.binary, args.uncentered,
-                     args.unstandardized, args.log2, args.remove_labels, args.mean_vector,
-                     args.std_vector, args.alphabet)
+    _run_kmer_counts(
+        args.fasta,
+        args.outfile,
+        int(args.kmer),
+        args.binary,
+        args.uncentered,
+        args.unstandardized,
+        args.log2,
+        args.remove_labels,
+        args.mean_vector,
+        args.std_vector,
+        args.alphabet,
+    )
 
 
 def _run_pearson(counts1, counts2, outfile, binary_input, binary_output):
@@ -445,42 +462,37 @@ def _run_pearson(counts1, counts2, outfile, binary_input, binary_output):
 
 
 def console_pearson():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=PEARSON_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('counts1',
-                        help='Full path of a count file produced by kmer_counts.py.')
-    parser.add_argument('counts2',
-                        help=('Full path of a second count file produced by kmer_counts.py. '
-                              'This can be the same path as the first counts file.'))
-    parser.add_argument('-o', '--outfile', default='pearson.seekr',
-                        help='Path of file to save similarities to.')
-    parser.add_argument('-bi', '--binary_input', action='store_true',
-                        help='Set if the input will be a .npy file.')
-    parser.add_argument('-bo', '--binary_output', action='store_true',
-                        help='Set if output should be a .npy file.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=PEARSON_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("counts1", help="Full path of a count file produced by kmer_counts.py.")
+    parser.add_argument(
+        "counts2",
+        help=(
+            "Full path of a second count file produced by kmer_counts.py. "
+            "This can be the same path as the first counts file."
+        ),
+    )
+    parser.add_argument("-o", "--outfile", default="pearson.seekr", help="Path of file to save similarities to.")
+    parser.add_argument("-bi", "--binary_input", action="store_true", help="Set if the input will be a .npy file.")
+    parser.add_argument("-bo", "--binary_output", action="store_true", help="Set if output should be a .npy file.")
     args = _parse_args_or_exit(parser)
-    _run_pearson(args.counts1, args.counts2, args.outfile,
-                 args.binary_input, args.binary_output)
+    _run_pearson(args.counts1, args.counts2, args.outfile, args.binary_input, args.binary_output)
 
 
 def _run_visualize_distro(adj, out_path, sample):
     if sample is not None:
         sample = float(sample)
     mean, std = pearson.visualize_distro(adj, out_path, sample)
-    print('Mean: ', mean)
-    print('Std. Dev.: ', std)
+    print("Mean: ", mean)
+    print("Std. Dev.: ", std)
 
 
 def console_visualize_distro():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=VISUALIZE_DISTRO_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('adj',
-                        help='Path to either .csv or .npy file, representing adjacency matrix')
-    parser.add_argument('out_path', help='Full path of a output image.')
-    parser.add_argument('-s', '--sample', default=None,
-                        help='Float representing random portion of adj to visualize.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=VISUALIZE_DISTRO_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("adj", help="Path to either .csv or .npy file, representing adjacency matrix")
+    parser.add_argument("out_path", help="Full path of a output image.")
+    parser.add_argument("-s", "--sample", default=None, help="Float representing random portion of adj to visualize.")
     args = _parse_args_or_exit(parser)
     _run_visualize_distro(args.adj, args.out_path, args.sample)
 
@@ -493,19 +505,19 @@ def _run_norm_vectors(fasta, mean_vector, std_vector, log2, kmer):
 
 
 def console_norm_vectors():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=NORM_VECTORS_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('fasta', help='path to .fa file')
-    parser.add_argument('-mv', '--mean_vector', default='mean.npy',
-                        help='path to output mean vector')
-    parser.add_argument('-sv', '--std_vector', default='std.npy',
-                        help='path to output standard deviation vector')
-    parser.add_argument('-l', '--log2', default=Log2.post.name,
-                        choices=[l2.name for l2 in Log2],
-                        help='Decided if and when to log transform counts')
-    parser.add_argument('-k', '--kmer', default=6,
-                        help='length of kmers you want to count')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=NORM_VECTORS_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("fasta", help="path to .fa file")
+    parser.add_argument("-mv", "--mean_vector", default="mean.npy", help="path to output mean vector")
+    parser.add_argument("-sv", "--std_vector", default="std.npy", help="path to output standard deviation vector")
+    parser.add_argument(
+        "-l",
+        "--log2",
+        default=Log2.post.name,
+        choices=[l2.name for l2 in Log2],
+        help="Decided if and when to log transform counts",
+    )
+    parser.add_argument("-k", "--kmer", default=6, help="length of kmers you want to count")
     args = _parse_args_or_exit(parser)
     _run_norm_vectors(args.fasta, args.mean_vector, args.std_vector, args.log2, int(args.kmer))
 
@@ -520,28 +532,33 @@ def _run_graph(adj, threshold, gml_path, csv_path, louvain, resolution, n_comms,
 
 
 def console_graph():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=GRAPH_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('adj',
-                        help='Path to either .csv or .npy file, representing adjacency matrix')
-    parser.add_argument('threshold', help=('Value for thresholding adjacency matrix. '
-                                           'Below this limit, all edges are 0.'))
-    parser.add_argument('-g', '--gml_path', default=None,
-                        help='Path to output graph file in .gml format')
-    parser.add_argument('-c', '--csv_path', default=None,
-                        help='Path to output community file in .csv format')
-    parser.add_argument('-l', '--louvain',  action='store_true',
-                        help='If set, use Louvain for community detection instead of Leiden.')
-    parser.add_argument('-r', '--resolution', default=1,
-                        help=' Resolution parameter for community detection algorithm')
-    parser.add_argument('-n', '--n_comms', default=5,
-                        help='Number of communities to find. This does not count a null community.')
-    parser.add_argument('-s', '--seed', default=None,
-                        help='An integer to create reproducible results between runs.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=GRAPH_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("adj", help="Path to either .csv or .npy file, representing adjacency matrix")
+    parser.add_argument(
+        "threshold", help=("Value for thresholding adjacency matrix. " "Below this limit, all edges are 0.")
+    )
+    parser.add_argument("-g", "--gml_path", default=None, help="Path to output graph file in .gml format")
+    parser.add_argument("-c", "--csv_path", default=None, help="Path to output community file in .csv format")
+    parser.add_argument(
+        "-l", "--louvain", action="store_true", help="If set, use Louvain for community detection instead of Leiden."
+    )
+    parser.add_argument("-r", "--resolution", default=1, help=" Resolution parameter for community detection algorithm")
+    parser.add_argument(
+        "-n", "--n_comms", default=5, help="Number of communities to find. This does not count a null community."
+    )
+    parser.add_argument("-s", "--seed", default=None, help="An integer to create reproducible results between runs.")
     args = _parse_args_or_exit(parser)
-    _run_graph(args.adj, float(args.threshold), args.gml_path, args.csv_path, args.louvain,
-               float(args.resolution), int(args.n_comms), args.seed)
+    _run_graph(
+        args.adj,
+        float(args.threshold),
+        args.gml_path,
+        args.csv_path,
+        args.louvain,
+        float(args.resolution),
+        int(args.n_comms),
+        args.seed,
+    )
 
 
 def _run_gen_rand_rnas(in_fasta, out_fasta, kmer, mutations, seed, group):
@@ -557,22 +574,18 @@ def _run_gen_rand_rnas(in_fasta, out_fasta, kmer, mutations, seed, group):
 
 
 def console_gen_rand_rnas():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=GEN_RAND_RNAS_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('in_fasta', help='path to .fa file')
-    parser.add_argument('out_fasta', help='path to new .fa file')
-    parser.add_argument('-k', '--kmer', default=1,
-                        help='Length of kmers you want to conserve')
-    parser.add_argument('-m', '--mutations', default=0,
-                        help='Number of SNP mutations to make in RNA')
-    parser.add_argument('-s', '--seed', default=None,
-                        help='An integer to create reproducible results between runs.')
-    parser.add_argument('-g', '--group', action='store_true',
-                        help='Set to concatenate RNAs before shuffling and mutating.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=GEN_RAND_RNAS_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("in_fasta", help="path to .fa file")
+    parser.add_argument("out_fasta", help="path to new .fa file")
+    parser.add_argument("-k", "--kmer", default=1, help="Length of kmers you want to conserve")
+    parser.add_argument("-m", "--mutations", default=0, help="Number of SNP mutations to make in RNA")
+    parser.add_argument("-s", "--seed", default=None, help="An integer to create reproducible results between runs.")
+    parser.add_argument(
+        "-g", "--group", action="store_true", help="Set to concatenate RNAs before shuffling and mutating."
+    )
     args = _parse_args_or_exit(parser)
-    _run_gen_rand_rnas(args.in_fasta, args.out_fasta, int(args.kmer), int(args.mutations),
-                       args.seed, args.group)
+    _run_gen_rand_rnas(args.in_fasta, args.out_fasta, int(args.kmer), int(args.mutations), args.seed, args.group)
 
 
 def _run_pwms(pwm_dir, counts, kmer, out_path):
@@ -584,80 +597,110 @@ def _run_pwms(pwm_dir, counts, kmer, out_path):
 
 def console_pwm():
     # TODO (Dan) name this function
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=PWM_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('pwm_dir', help='Path to directory containing PWM files.')
-    parser.add_argument('counts', help='Path to kmer_counts file.')
-    parser.add_argument('-k', '--kmer', default=5,
-                        help='Length of kmer.')
-    parser.add_argument('-o', '--out_path',
-                        help='Path to new csv file containing weighted count sums.')
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=PWM_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("pwm_dir", help="Path to directory containing PWM files.")
+    parser.add_argument("counts", help="Path to kmer_counts file.")
+    parser.add_argument("-k", "--kmer", default=5, help="Length of kmer.")
+    parser.add_argument("-o", "--out_path", help="Path to new csv file containing weighted count sums.")
     args = _parse_args_or_exit(parser)
     # TODO (Dan) update name
     _run_pwms(args.pwm_dir, args.counts, int(args.kmer), args.out_path)
 
 
-def _run_domain_pearson(query_path, target_path, reference_path, mean, std, r_values,
-                        percentiles, kmer, log2, window, slide):
+def _run_domain_pearson(
+    query_path, target_path, reference_path, mean, std, r_values, percentiles, kmer, log2, window, slide
+):
     # Note: This function is separated for testing
-    domain_pearson = pearson.DomainPearson(query_path, target_path, reference_path, r_values,
-                                           percentiles, mean, std, Log2[log2], kmer, window, slide)
+    domain_pearson = pearson.DomainPearson(
+        query_path, target_path, reference_path, r_values, percentiles, mean, std, Log2[log2], kmer, window, slide
+    )
     domain_pearson.run()
 
 
 def console_domain_pearson():
-    assert sys.version_info[0] == 3, 'Python version must be 3.x'
-    parser = argparse.ArgumentParser(usage=DOMAIN_PEARSON_DOC,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('query_path',
-                        help='Path to fa file containing transcripts of interest (e.g. Xist-2kb).')
-    parser.add_argument('target_path', help=('Path to second fa file which will be tiled to find '
-                                             'domains similar to query transcripts.'))
-    parser.add_argument('mean', help='Path to npy file containing mean array for normalization.')
-    parser.add_argument('std', help='Path to npy file containing std array for standardization.')
-    parser.add_argument('-rp', '--reference_path', default=None,
-                        help=('Path to third fasta file containing sequences to be used for '
-                              'comparison when calculating percentile values of the r-values '
-                              'between the query and targets (e.g. mouse transcriptome).'))
-    parser.add_argument('-r', '--r_values', help='Path to new csv file for storing r-values.')
-    parser.add_argument('-p', '--percentiles', help='Path to new csv file for storing percentiles.')
-    parser.add_argument('-k', '--kmer', default=6,
-                        help='Length of kmers you want to count.')
-    parser.add_argument('-l', '--log2', default=Log2.post.name,
-                        choices=[l2.name for l2 in Log2],
-                        help='Decided if and when to log transform counts')
-    parser.add_argument('-w', '--window', default=1000,
-                        help=('Size of tile/domain to be created from target transcripts for '
-                              'comparison against queries.'))
-    parser.add_argument('-s', '--slide', default=100,
-                        help=('Number of basepairs to move along target transcript before creating '
-                              'another tile/domain.'))
+    assert sys.version_info[0] == 3, "Python version must be 3.x"
+    parser = argparse.ArgumentParser(usage=DOMAIN_PEARSON_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("query_path", help="Path to fa file containing transcripts of interest (e.g. Xist-2kb).")
+    parser.add_argument(
+        "target_path",
+        help=("Path to second fa file which will be tiled to find " "domains similar to query transcripts."),
+    )
+    parser.add_argument("mean", help="Path to npy file containing mean array for normalization.")
+    parser.add_argument("std", help="Path to npy file containing std array for standardization.")
+    parser.add_argument(
+        "-rp",
+        "--reference_path",
+        default=None,
+        help=(
+            "Path to third fasta file containing sequences to be used for "
+            "comparison when calculating percentile values of the r-values "
+            "between the query and targets (e.g. mouse transcriptome)."
+        ),
+    )
+    parser.add_argument("-r", "--r_values", help="Path to new csv file for storing r-values.")
+    parser.add_argument("-p", "--percentiles", help="Path to new csv file for storing percentiles.")
+    parser.add_argument("-k", "--kmer", default=6, help="Length of kmers you want to count.")
+    parser.add_argument(
+        "-l",
+        "--log2",
+        default=Log2.post.name,
+        choices=[l2.name for l2 in Log2],
+        help="Decided if and when to log transform counts",
+    )
+    parser.add_argument(
+        "-w",
+        "--window",
+        default=1000,
+        help=("Size of tile/domain to be created from target transcripts for " "comparison against queries."),
+    )
+    parser.add_argument(
+        "-s",
+        "--slide",
+        default=100,
+        help=("Number of basepairs to move along target transcript before creating " "another tile/domain."),
+    )
     args = _parse_args_or_exit(parser)
-    _run_domain_pearson(args.query_path, args.target_path, args.reference_path, args.mean, args.std,
-                        args.r_values, args.percentiles, int(args.kmer), args.log2,
-                        int(args.window), args.slide)
+    _run_domain_pearson(
+        args.query_path,
+        args.target_path,
+        args.reference_path,
+        args.mean,
+        args.std,
+        args.r_values,
+        args.percentiles,
+        int(args.kmer),
+        args.log2,
+        int(args.window),
+        args.slide,
+    )
 
 
 def console_seekr_help():
-    intro = ('Welcome to SEEKR! \n'
-             'Below is a description of all SEEKR commands.\n'
-             'For additional help see the README at: \n'
-             'https://github.com/CalabreseLab/seekr.\n\n')
+    intro = (
+        "Welcome to SEEKR! \n"
+        "Below is a description of all SEEKR commands.\n"
+        "For additional help see the README at: \n"
+        "https://github.com/CalabreseLab/seekr.\n\n"
+    )
     print(intro)
-    cmds2doc = {'seekr_download_gencode': DOWNLOAD_GENCODE_DOC,
-                'seekr_canonical_gencode': CANONICAL_GENCODE_DOC,
-                'seekr_norm_vectors': NORM_VECTORS_DOC,
-                'seekr_kmer_counts': KMER_COUNTS_DOC,
-                'seekr_pearson': PEARSON_DOC,
-                'seekr_visualize_distro': VISUALIZE_DISTRO_DOC,
-                'seekr_graph': GRAPH_DOC,
-                'seekr_gen_rand_rnas': GEN_RAND_RNAS_DOC,
-                'seekr_pmw': PWM_DOC,
-                'seekr_domain_pearson': DOMAIN_PEARSON_DOC}
+    cmds2doc = {
+        "seekr_download_gencode": DOWNLOAD_GENCODE_DOC,
+        "seekr_canonical_gencode": CANONICAL_GENCODE_DOC,
+        "seekr_norm_vectors": NORM_VECTORS_DOC,
+        "seekr_kmer_counts": KMER_COUNTS_DOC,
+        "seekr_pearson": PEARSON_DOC,
+        "seekr_visualize_distro": VISUALIZE_DISTRO_DOC,
+        "seekr_graph": GRAPH_DOC,
+        "seekr_gen_rand_rnas": GEN_RAND_RNAS_DOC,
+        "seekr_pmw": PWM_DOC,
+        "seekr_domain_pearson": DOMAIN_PEARSON_DOC,
+    }
     for c, d in cmds2doc.items():
         print(f"{'='*25}\n{c}\n{'='*25}\n{d}")
-    conclusion = ('To see a full description of flags and defaults, '
-                  'run any of the commands listed above, without any parameters '
-                  '(e.g. "$ seekr_graph").')
+    conclusion = (
+        "To see a full description of flags and defaults, "
+        "run any of the commands listed above, without any parameters "
+        '(e.g. "$ seekr_graph").'
+    )
     print(conclusion)

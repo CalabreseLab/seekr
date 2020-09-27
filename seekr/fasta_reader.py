@@ -6,7 +6,7 @@ Created on Mon Jul  4 13:10:49 2016
 """
 
 
-class Reader():
+class Reader:
     """Fixes any compatibility issues a fasta file might have with this code.
 
     Parameters
@@ -48,14 +48,14 @@ class Reader():
         """Sets data to upper case, single line sequences for each header
         """
         new_data = []
-        seq = ''
+        seq = ""
         for i, line in enumerate(self.data):
-            if line[0] == '>':
+            if line[0] == ">":
                 if seq:
                     new_data.append(seq.upper())
-                    seq = ''
+                    seq = ""
                 else:
-                    assert i == 0, 'There may be a header without a sequence at line {}.'.format(i)
+                    assert i == 0, "There may be a header without a sequence at line {}.".format(i)
                 new_data.append(line)
             else:
                 seq += line
@@ -90,20 +90,20 @@ class Reader():
     def supply_basic_header(self):
         """Convert headerlines to GENCODE format with only common name and length"""
         new_fasta = []
-        
+
         if self.names is None:
             self.names = iter(self.get_headers())
         for i, line in enumerate(self.data):
-            if line[0] =='>':
-                name = next(self.names).strip('>')
-                length = len(self.data[i+1])
-                new_fasta.append('>||||{}||{}|'.format(name, length))
+            if line[0] == ">":
+                name = next(self.names).strip(">")
+                length = len(self.data[i + 1])
+                new_fasta.append(">||||{}||{}|".format(name, length))
             else:
                 new_fasta.append(line)
         return new_fasta
 
     def save(self):
         """Write self.data to a new fasta file"""
-        with open(self.outfasta, 'w') as outfasta:
+        with open(self.outfasta, "w") as outfasta:
             for line in self.data:
-                outfasta.write(line+'\n')
+                outfasta.write(line + "\n")

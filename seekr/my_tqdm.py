@@ -15,12 +15,13 @@ import sys
 
 
 def _is_kernel():
-    if 'IPython' not in sys.modules:
+    if "IPython" not in sys.modules:
         # IPython hasn't been imported, definitely not
         return False
     from IPython import get_ipython
+
     # check for `kernel` attribute on the IPython instance
-    return getattr(get_ipython(), 'kernel', None) is not None
+    return getattr(get_ipython(), "kernel", None) is not None
 
 
 def my_tqdm():

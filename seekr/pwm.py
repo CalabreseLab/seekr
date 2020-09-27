@@ -31,6 +31,7 @@ class CountsWeighter:
     df: pd.DataFrame (default=None)
         # TODO (Dan) One line description of contents
     """
+
     def __init__(self, pwm_dir=None, counts=None, k=5, out_path=None):
         self.pwm_dir = pwm_dir
         if pwm_dir is not None:
@@ -40,7 +41,7 @@ class CountsWeighter:
         self.out_path = out_path
 
         self.k_sub = 4
-        self.kmers = [''.join(p) for p in product('AGTC', repeat=self.k)]
+        self.kmers = ["".join(p) for p in product("AGTC", repeat=self.k)]
         self.df = None
         if counts is not None:  # get_counts depends on self.kmers
             self.counts = self.get_counts(counts)
@@ -59,7 +60,7 @@ class CountsWeighter:
             Kmer counts matrix describing transcript kmer profiles.
         """
         counts_types = (str, pd.DataFrame, np.ndarray)
-        err_msg = f'adj must be one of {counts_types}, not {type(counts)}.'
+        err_msg = f"adj must be one of {counts_types}, not {type(counts)}."
         assert type(counts) in counts_types, err_msg
         if isinstance(counts, str):
             try:
@@ -81,14 +82,14 @@ class CountsWeighter:
             Position weight matrix as a nested dict (for fast lookups).
             Outer keys are nucleotides. Inner keys are positions. Inner values are weights.
         """
-        for pwm_path in self.pwm_dir.glob('*.txt'):
+        for pwm_path in self.pwm_dir.glob("*.txt"):
             try:
-                pwm = pd.read_csv(pwm_path, sep='\t')
+                pwm = pd.read_csv(pwm_path, sep="\t")
             except pd.errors.EmptyDataError:
-                print(f'The motif file {pwm_path} is empty. Skipping.')
+                print(f"The motif file {pwm_path} is empty. Skipping.")
                 continue
-            pwm.drop('Pos', axis=1, inplace=True)
-            pwm = pwm.rename(columns={'U': 'T'}).to_dict()
+            pwm.drop("Pos", axis=1, inplace=True)
+            pwm = pwm.rename(columns={"U": "T"}).to_dict()
             yield pwm_path, pwm
 
     def set_kmer2weight(self, kmer2weight, pwm, key_kmer, iter_kmer, n_kmers):
@@ -112,11 +113,11 @@ class CountsWeighter:
             Keys are all kmers, values are the kmer's weight in a given pwm.
         """
         kmer2weight = defaultdict(int)
-        motif_len = len(pwm['A'])
+        motif_len = len(pwm["A"])
         if motif_len < self.k:
             n_kmers = motif_len - 4 + 1
             for kmer in self.kmers:
-                for sub_kmer in (kmer[i:i+self.k_sub] for i in range(self.k-self.k_sub+1)):
+                for sub_kmer in (kmer[i : i + self.k_sub] for i in range(self.k - self.k_sub + 1)):
                     self.set_kmer2weight(kmer2weight, pwm, kmer, sub_kmer, n_kmers)
         else:
             for kmer in self.kmers:
@@ -146,7 +147,7 @@ class CountsWeighter:
     def save(self):
         """Save df to csv file."""
         if self.out_path is not None:
-            self.df.to_csv(self.out_path, float_format='%.4f')
+            self.df.to_csv(self.out_path, float_format="%.4f")
 
     def run(self):
         """TODO (Dan) Update based on description of self.df"""
@@ -154,5 +155,5 @@ class CountsWeighter:
         for pwm_path, pwm in self.gen_pwm_dicts():
             kmer2weight = self.build_weights_dict(pwm)
             score_dict[pwm_path.name] = self.weight_counts(kmer2weight)
-        self.df = pd.DataFrame.from_dict(score_dict, orient='index', columns=self.counts.index)
+        self.df = pd.DataFrame.from_dict(score_dict, orient="index", columns=self.counts.index)
         self.save()

@@ -8,20 +8,19 @@ from seekr import utils
 
 
 class TestMaker:
-
     def _save_adj(self, out_dir, binary=True):
         adj = self._build_adj()
         if binary:
-            out_path = str(out_dir.join('adj.npy'))
+            out_path = str(out_dir.join("adj.npy"))
             np.save(out_path, adj.values)
         else:
-            out_path = str(out_dir.join('adj.csv'))
+            out_path = str(out_dir.join("adj.csv"))
             adj.to_csv(out_path)
         return out_path
 
     def _build_adj(self):
-        kmers = 'tests/data/example_2mers.npy'
-        kmers = pkg_resources.resource_filename('seekr', kmers)
+        kmers = "tests/data/example_2mers.npy"
+        kmers = pkg_resources.resource_filename("seekr", kmers)
         kmers = np.load(kmers)
         adj = np.corrcoef(kmers) * -1  # Flip signs for fewer negatives
         names = list(range(5))

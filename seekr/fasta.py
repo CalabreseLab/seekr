@@ -74,7 +74,7 @@ class Maker:
             Common style names of sequences which are being kept
         """
         if self.outnames is not None:
-            pickle.dump(common_name_list, open(self.outnames, 'wb'))
+            pickle.dump(common_name_list, open(self.outnames, "wb"))
 
     def filter1(self, zeros=1, unique_per_gene=False):
         """Filters a fasta file to only keep *1 transcript names.
@@ -94,20 +94,20 @@ class Maker:
             The common style names of the sequences which are being kept
         """
         common_name_list = []
-        with open(self.outfasta, 'w') as outfasta:
-            current_gene = ''
-            best_name_for_gene = ''
-            best_seq_for_gene = ''
+        with open(self.outfasta, "w") as outfasta:
+            current_gene = ""
+            best_name_for_gene = ""
+            best_seq_for_gene = ""
             for name, seq in self.data:
-                name_data = name.split('|')
+                name_data = name.split("|")
                 common_name = name_data[4]
                 gene = name_data[1]
-                canonical = common_name[-(zeros+1):] == '0'*zeros+'1'
+                canonical = common_name[-(zeros + 1) :] == "0" * zeros + "1"
                 if canonical:
                     if not unique_per_gene:
                         common_name_list.append(common_name)
-                        outfasta.write(name+'\n')
-                        outfasta.write(seq+'\n')
+                        outfasta.write(name + "\n")
+                        outfasta.write(seq + "\n")
                         continue
                     new_gene = gene != current_gene
                     if not best_name_for_gene:
@@ -115,24 +115,23 @@ class Maker:
                         best_seq_for_gene = seq
                         current_gene = gene
                     elif best_seq_for_gene and not new_gene:
-                        new_is_better = common_name[-3:] < best_name_for_gene.split('|')[4][-3:]
+                        new_is_better = common_name[-3:] < best_name_for_gene.split("|")[4][-3:]
                         if new_is_better:
                             best_name_for_gene = name
                             best_seq_for_gene = seq
-                        warning = (f'Gene {gene} has at least two viable isoforms. '
-                                   f'Keeping: {best_name_for_gene}')
+                        warning = f"Gene {gene} has at least two viable isoforms. " f"Keeping: {best_name_for_gene}"
                         print(warning)
                     elif new_gene:
-                        common_name_list.append(best_name_for_gene.split('|')[4])
-                        outfasta.write(best_name_for_gene+'\n')
-                        outfasta.write(best_seq_for_gene + '\n')
+                        common_name_list.append(best_name_for_gene.split("|")[4])
+                        outfasta.write(best_name_for_gene + "\n")
+                        outfasta.write(best_seq_for_gene + "\n")
                         current_gene = gene
                         best_name_for_gene = name
                         best_seq_for_gene = seq
             if best_seq_for_gene:
                 common_name_list.append(common_name)
-                outfasta.write(best_name_for_gene + '\n')
-                outfasta.write(best_seq_for_gene + '\n')
+                outfasta.write(best_name_for_gene + "\n")
+                outfasta.write(best_seq_for_gene + "\n")
         self._name_dump(common_name_list)
         return common_name_list
 
@@ -154,18 +153,17 @@ class Maker:
         common_name_list = []
         filtered_fasta = []
         for name, seq in self.data:
-            common_name = name.split('|')[4]
+            common_name = name.split("|")[4]
             length = len(seq)
-            if ((length <= size_lim and keep_all_below) or
-            (length >= size_lim and not keep_all_below)):
+            if (length <= size_lim and keep_all_below) or (length >= size_lim and not keep_all_below):
                 if self.outnames:
                     common_name_list.append(common_name)
                 filtered_fasta.append((name, seq))
 
         if self.outfasta is not None:
-            with open(self.outfasta, 'w') as outfasta:
+            with open(self.outfasta, "w") as outfasta:
                 for dt in filtered_fasta:
-                    outfasta.write(dt+'\n')
+                    outfasta.write(dt + "\n")
         self._name_dump(common_name_list)
         return filtered_fasta
 
@@ -182,20 +180,20 @@ class Maker:
         filtered_fasta : list
             Lines of the new fasta file
         """
-        common_names = [n.split('|')[4] for n in self.names]
+        common_names = [n.split("|")[4] for n in self.names]
         names_dict = dict(zip(common_names, self.data))
         filtered_fasta = []
         for n in keep_names:
             try:
                 filtered_fasta.append(names_dict[n])
             except KeyError:
-                print('{} is not in fasta file'.format(n))
+                print("{} is not in fasta file".format(n))
 
         if self.outfasta is not None:
-            with open(self.outfasta, 'w') as outfasta:
+            with open(self.outfasta, "w") as outfasta:
                 for dt in filtered_fasta:
-                    outfasta.write(dt[0]+'\n')
-                    outfasta.write(dt[1]+'\n')
+                    outfasta.write(dt[0] + "\n")
+                    outfasta.write(dt[1] + "\n")
         return filtered_fasta
 
     def separate(self, outdir, filenames=None):
@@ -214,10 +212,10 @@ class Maker:
         if filenames is None:
             filenames = range(len(self.data))
         for fn, (name, seq) in zip(filenames, self.data):
-            fn = '{}.fa'.format(fn)
+            fn = "{}.fa".format(fn)
             with open(join(outdir, fn), "w") as outfile:
-                outfile.write(name+'\n')
-                outfile.write(seq+'\n')
+                outfile.write(name + "\n")
+                outfile.write(seq + "\n")
 
 
 class RandomMaker(Maker):
@@ -269,12 +267,12 @@ class RandomMaker(Maker):
             np.random.seed(seed)
 
     def shuffle(self, seq):
-        rand_seq = shuffle(seq.encode(), self.k).decode('utf-8')
+        rand_seq = shuffle(seq.encode(), self.k).decode("utf-8")
         rand_array = np.array(list(rand_seq))
         indices = np.random.choice(len(seq), self.mutations, replace=False)
-        new_bases = np.random.choice(list('AGTC'), self.mutations)
+        new_bases = np.random.choice(list("AGTC"), self.mutations)
         rand_array[indices] = new_bases
-        rand_seq = ''.join(rand_array)
+        rand_seq = "".join(rand_array)
         return rand_seq
 
     def get_random_seqs(self, seqs):
@@ -323,9 +321,9 @@ class RandomMaker(Maker):
 
     def save(self):
         if self.outfasta is not None:
-            with open(self.outfasta, 'w') as outfasta:
+            with open(self.outfasta, "w") as outfasta:
                 for line in self.new_fasta_seqs:
-                    outfasta.write('{}\n'.format(line))
+                    outfasta.write("{}\n".format(line))
 
     def synthesize_random(self):
         """Make random RNAs based on natural RNAs.
@@ -338,7 +336,7 @@ class RandomMaker(Maker):
         if self.individual:
             new_seqs = self.get_random_seqs(self.seqs)
         else:
-            new_seqs = self.get_random_seqs([''.join(self.seqs)])
+            new_seqs = self.get_random_seqs(["".join(self.seqs)])
             new_seqs = self.split(new_seqs[0])
         self.new_fasta_seqs = self.inject_seqs(new_seqs)
         self.save()
@@ -362,13 +360,13 @@ class Downloader:
         species: str
             Name of species (human or mouse)
         """
-        url = f'https://www.gencodegenes.org/{species}/'
+        url = f"https://www.gencodegenes.org/{species}/"
         html = requests.get(url).text
         for line in html.splitlines():
-            if '<title>' in line:
+            if "<title>" in line:
                 title = line
                 break
-        release = title.split('Release')[1].strip().strip('</title>')
+        release = title.split("Release")[1].strip().strip("</title>")
         return release
 
     def build_url(self, biotype, species, release):
@@ -391,18 +389,18 @@ class Downloader:
             Name of specific release to download (e.g. 'M5'). Will not be None.
         """
         error_msg = "'biotype' must be in ('all', 'pc', 'lncRNA')."
-        assert biotype in ('all', 'pc', 'lncRNA'), error_msg
+        assert biotype in ("all", "pc", "lncRNA"), error_msg
         error_msg = "'species' must be either 'human' or 'mouse'."
-        assert species in ('human', 'mouse'), error_msg
-        biotype2prefix = {'all': '', 'pc': 'pc_', 'lncRNA': 'lncRNA_'}
+        assert species in ("human", "mouse"), error_msg
+        biotype2prefix = {"all": "", "pc": "pc_", "lncRNA": "lncRNA_"}
         prefix = biotype2prefix[biotype]
         if release is None:
             release = self.find_current_release(species)
-        if species == 'mouse':
+        if species == "mouse":
             error_msg = "Mouse releases must begin with 'M'."
-            assert release[0] == 'M', error_msg
-        url_base = 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_'
-        url = f'{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz'
+            assert release[0] == "M", error_msg
+        url_base = "ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_"
+        url = f"{species}/release_{release}/gencode.v{release}.{prefix}transcripts.fa.gz"
         url = url_base + url
         return url, release
 
@@ -414,13 +412,13 @@ class Downloader:
         gzip_path: str
             Gzipped file location
         """
-        out_path = gzip_path.strip('.gz')
-        with gzip.open(gzip_path, 'rb') as in_file:
-            with open(out_path, 'wb') as out_file:
+        out_path = gzip_path.strip(".gz")
+        with gzip.open(gzip_path, "rb") as in_file:
+            with open(out_path, "wb") as out_file:
                 shutil.copyfileobj(in_file, out_file)
         os.remove(gzip_path)
 
-    def get_gencode(self, biotype, species='human', release=None, out_path=None, unzip=True):
+    def get_gencode(self, biotype, species="human", release=None, out_path=None, unzip=True):
         """Download .fa.gz file from Gencode's site.
 
         Parameters
@@ -439,18 +437,17 @@ class Downloader:
         url, release = self.build_url(biotype, species, release)
         if out_path is not None:
             error_msg = "Even if unzipping, 'out_path' must end with '.gz'."
-            assert out_path.endswith('.gz'), error_msg
+            assert out_path.endswith(".gz"), error_msg
         try:
             with closing(urllib.request.urlopen(url)) as r:
                 if out_path is None:
-                    out_path = f'v{release}_{biotype}.fa.gz'
-                with open(out_path, 'wb') as out_file:
+                    out_path = f"v{release}_{biotype}.fa.gz"
+                with open(out_path, "wb") as out_file:
                     shutil.copyfileobj(r, out_file)
             if unzip:
                 self.gunzip(out_path)
         except urllib.error.URLError as url_error:
-            print('The file failed to download because:\n', url_error)
+            print("The file failed to download because:\n", url_error)
             cd_err = "<urlopen error ftp error: error_perm('550 Failed to change directory.',)>"
             if str(url_error) == cd_err:
-                print('Did you pass a valid `--release` value (e.g. M14, 22)?')
-
+                print("Did you pass a valid `--release` value (e.g. M14, 22)?")

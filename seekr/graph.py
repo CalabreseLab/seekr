@@ -54,8 +54,7 @@ class Maker:
         Needed for converting networkx Graph to igraph Graph.
     """
 
-    def __init__(self, adj=None, gml_path=None, csv_path=None, leiden=True,
-                 threshold=0, gamma=1, n_comms=5, seed=None):
+    def __init__(self, adj=None, gml_path=None, csv_path=None, leiden=True, threshold=0, gamma=1, n_comms=5, seed=None):
         self.adj = adj
         if adj is not None:
             self.adj = get_adj(adj)
@@ -73,7 +72,7 @@ class Maker:
         self.df = None
         self.tempfile_path = None
         if self.gml_path is None:
-            self.tempfile_path = Path(str(uuid.uuid4()) + '.gml')
+            self.tempfile_path = Path(str(uuid.uuid4()) + ".gml")
 
     def apply_threshold(self):
         """Remove low weighted edges from graph."""
@@ -123,12 +122,14 @@ class Maker:
             if self.detector is louvain:
                 self.detector.set_rng_seed(self.seed)
             else:
-                extra_args['seed'] = self.seed
-        self.partition = self.detector.find_partition(graph,
-                                                      self.detector.RBConfigurationVertexPartition,
-                                                      weights='weight',
-                                                      resolution_parameter=self.gamma,
-                                                      **extra_args)
+                extra_args["seed"] = self.seed
+        self.partition = self.detector.find_partition(
+            graph,
+            self.detector.RBConfigurationVertexPartition,
+            weights="weight",
+            resolution_parameter=self.gamma,
+            **extra_args
+        )
 
     def membership2attribute(self):
         """Store communities in graph.
@@ -148,7 +149,7 @@ class Maker:
         for node in self.graph.nodes():
             group = min(n_comms, main2group.get(node, n_comms))
             name2group[node] = group
-        networkx.set_node_attributes(self.graph, name='Group', values=name2group)
+        networkx.set_node_attributes(self.graph, name="Group", values=name2group)
         return name2group
 
     def build(self, clear_adj=True, main_sub=True):
@@ -180,8 +181,8 @@ class Maker:
         name2group = self.membership2attribute()
         if self.gml_path is not None:  # This is outside of the save function intentionally.
             self.save()
-        self.df = pd.DataFrame.from_dict(name2group, orient='index')
-        self.df.columns = ['Group']
+        self.df = pd.DataFrame.from_dict(name2group, orient="index")
+        self.df.columns = ["Group"]
         if self.csv_path is not None:
             self.df.to_csv(self.csv_path)
         if self.tempfile_path:

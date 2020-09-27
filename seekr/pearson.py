@@ -54,7 +54,7 @@ def pearson(counts1, counts2, row_standardize=True, outfile=None):
         counts2 = (counts2.T / np.std(counts2, axis=1)).T
 
     # Take the inner product and save
-    dist = np.inner(counts1, counts2)/counts1.shape[1]
+    dist = np.inner(counts1, counts2) / counts1.shape[1]
     if outfile:
         np.save(outfile, dist)
     return dist
@@ -66,7 +66,7 @@ def visualize_distro(adj, out_path, sample=None):
         adj = adj.values
     if sample is not None:
         if not 0 < sample <= 1:
-            raise ValueError('Value of sample must satisfy: 0 < sample <= 1')
+            raise ValueError("Value of sample must satisfy: 0 < sample <= 1")
         size = int(len(adj) * sample)
         rows = np.random.choice(len(adj), size, replace=False)
         cols = np.random.choice(adj.shape[1], size, replace=False)
@@ -75,15 +75,15 @@ def visualize_distro(adj, out_path, sample=None):
     mean = flat.mean()
     std = flat.std()
     std1 = mean + std
-    std2 = mean + (2*std)
-    ax = sns.distplot(flat, label=f'Distro (n={flat.size})')
+    std2 = mean + (2 * std)
+    ax = sns.distplot(flat, label=f"Distro (n={flat.size})")
     y_max = ax.get_ylim()[1]
-    plt.plot((mean, mean), (0, y_max/2), label='Mean')
-    plt.plot((std1, std1), (0, y_max/2), label='Mean + 1 std. dev.')
-    plt.plot((std2, std2), (0, y_max/2), label='Mean + 2 std. dev.')
-    plt.xlabel('r-value')
+    plt.plot((mean, mean), (0, y_max / 2), label="Mean")
+    plt.plot((std1, std1), (0, y_max / 2), label="Mean + 1 std. dev.")
+    plt.plot((std2, std2), (0, y_max / 2), label="Mean + 2 std. dev.")
+    plt.xlabel("r-value")
     plt.legend()
-    plt.savefig(out_path, bbox_inches='tight', dpi=600)
+    plt.savefig(out_path, bbox_inches="tight", dpi=600)
     return mean, std
 
 
@@ -107,8 +107,8 @@ def pvalue(dist, N):
     http://stats.stackexchange.com/questions/120199/calculate-p-value-for-the-correlation-coefficient
     http://stackoverflow.com/questions/17559897/python-p-value-from-t-statistic
     """
-    pvals = dist / np.sqrt((1-dist**2) / (N -2))
-    pvals = t.sf(np.abs(pvals), N - 2)*2
+    pvals = dist / np.sqrt((1 - dist ** 2) / (N - 2))
+    pvals = t.sf(np.abs(pvals), N - 2) * 2
     return pvals
 
 
@@ -164,9 +164,20 @@ class DomainPearson:
     There are 'clever' ways of doing this that are a lot messier and harder to maintain.
     """
 
-    def __init__(self, query_path=None, target_path=None, reference_path=None, r_values_path=None,
-                 percentiles_path=None, mean=True, std=True, log2=Log2.post,
-                 k=6, window=1000, slide=100):
+    def __init__(
+        self,
+        query_path=None,
+        target_path=None,
+        reference_path=None,
+        r_values_path=None,
+        percentiles_path=None,
+        mean=True,
+        std=True,
+        log2=Log2.post,
+        k=6,
+        window=1000,
+        slide=100,
+    ):
         self.query_path = query_path
         self.target_path = target_path
         if reference_path is None and percentiles_path is not None:
@@ -195,8 +206,7 @@ class DomainPearson:
         query_counts: ndarray
             Normalized kmer profiles for each query transcript.
         """
-        counter = BasicCounter(self.query_path, k=self.k, mean=self.mean, std=self.std,
-                               log2=self.log2)
+        counter = BasicCounter(self.query_path, k=self.k, mean=self.mean, std=self.std, log2=self.log2)
         counter.get_counts()
         return counter.counts
 
@@ -219,7 +229,7 @@ class DomainPearson:
         upper = max(1, len(target) - self.window + 1)
         for i in range(0, upper, self.slide):
             end = i + self.window
-            tiles.append(target[i: end])
+            tiles.append(target[i:end])
         tiles[-1] += target[end:]
         counter = BasicCounter(k=self.k, mean=self.mean, std=self.std, log2=self.log2)
         counter.seqs = tiles
@@ -236,7 +246,7 @@ class DomainPearson:
         target_counts: ndarray
             Normalized kmer profiles for each tile in target transcript.
         """
-        self.column_labels.extend(target_header + f'_{i}' for i in range(len(target_counts)))
+        self.column_labels.extend(target_header + f"_{i}" for i in range(len(target_counts)))
 
     def compare_query_target(self, query_counts, target_header, target):
         """Calculare r-values for """
@@ -248,9 +258,7 @@ class DomainPearson:
     def r_values2df(self, r_values):
         """Convert r_values from list of numpy arrays to a labeled DataFrame."""
         self.r_values = np.hstack(r_values)
-        self.r_values = pd.DataFrame(data=self.r_values,
-                                     index=self.row_labels,
-                                     columns=self.column_labels)
+        self.r_values = pd.DataFrame(data=self.r_values, index=self.row_labels, columns=self.column_labels)
 
     def percentileofscore(self, a, score):
         """Same as scipy's percentileofscore where kind='rank'.
@@ -264,7 +272,7 @@ class DomainPearson:
         """
         left = np.count_nonzero(a < score)
         right = np.count_nonzero(a <= score)
-        pct = (right + left + (1 if right > left else 0)) * 50.0/len(a)
+        pct = (right + left + (1 if right > left else 0)) * 50.0 / len(a)
         return pct
 
     def calc_percentiles(self, query_counts):
@@ -281,16 +289,14 @@ class DomainPearson:
         percentiles_df: DataFame
             Percentile equivalent of each element in r_values, across each row.
         """
-        counter = BasicCounter(infasta=self.reference_path, k=self.k, mean=self.mean, std=self.std,
-                               log2=self.log2)
+        counter = BasicCounter(infasta=self.reference_path, k=self.k, mean=self.mean, std=self.std, log2=self.log2)
         counter.get_counts()
         query_vs_ref_rvals = pearson(query_counts, counter.counts)[0]
         percentiles_df = pd.DataFrame(columns=self.r_values.columns)
         for index, row in self.r_values.iterrows():
             percentiles = []
             for query_vs_tile_rval in row:
-                percentiles.append(self.percentileofscore(query_vs_ref_rvals,
-                                                          query_vs_tile_rval))
+                percentiles.append(self.percentileofscore(query_vs_ref_rvals, query_vs_tile_rval))
             percentiles_df.loc[index] = percentiles
         return percentiles_df
 
@@ -313,9 +319,9 @@ class DomainPearson:
     def save(self):
         """Save csv files of r_values and percentiles, using limited precision float values."""
         if self.r_values_path is not None:
-            self.r_values.to_csv(self.r_values_path, float_format='%.4f')
+            self.r_values.to_csv(self.r_values_path, float_format="%.4f")
         if self.percentiles_path is not None:
-            self.percentiles.to_csv(self.percentiles_path, float_format='%.4f')
+            self.percentiles.to_csv(self.percentiles_path, float_format="%.4f")
 
     def run(self):
         self.row_labels = Reader(self.query_path).get_headers()
