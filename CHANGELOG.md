@@ -22,6 +22,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 *
 ---
 
+## 1.5.2
+
+### Fixed
+
+* seekr_domain_person can run without reference path. ([See Issue](https://github.com/CalabreseLab/seekr/issues/19))
+
+### Changed
+
+* `black` formatting!
+
 ## 1.5.1
 
 ### Fixed
