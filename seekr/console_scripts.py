@@ -7,6 +7,7 @@ from seekr import fasta
 from seekr import graph
 from seekr import pearson
 from seekr.kmer_counts import BasicCounter, Log2
+from seekr.__version__ import __version__
 
 # TODO (Dan) fix names
 from seekr.pwm import CountsWeighter
@@ -676,9 +677,13 @@ def console_domain_pearson():
     )
 
 
-def console_seekr_help():
+def _run_console_seekr_help(version):
+    if version:
+        print(__version__)
+        sys.exit()
+
     intro = (
-        "Welcome to SEEKR! \n"
+        f"Welcome to SEEKR! ({__version__})\n"
         "Below is a description of all SEEKR commands.\n"
         "For additional help see the README at: \n"
         "https://github.com/CalabreseLab/seekr.\n\n"
@@ -704,3 +709,11 @@ def console_seekr_help():
         '(e.g. "$ seekr_graph").'
     )
     print(conclusion)
+
+
+def console_seekr_help():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-v", "--version", action="store_true", help="Print current version and exit.")
+    args = parser.parse_args()
+    _run_console_seekr_help(args.version)

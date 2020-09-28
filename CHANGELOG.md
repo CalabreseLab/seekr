@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 *
 ---
 
+## 1.5.3
+
+### Added
+
+* Version checking from cmd line
+
 ## 1.5.2
 
 ### Fixed
