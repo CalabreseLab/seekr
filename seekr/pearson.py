@@ -125,14 +125,14 @@ class DomainPearson:
         Path to third fasta file containing sequences to be used for comparison when calculating
         percentile values of the r-values between the query and targets (e.g. mouse transcriptome).
     r_values_path: str (default=None)
-        Path to csv file containing pairwise comparisons between queries and target tiles.
+        Path to write csv file of pairwise comparisons between queries and target tiles.
     percentiles_path: str (default=None)
-        Path to csv file containing the percentile equivalent of each element in r_value_path's csv.
-    mean: bool, np.array, str (default=True)
+        Path to write csv file of the percentile equivalent of each element in r_value_path's csv.
+    mean: Optional[bool, np.array, str] (default=True)
         Set the mean to 0 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated mean array.
         Can be produced by `seekr_norm_vectors`.
-    std: bool, np.array, str (default=True)
+    std: Optional[bool, np.array, str] (default=True)
         Set the std. dev. to 1 for each kmer/column of the count matrix.
         If str, provide path to a previously calculated std array.
         Can be produced by `seekr_norm_vectors`.
@@ -332,5 +332,6 @@ class DomainPearson:
         for target_header, target in my_tqdm()(target_headers_seqs):
             r_values.append(self.compare_query_target(query_counts, target_header, target))
         self.r_values2df(r_values)
-        self.percentiles = self.calc_percentiles(query_counts)
+        if self.reference_path is not None:
+            self.percentiles = self.calc_percentiles(query_counts)
         self.save()
