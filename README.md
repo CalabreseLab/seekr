@@ -276,7 +276,7 @@ $ seekr_graph example_vs_self.csv .13 -g example.gml -c communities.csv
 The value for thresholding the adjacency matrix is very experiment dependent.
 Because a reasonable default is difficult to predict, it is a required parameter.
 For example, if you are using `k=5`, it likely makes sense to increase the threshold (e.g. to .3).
-`seekr_pearson_distro` can be run to suggest a value for the threshold.
+`seekr_visualize_distro` can be run to suggest a value for the threshold.
 Similarly, the community finding algorithm allows you course control of community size with its resolution parameter (gamma).
 Testing ranges from .1 to 5 is reasonable, where values from 1-3 have been most useful in our experience.
 
