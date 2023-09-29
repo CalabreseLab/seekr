@@ -543,7 +543,7 @@ Plot and align the two input sequences with numbered positions. Highlight the wo
 the words of interest are 'ATTA' in '#d62728', 'AAAA' in '#e377c2', and 'ACTC' in '#ff7f0e'
 wrap length is 60 characters and the textplot is saved as test_kmer_textplot.pdf under current directory
     
-    $ seerk_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -o test -pf pdf -d 300
+    $ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -o test -pf pdf -d 300
 
 to save under other location change to -o /Users/username/Desktop/test
 
@@ -1362,7 +1362,7 @@ def console_kmer_msd_barplot():
 
 
 
-def console_kmer_textlot():
+def console_kmer_textplot():
     assert sys.version_info[0] == 3, "Python version must be 3.x"
     parser = argparse.ArgumentParser(usage=KMER_TEXTPLOT_DOC, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("seq1file", 
