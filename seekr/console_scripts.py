@@ -1064,7 +1064,6 @@ def console_find_pval():
         fitres,
         args.log2,
         int(args.bestfit),
-        args.savefile,
         args.outputname,
         args.progress_bar,
         )
