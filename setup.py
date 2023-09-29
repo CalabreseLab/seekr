@@ -26,9 +26,6 @@ requirements = [
     "matplotlib",
     "seaborn",
     "scipy",
-    "warnings",
-    "re",
-    "os",
 ]
 
 test_requirements = ["pytest"]
