@@ -30,6 +30,6 @@ seekr_kmer_dendrogram test_pval.csv
 seekr_kmer_leiden ldseq.fa bkg_mean_4mer.npy bkg_std_4mer.npy 4 -s
 seekr_kmer_count_barplot test.fa bkg_mean_4mer.npy bkg_std_4mer.npy 4
 seekr_kmer_msd_barplot test.fa bkg_mean_4mer.npy bkg_std_4mer.npy 4 
-seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC'
+seekr_kmer_textplot seqs1.fa seqs2.fa 'ATTA,AAAA,ACTC'
 
 printf "\nCompleted successfully!"
