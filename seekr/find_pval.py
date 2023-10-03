@@ -37,7 +37,7 @@
 # or a list of distributions, in the format of tuples (string, number, tuple of numbers) corresponds to (distribution name, deviance, parameters)
 
 ### Example:
-# fitres = find_dist(inputseq='default', k_mer=4, models='common10', subsetting=True, subset_size = 10000, fit_model=True, statsmethod='ks',progress_bar=True, plotfit=None, outputname='test')
+# fitres = find_dist(inputseq='default', k_mer=4, log2='Log2.post', models='common10', subsetting=True, subset_size = 10000, fit_model=True, statsmethod='ks',progress_bar=True, plotfit=None, outputname='test')
 # pvals=find_pval(seq1file='test1.fa', seq2file='test2.fa', mean_path='bkg_mean_4mers.npy', std_path='bkg_std_4mers.npy', k_mer=4, fitres=fitres, log2='Log2.post', bestfit=1, outputname=None, progress_bar=True)
 
 
