@@ -60,7 +60,7 @@
 # if outputname is given, a csv file with the given name and path will be saved for either a list of fitted distributions or a npy array
 
 ### Example:
-# fitres = find_dist(inputseq='default', k_mer=4, models='common10', subsetting=True, subset_size = 10000, fit_model=False, statsmethod='ks',progress_bar=True, plotfit=None, outputname='test')
+# fitres = find_dist(inputseq='default', k_mer=4, log2='Log2.post', models='common10', subsetting=True, subset_size = 10000, fit_model=False, statsmethod='ks',progress_bar=True, plotfit=None, outputname='test')
 
 ####################################################################################################################
 import numpy as np
