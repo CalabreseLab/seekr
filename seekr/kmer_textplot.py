@@ -12,7 +12,6 @@
 
 ### Input:
 # seq1file, seq2file: input sequence 1 and 2, both in fasta format, if seq1 and seq2 includes more than one sequence, only the first sequence will be plotted
-# please have unique header for seq1 and seq2, the header will be used as the name of the sequence in the plot
 # words: word of interest, max 10 words in the format of a list, example: ['ATTA','AAAA','ACTC','CCTT','GGCC'], if more than 10 words, only the first 10 will be plotted
 # color_vec: list of hex color for the words of interest (for example: ['#d62728','#e377c2','#ff7f0e']), default will use the 'tab10' pallette with rearrangements into a quasi-rainbow order
 # the order of default color: red, pink, orange, olive, green, cyan, blue, purple, brown, grey
