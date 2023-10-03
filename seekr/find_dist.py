@@ -25,7 +25,7 @@
 # here subsetting is performed after getting all possible pairwise seekr pearson correlation values for the background sequences
 # subsetting is not performed on the input background sequences
 # subset_size: the size of the subset to use for fitting or output. Default is 100000. only be used when subsetting=True
-# id subset_size is larger than the actual data size, the actual data size will be used instead
+# if subset_size is larger than the actual data size, the actual data size will be used instead
 # fit_model: True (default) or False. whether or not to fit the data to the distributions sepcified in models. 
 # For small dataset, you can set fit_model=False, this will return the actual data as a npy array, without fitting to any distributions
 # in this way, the p values will be calculated based on the actual data instead of the fitted distribution
