@@ -470,7 +470,7 @@ for better visualization and customization, please set savecsv to True and use G
 
 Details:
 take as input a fasta file with multiple sequences
-calculte sequences distance matrix as seekr pearson correlation of the fasta file to itself
+calculate sequences distance matrix as seekr pearson correlation of the fasta file to itself
 use Leiden community to call cluster
 edge is weighted with the pearson correlation results
 layout the nodes with igraph
