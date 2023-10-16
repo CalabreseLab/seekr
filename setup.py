@@ -23,7 +23,7 @@ requirements = [
     "louvain",
     "leidenalg",
     "ushuffle",
-    "matplotlib",
+    "matplotlib==3.8.0",
     "seaborn",
     "scipy",
 ]
