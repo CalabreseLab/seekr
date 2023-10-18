@@ -23,7 +23,7 @@ requirements = [
     "louvain",
     "leidenalg",
     "ushuffle",
-    "matplotlib==3.5.3",
+    "matplotlib>=3.5.3",
     "seaborn",
     "scipy",
 ]
