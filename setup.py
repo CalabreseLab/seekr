@@ -26,6 +26,7 @@ requirements = [
     "matplotlib>=3.5.3",
     "seaborn",
     "scipy",
+    "pycairo",
 ]
 
 test_requirements = ["pytest"]
