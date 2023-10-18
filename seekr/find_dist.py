@@ -115,8 +115,9 @@ def find_dist(inputseq='default', k_mer=4, log2='Log2.post', models='common10', 
         distributions = [d for d in distributions if d != 'levy_stable']
         distributions = [d for d in distributions if d != 'studentized_range']
         # if 'gilbrat' is in distributions, replace 'gilbrat' with 'gibrat' as 'gilbrat' is a misspelling of 'gibrat'
-        if 'gilbrat' in distributions:
-            distributions[distributions.index('gilbrat')] = 'gibrat'
+        # if 'gilbrat' in distributions:
+        #     distributions[distributions.index('gilbrat')] = 'gibrat'
+        # use what it is from the stats package
 
         if models != 'all':
             # check if the user input distributions are included in the distributions list
