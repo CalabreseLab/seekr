@@ -18,12 +18,12 @@ requirements = [
     "numpy",
     "pandas",
     "requests",
-    "networkx",
+    "networkx>=3.2",
     "python-igraph",
     "louvain",
     "leidenalg",
     "ushuffle",
-    "matplotlib>=3.5.3",
+    "matplotlib>=3.8",
     "seaborn",
     "scipy",
 ]
@@ -32,7 +32,7 @@ test_requirements = ["pytest"]
 
 setup(
     name=about["__title__"],
-    python_requires=">3.6",
+    python_requires=">=3.9",
     version=about["__version__"],
     install_requires=requirements,
     tests_require=test_requirements,
@@ -52,7 +52,7 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.9",
     ],
     entry_points={
         "console_scripts": [
