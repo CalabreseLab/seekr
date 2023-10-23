@@ -336,7 +336,7 @@ class RandomMaker(Maker):
     def synthesize_random(self):
         # deprecate this function to avoid installing ushuffle, which has an outdated cython wrapper
 
-        print('synthesize_random function and all related functions are deprecated.')
+        print('seekr_gen_rand_rnas and synthesize_random function and all related functions are deprecated.')
         print('The core algotrithm ushuffle has an outdated cython wrapper which causes problems during installation.')
         print('To generate random sequence while preserving kmer content, please refer to fasta-shuffle-letters in the MEME Suite.')
         print('https://meme-suite.org/meme/doc/fasta-shuffle-letters.html')
