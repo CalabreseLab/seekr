@@ -15,4 +15,7 @@ RUN pip install .
 RUN pip install jupyter
 
 # Set the default command to run Jupyter Notebook in non-token mode
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+# CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+
+# set the default command to display seekr manual page
+CMD ["seekr"]
