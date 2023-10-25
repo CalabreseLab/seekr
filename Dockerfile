@@ -12,4 +12,4 @@ COPY . .
 RUN pip install .
 
 # Set the default behavior of the container to show the help or usage information 
-CMD ["seekr", "--help"]
+CMD ["seekr"]
