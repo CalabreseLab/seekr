@@ -569,7 +569,7 @@ Firstly, you should install Docker on your computer. Please refer to the [offici
 After you have successfully installed Docker. Start/Run the application and make sure it is running properly – you should see the docker icon on your task bar with the status indicated.
 
 #### Pull Docker Image and Test Run
-First, start your command line tool, Terminal for MacOS and CMD for Windows. You can also use Powershell or Cygwin for Windows, but Cygwin might have interaction issues.
+1. Start your command line tool: Terminal for MacOS and CMD for Windows. You can also use Powershell or Cygwin for Windows, but Cygwin might have interaction issues.
 
 From the command line, pull the Docker Image:
 ```
@@ -577,7 +577,7 @@ docker pull lysosomelee/seekr_docker:latest
 ```
 You can replace `latest` with a specific tag if needed.
 
-Test Run the Docker Image
+2. Test Run the Docker Image
 ```
 docker run -it --rm lysosomelee/seekr_docker:latest
 ```
