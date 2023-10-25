@@ -654,29 +654,22 @@ Once you are done, you can click the **Shut Down** button under the **File** tab
 Then you need to exit the Docker Container from the interative session by typing `exit` and hit enter.
 
 ### Cleanup (Optional)
-Clean Up Docker Container:
-* List all containers, including the stopped ones: `docker ps -a`
-* To remove a specific container: `docker rm CONTAINER_ID_OR_NAME`
-* To remove all stopped containers: `docker container prune`
+* Clean Up Docker Container:
+    + List all containers, including the stopped ones: `docker ps -a`
+    + To remove a specific container: `docker rm CONTAINER_ID_OR_NAME`
+    + To remove all stopped containers: `docker container prune`
 
-Clean Up Docker Image:
-If you want to remove the Docker image you used:
-* List all images: `docker images`
-* Remove a specific image: `docker rmi IMAGE_ID_OR_NAME`
+* Clean Up Docker Image. If you want to remove the Docker image you used:
+    + List all images: `docker images`
+    + Remove a specific image: `docker rmi IMAGE_ID_OR_NAME`
 
 You'd typically only remove an image if you're sure you won't be using it again soon, or if you want to fetch a fresh version of it from a repository like Docker Hub.
 
-Additional Cleanup:
-Docker also maintains a cache of intermediate images and volumes. Over time, these can accumulate. To free up space:
-* Remove unused data: `docker system prune`
-* To also remove unused volumes (be careful, as this might remove data you want to keep): `docker system prune --volumes`
+* Additional Cleanup. Docker also maintains a cache of intermediate images and volumes. Over time, these can accumulate. To free up space:
+    + Remove unused data: `docker system prune`
+    + To also remove unused volumes (be careful, as this might remove data you want to keep): `docker system prune --volumes`
 
 Remember to always be cautious when cleaning up, especially with commands that remove data. Make sure you have backups of any essential data, and always double-check what you're deleting.
-
-
-
-
-
 
 
 ## Additional considerations
