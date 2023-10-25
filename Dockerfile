@@ -11,5 +11,8 @@ COPY . .
 # Install your package and any dependencies
 RUN pip install .
 
-# Set the default behavior of the container to show the help or usage information 
-CMD ["seekr"]
+# Install Jupyter Notebook
+RUN pip install jupyter
+
+# Set the default command to run Jupyter Notebook in non-token mode
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
