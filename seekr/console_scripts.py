@@ -1283,7 +1283,7 @@ def console_kmer_leiden():
         args.algo,
         float(args.rs),
         float(args.pearsoncutoff),
-        int(args.seed)
+        int(args.seed),
         args.edgecolormethod,
         float(args.edgethreshold),
         int(args.labelfontsize),
