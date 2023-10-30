@@ -21,10 +21,8 @@ import os
 import gzip
 import pickle
 import shutil
-import ftplib
 import requests
 import urllib.request
-import numpy as np
 
 from contextlib import closing
 from os.path import exists, join
