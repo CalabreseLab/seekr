@@ -275,7 +275,7 @@ plot dendrogram for the rows of the input pval.csv file
 with the distance metric of correlation and the linkage method of complete
 the plot will be saved as test_kmer_dendrogram_row.pdf under current directory
     
-    $ seekr_kmer_dendrogram pval.csv -dd row -distm correlation -linkm complete -ph 8 -hratio 0.5 -lfs 16 -o test -pf pdf -d 300
+    $ seekr_kmer_dendrogram pval.csv -dd row -distm correlation -linkm complete -ph 8 -wratio 0.5 -lfs 16 -o test -pf pdf -d 300
 
 to save under other location change to -o /Users/username/Desktop/test
 
@@ -800,7 +800,7 @@ def console_kmer_dendrogram():
         help="the linkage method to use for the dendrogram, common options are: 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward'."
         )
     parser.add_argument("-ph", "--plot_ht", default=8, help="height of the dendrogram plot.")
-    parser.add_argument("-hratio", "--wd_ratio", default=0.5, help="a ratio factor to control the dendrgram width.")
+    parser.add_argument("-wratio", "--wd_ratio", default=0.5, help="a ratio factor to control the dendrgram width.")
     parser.add_argument("-lfs", "--leaf_font_size", default=16, help="the font size of the leaves or labels.")
     parser.add_argument("-o", "--outputname", default="test", help="the path and name to save the output dendrogram, will automatically be combined with the trailing part _kmer_dendrogram_row/column depending on --dendro_direct.")
     parser.add_argument("-pf", "--pformat", default='pdf', help="the format of the output dendrogram, other options are: 'eps', 'jpeg', 'jpg', 'pgf', 'png', 'ps', 'raw', 'rgba', 'svg', 'svgz', 'tif', 'tiff', 'webp'.")
