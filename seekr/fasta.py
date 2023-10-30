@@ -24,6 +24,7 @@ import shutil
 import ftplib
 import requests
 import urllib.request
+# import numpy as np
 
 from contextlib import closing
 from os.path import exists, join
@@ -31,7 +32,7 @@ from os import makedirs
 # from ushuffle import shuffle
 # from ushuffle import set_seed
 
-from seekr.my_tqdm import my_tqdm, my_trange
+# from seekr.my_tqdm import my_tqdm, my_trange
 from seekr.fasta_reader import Reader
 
 
