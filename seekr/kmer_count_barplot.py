@@ -25,7 +25,7 @@
 # ylabelsize: y axis label font size, default is 20
 # xticksize: x tick label font size, default is 20
 # yticksize: y tick label font size, default is 20
-# lengendsize: legend font size, default is 12
+# legendsize: legend font size, default is 12
 # outputname: the path and name to save the output file, default is current working directory 'test', other example: '/Users/username/Desktop/test'
 # outputname will be automatically added a trailing part '_kmer_count_barplot'
 # pformat: the format of the output file, default is 'pdf'. Other options are: 'eps', 'jpeg', 'jpg', 'pgf', 'png', 'ps', 'raw', 'rgba', 'svg', 'svgz', 'tif', 'tiff', 'webp'
@@ -38,7 +38,7 @@
 # kmer_count_barplot(inputfile='test.fa', mean='gencodevM25_unique_mean_4mers.npy', 
 #                    std = 'gencodevM25_unique_std_4mers.npy', log2 = 'Log2.post', 
 #                    k=4, sortmethod='ascending', topkmernumber=10,
-#                    xlabelsize=20, ylabelsize=20, xticksize=20, yticksize=20, lengendsize=12,
+#                    xlabelsize=20, ylabelsize=20, xticksize=20, yticksize=20, legendsize=12,
 #                    outputname='/Users/username/Downloads/test', pformat='pdf', pdpi=300)
 
 #######################################################################################################################
@@ -55,7 +55,7 @@ from seekr.fasta_reader import Reader as seekrReader
 
 
 def kmer_count_barplot(inputfile, mean, std, k, log2='Log2.post', sortmethod='ascending', topkmernumber=10,
-                       xlabelsize=20, ylabelsize=20, xticksize=20, yticksize=20, lengendsize=12, 
+                       xlabelsize=20, ylabelsize=20, xticksize=20, yticksize=20, legendsize=12, 
                        outputname='test',pformat='pdf',pdpi=300):
 
     t1 = seekrBasicCounter(inputfile, mean=mean, std=std, log2=log2, k=k,silent=True)
@@ -138,7 +138,7 @@ def kmer_count_barplot(inputfile, mean, std, k, log2='Log2.post', sortmethod='as
     plt.yticks(fontsize=yticksize)
 
     # Place the legend to the right of the plot
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=lengendsize)
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=legendsize)
 
 
     #plt.show()
