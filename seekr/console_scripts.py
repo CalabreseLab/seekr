@@ -920,7 +920,7 @@ def console_kmer_count_barplot():
     parser.add_argument("-yls", "--ylabelsize", default=20, help="y axis label font size.")
     parser.add_argument("-xts", "--xticksize", default=20, help="x tick label font size.")
     parser.add_argument("-yts", "--yticksize", default=20, help="y tick label font size.")
-    parser.add_argument("-ls", "--lengendsize", default=12, help="legend font size.")
+    parser.add_argument("-ls", "--legendsize", default=12, help="legend font size.")
     parser.add_argument(
         "-o", 
         "--outputname", 
@@ -946,7 +946,7 @@ def console_kmer_count_barplot():
         int(args.ylabelsize),
         int(args.xticksize),
         int(args.yticksize),
-        int(args.lengendsize),
+        int(args.legendsize),
         args.outputname,
         args.pformat,
         int(args.pdpi),
