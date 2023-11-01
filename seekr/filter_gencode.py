@@ -117,7 +117,7 @@ def filter_gencode(fasta_path, gtf_path=None, len_threshold=0, canonical=False, 
     headers_len = [int(i[-2]) for i in headers_list]
  
     # filter by canonical and/or isoform
-    if canonical == True or isoform != 0:
+    if canonical == True or isoform != '0':
 
         if gtf_path == None:
             print('Please provide a gtf file path for filtering by Ensemble_canonical tag and/or isoform number')
