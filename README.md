@@ -319,10 +319,10 @@ Python example:
 ```python
 from seekr import filter_gencode
 
-headers, seqs = filter_gencode(fasta_path='gencode.vM33.lncRNA_transcripts.fa', 
-                               gtf_path='gencode.vM33.long_noncoding_RNAs.gtf',
-                               len_threshold=500, canonical=True, isoform='201',
-                               outputname='test')
+headers, seqs = filter_gencode.filter_gencode(fasta_path='gencode.vM33.lncRNA_transcripts.fa', 
+                                              gtf_path='gencode.vM33.long_noncoding_RNAs.gtf',
+                                              len_threshold=500, canonical=True, isoform='201',
+                                              outputname='test')
 ```
 
 Console examples:
