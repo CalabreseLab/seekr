@@ -71,7 +71,7 @@ See below to learn about the other files produced along the way.
 as a small sample set,
 if you want to download that file and follow along.
 * GENCODE is a high quality source for human and mouse lncRNA annotation.
-Fasta files can be found [here](https://www.gencodegenes.org/releases/current.html).
+Fasta files can be found [here](https://ftp.ebi.ac.uk/pub/databases/gencode/).
   * In the examples below we'll generically refer to `gencode.fa`.
     Any sufficiently large fasta file can be used, as needed.
 
