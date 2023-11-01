@@ -1172,7 +1172,7 @@ def _run_console_seekr_help(version):
     conclusion = (
         "To see a full description of flags and defaults, "
         "run any of the commands listed above, without any parameters "
-        '(e.g. "$ seekr_graph").'
+        '(e.g. "$ seekr_kmer_leiden").'
     )
     print(conclusion)
 
