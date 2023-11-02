@@ -33,7 +33,7 @@ Any issues can be reported to https://github.com/CalabreseLab
 
 import numpy as np
 
-from enum import Enum
+# from enum import Enum
 from collections import defaultdict
 from itertools import product
 from pandas import DataFrame
