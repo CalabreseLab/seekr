@@ -819,7 +819,7 @@ def console_adj_pval():
     # Read the CSV file into a DataFrame with the headers and index names
     pvals = pd.read_csv(args.pval_path, header=0, index_col=0)
 
-    find_pval.find_pval(
+    adj_pval.adj_pval(
         pvals,
         args.method,
         float(args.alpha),
