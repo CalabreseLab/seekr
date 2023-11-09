@@ -70,8 +70,9 @@ def adj_pval(pvals, method, alpha=0.05, outputname=None):
                 # pvals is a symmetric matrix
                 # only get the upper triangle of the matrix, excluding the diagonal
                 # and flatten it to numpy array
-                upper_tri = pvals.where(np.triu(np.ones(pvals.shape), k=1).astype(bool))
-                upper_tri_values = upper_tri.unstack().dropna()
+                upper_triangle_indices = np.triu_indices_from(pvals, k=1)
+                # Extract the p-values from the upper triangle
+                upper_tri_values = pvals.values[upper_triangle_indices]
                 # perform multiple comparison correction
                 adj_p_vals = ssm.multipletests(upper_tri_values, alpha=alpha, method=method)[1]
     
@@ -79,8 +80,7 @@ def adj_pval(pvals, method, alpha=0.05, outputname=None):
                 adj_df = pd.DataFrame(np.nan, index=pvals.index, columns=pvals.columns)
                 
                 # Fill the upper triangle of the adjusted DataFrame with the adjusted p-values
-                upper_indices = np.triu_indices_from(adj_df, k=1)
-                adj_df.values[upper_indices] = adj_p_vals
+                adj_df.values[upper_triangle_indices] = adj_p_vals
 
                 if outputname:
                     adj_df.to_csv(f'{outputname}_{method}_alpha{alpha}_adjusted_pval.csv')
