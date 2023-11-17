@@ -20,7 +20,6 @@ requirements = [
     "requests",
     "networkx>=3.1",
     "python-igraph==0.10.4",
-    "louvain",
     "leidenalg==0.9.1",
     "matplotlib>=3.7",
     "seaborn",
