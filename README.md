@@ -545,7 +545,7 @@ Console example (minimal and full versions):
 ```
 $ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC'
 
-$ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -cbh 1.5 -o kmer_textplot -pf pdf -d 300
+$ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -cbh 0.15 -o kmer_textplot -pf pdf -d 300
 ```
 
 ## Seekr Docker Image
