@@ -465,7 +465,7 @@ Plot and align the two input sequences with numbered positions. Highlight the wo
 the words of interest are 'ATTA' in '#d62728', 'AAAA' in '#e377c2', and 'ACTC' in '#ff7f0e'
 wrap length is 60 characters and the textplot is saved as test_kmer_textplot.pdf under current directory
     
-    $ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -cbh 1.5 -o test_kmer_textplot -pf pdf -d 300
+    $ seekr_kmer_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2,#ff7f0e' -wl 60 -cs 0.1 -ls 0.2 -sfs 42 -nfs 40 -cbh 0.15 -o test_kmer_textplot -pf pdf -d 300
 
 to save under other location change to -o /Users/username/Desktop/test_kmer_textplot
 
@@ -1197,7 +1197,7 @@ def console_kmer_textplot():
     parser.add_argument("-ls", "--line_spacing", default=0.2, help="line space between seq1, seq2 and number.")
     parser.add_argument("-sfs", "--seqfontsize", default=42, help="sequence character font size.")
     parser.add_argument("-nfs", "--numfontsize", default=40, help="sequence position number font size.")
-    parser.add_argument("-cbh", "--colorblockh", default=1.5, help="height of the highlight color block.")
+    parser.add_argument("-cbh", "--colorblockh", default=0.15, help="height of the highlight color block.")
     parser.add_argument(
         "-o", 
         "--outputname", 
