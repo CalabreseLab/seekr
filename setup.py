@@ -18,7 +18,6 @@ requirements = [
     "numpy",
     "pandas",
     "requests",
-    "setuptools==69.0.3",
     "networkx>=3.1",
     "python-igraph==0.10.4",
     "leidenalg==0.9.1",
