@@ -9,6 +9,8 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install your package and any dependencies
+RUN pip install --upgrade pip
+RUN pip install setuptools==69.0.3
 RUN pip install .
 
 # Install Jupyter Notebook
