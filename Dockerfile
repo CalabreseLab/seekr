@@ -1,12 +1,15 @@
 # Use an official Python runtime as the parent image (slim version or full version)
 # FROM python:3.9.5
-FROM python:3.9.5-slim
+FROM python:3.9.5
 
 # Set the working directory
 WORKDIR /usr/src/app
 
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
+
+# Update and install system-level dependencies
+RUN apt-get update && apt-get install -y cmake
 
 # Upgrade pip and setuptools
 RUN pip install --upgrade pip setuptools
