@@ -658,7 +658,7 @@ kmer_comp_textplot.kmer_comp_textplot(seq1file='/data/test1.fa', seq2file='/data
                                       color_vec='default', wraplen=60,
                                       char_spacing=0.1, line_spacing=0.2,
                                       seqfontsize=72, numfontsize=40, colorblockh=0.15, 
-                                      outputname='/data/kmer_textplot', plotformat='pdf',
+                                      outputname='/data/comp_textplot', plotformat='pdf',
                                       plotdpi=300)
 ```
 Once you are done, you can click the **Shut Down** button under the **File** tab of Jupyter Notebook to shut down the instance or you can just click `Ctrl+C` twice from the command line to kill the process. 
