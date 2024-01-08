@@ -1,6 +1,6 @@
 ###################################################################################################
 ### Description:
-# filter gencode fasta file by 1: length; 2: transcript feature type and Ensemble_canonical tag 3: transcript feature type and isoform number
+# filter gencode fasta file by 1: length; 2: transcript feature type and Ensemble_canonical tag 3: transcript feature type and isoform number 4: remove duplicated sequences
 
 ### Details:
 # please use gencode downloaded fasta and gtf files as input, other formats are not tested
