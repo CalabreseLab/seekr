@@ -12,7 +12,7 @@
 
 ### Input:
 # seqfile: input sequences in fasta format, can include more than one sequence, each sequence will be plotted as a separate plot
-# the part of the fasta header after > before the first | , or the whole header after > if there is no |, will be used as the name of the plot for each sequence
+# the part of the fasta header after > and before the first | , or the whole header after > if there is no |, will be used as the name of the plot for each sequence
 # make sure the fasta header of the seqfile contains unique ID for each sequence before the first |, or manually name the fasta header according to your need
 # make sure the fasta header does not contain any special characters, such as :, /, \, *, ?, ", <, space, tab, etc, or it could cause error in saving the plot
 # words: word of interest, max 10 words in the format of a list, example: ['ATTA','AAAA','ACTC','CCTT','GGCC'], if more than 10 words, only the first 10 will be plotted
