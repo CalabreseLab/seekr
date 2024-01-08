@@ -602,7 +602,7 @@ docker run -v /path/to/your/files:/data calabreselab/seekr:latest seekr_kmer_com
 In this command:
 * `-v /path/to/your/files:/data`: This mounts the directory `/path/to/your/files` from your host machine (where seq1.fa and seq2.fa are located) to the `/data` directory inside the Docker container. Replace `/path/to/your/files` with the actual path to your files.
 * `seekr_kmer_comp_textplot /data/seq1.fa /data/seq2.fa 'ATTA,AAAA,ACTC' -o /data/test`: This is the command that gets executed inside the Docker container. Since we mounted our files to `/data` in the container, we reference them with `/data/seq1.fa` and `/data/seq2.fa`. 
-* The `/data` folder is basically a mirror of the folder you specified in `/path/to/your/files`. So by specifying `-o /data/comp_textplot` (output with the path /data/ and plotname as in kmer_textplot.pdf) we can have the output files directly written in to the folder in `/path/to/your/files`.
+* The `/data` folder is basically a mirror of the folder you specified in `/path/to/your/files`. So by specifying `-o /data/comp_textplot` (output with the path /data/ and plotname as in comp_textplot.pdf) we can have the output files directly written in to the folder in `/path/to/your/files`.
 * Please remember to **specify your output path to `/data/`** otherwise it will not be saved to your folder on local machine and it would be hard to locate it even inside the Docker Container Filesystem (in this case, when the Docker Container is removed, your data will be deleted as well). 
 
 Examples of code mounts e:/test on Windows as the folder that contains the input and holds the output files:
