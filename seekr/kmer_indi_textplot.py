@@ -33,7 +33,7 @@
 # plotdpi: resolution of the output file, default is 300
 
 ### Output:
-# for each input sequence, a user defined format of files (pdf as default) of the highlighted text plot named using the fastaheader for that sequence is saved
+# for each input sequence, a user defined format of file (pdf as default) of the highlighted text plot named using the fasta header for that sequence is saved
 
 ### Example:
 # kmer_indi_textplot(seqfile='test.fa', words=['TAAA','GGTG','TCCA','GGTG','ACCT','ATAC','AGAC','GTCC','TTTT','ACCT'], 
