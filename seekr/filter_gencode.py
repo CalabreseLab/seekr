@@ -38,7 +38,7 @@
 
 
 #### Output:
-# fasta file (.fa) with the name of outputname.fa that is filtered by length and/or by transcript feature type and Ensemble_canonical tag and/or isoform number
+# fasta file (.fa) with the name of outputname.fa that is filtered by length and/or by transcript feature type and Ensemble_canonical tag and/or isoform number and/or duplicated sequences
 
 ### Example:
 # headers, seqs = filter_gencode(fasta_path='gencode.vM33.lncRNA_transcripts.fa', 
