@@ -21,10 +21,10 @@
 # if you want to use your own color vector, please make sure the length of the color vector is the same as the length of the words list
 # wraplen: wrapping length, how many words to wrap in each line, default is 60
 # char_spacing: space between characters in the plot, default is 0.1
-# line_spacing: line space between seq1, seq2 and number, default is 0.2
+# line_spacing: line space between seq1 and number, default is 0.3
 # seqfontsize: sequence character font size, default is 72
 # numfontsize: sequence position number font size, default is 40
-# colorblockh: the height of the highlight color block, default is 0.15, change this when change seqfontsize
+# colorblockh: the height of the highlight color block, default is 0.3, change this when change seqfontsize
 # outpoutpath: the path of the output file, default is under current directory, other example: '/Users/username/Desktop/indi_textplot/'
 # the name of each plot will be automatically generated based on the fasta header of each sequence.
 # plotformat: output format, default is 'pdf', other common options are 'png', 'jpg', 'svg', 'eps', 'tif', 'tiff', 'ps', 'webp'
