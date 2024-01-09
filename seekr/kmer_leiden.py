@@ -118,11 +118,16 @@ def kmer_leiden (inputfile, mean, std, k, algo='RBERVertexPartition', rs=1.0,
         kseed=None
 
 
-    if algo=='SurpriseVertexPartition' or algo=='SignificanceVertexPartition' or algo=='ModularityVertexPartition':
-        partition = leidenalg.find_partition(ig_graph,
+    if algo=='SignificanceVertexPartition':
+      partition = leidenalg.find_partition(ig_graph,
                                              algo_dict[algo],
-                                             weights='weight',
                                              seed=kseed)
+      
+    elif algo=='SurpriseVertexPartition' or algo=='ModularityVertexPartition':
+      partition = leidenalg.find_partition(ig_graph,
+                                           algo_dict[algo],
+                                           weights='weight',
+                                           seed=kseed)
     else:
         partition = leidenalg.find_partition(ig_graph,
                                              algo_dict[algo], 
