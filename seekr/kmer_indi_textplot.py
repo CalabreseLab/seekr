@@ -91,10 +91,10 @@ def kmer_indi_textplot(seqfile, words, color_vec='default', wraplen=60, char_spa
     # generate plot name based on header
     plotnames = [header.split('|')[0] for header in headers]
 
-    # get the longest seq to determine the fig size for all plots to keep them consistant
-    longest_sequence = max(seqs, key=len)
-    # Determine the max total number of lines to plot
-    max_total_lines = np.ceil(len(longest_sequence)/wraplen)
+    # # get the longest seq to determine the fig size for all plots to keep them consistant
+    # longest_sequence = max(seqs, key=len)
+    # # Determine the max total number of lines to plot
+    # max_total_lines = np.ceil(len(longest_sequence)/wraplen)
 
     for seq, plotname in zip(seqs, plotnames):
 
