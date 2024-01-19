@@ -69,6 +69,16 @@ def check_main_list(main_list):
 
 def find_pval(seq1file, seq2file, mean_path, std_path, k_mer, fitres, log2='Log2.post', bestfit=1, outputname=None, progress_bar=True):
 
+    # first check whether input k_mer is compatible with the mean and std files
+    meanfile = np.load(mean_path)
+    stdfile = np.load(std_path)
+
+    if len(meanfile) != 4**(k_mer) | len(stdfile) != 4**(k_mer):
+        print('k_mer size is not compatible with the normalization mean and/or std files.')
+        print('Please make sure the normalization mean and std files are generated using the same kmer size as specified here in k_mer.')
+        print('No p value is calculated. The output is None.')
+        return None
+    
     t1 = seekrBasicCounter(seq1file, mean=mean_path, std=std_path, k=k_mer, log2=log2, silent=True)
     t2 = seekrBasicCounter(seq2file, mean=mean_path, std=std_path, k=k_mer, log2=log2, silent=True)
 
