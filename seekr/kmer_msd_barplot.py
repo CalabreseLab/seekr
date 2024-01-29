@@ -148,7 +148,7 @@ def kmer_msd_barplot(inputfile, mean, std, k, log2='Log2.post', sortstat='mean',
     mpl.rcParams['pdf.fonttype'] = 42
 
     # plot the barplot
-    sns.barplot(x='Kword', y='Value', data=df_melted_plot, palette='tab10', errorbar='sd',capsize=0.2)
+    sns.barplot(x='Kword', y='Value', hue='Kword', data=df_melted_plot, palette='tab10', errorbar='sd',capsize=0.2, legend=False)
 
     # Setting x and y axis labels
     plt.xlabel('Kmer Words', fontsize=xlabelsize)
