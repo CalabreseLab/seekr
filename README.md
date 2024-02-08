@@ -22,7 +22,7 @@ Find communities of nucleotide sequences based on *k*-mer frequencies.
 Users have been successful in installing `seekr` from source on CentOS:
 
 ```
-conda create --name seekr_source python=3.9
+conda create --name seekr_source python=3.9.5
 conda activate seekr_source
 git clone https://github.com/CalabreseLab/seekr.git
 python3 setup.py install
