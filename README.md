@@ -56,9 +56,9 @@ where *k*-mer counts have been standardized against the set of canonical transcr
 we would run:
 
 ```
-$ seekr_download_gencode lncRNA -g [**Rename GTFs and check versions***]
-$ seekr_filter_gencode v33_lncRNA.fa -gtf v33_lncRNA.chr_patch_hapl_scaff.annotation.gtf -len 500 -can -o v33 # Name may change with GENCODE updates.
-$ seekr_norm_vectors v33_filtered.fa
+$ seekr_download_gencode lncRNA -g -gp gp v45_lncRNA.gtf
+$ seekr_filter_gencode v45_lncRNA.fa -gtf v45_lncRNA.gtf -len 500 -can -o v45_filtered.fa # Name may change with GENCODE updates.
+$ seekr_norm_vectors v45_filtered.fa
 $ seekr_kmer_counts example.fa -o 6mers.csv -mv mean.npy -sv std.npy
 $ seekr_pearson 6mers.csv 6mers.csv -o example_vs_self.csv
 $ cat example_vs_self.csv
