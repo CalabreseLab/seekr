@@ -50,7 +50,7 @@ $ seekr
 ### Quickstart
 
 To get a .csv file of communities for every transcript in a small .fa file called  [`example.fa`](https://raw.githubusercontent.com/CalabreseLab/seekr/master/seekr/tests/data/example.fa),
-(where RNAs have been normalized to a data set of canonical transcripts from [GENCODE](https://www.gencodegenes.org/),
+where *k*-mer counts have been standardized against the set of canonical transcripts from [GENCODE](https://www.gencodegenes.org/),
 we would run:
 
 ```
