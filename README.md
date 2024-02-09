@@ -418,7 +418,7 @@ $ seekr_adj_pval test_pval.csv bonferroni -a 0.05 -o test_bonferroni_0.05_adj_pv
 ### Visualization
 
 #### kmer_heatmap
-Customizeable heatmap (outputname.hformat) for easier visualization of the results of seekr.pearson (r values) or find_pval (p values). It takes in a dataframe with row and column names and plot the heatmap with/without dendrograms for both rows and columns. kmer_dendrgram is a good alternative to plot only the dendrograms (partial or full) to get a better idea of the clustering. For interested subgroups, use kmer_leiden, kmer_count_barplot, kmer_msd_barplot, kmer_comp_textplot and kmer_indi_textplot for further analysis.
+A customizable heatmap function to enable visualization of the results of kmer_count, seekr_pearson, or find_pval. Can perform hierarchial clustering on both rows and columns. It takes in a dataframe with row and column names and plots the heatmap with/without dendrograms for both rows and columns. kmer_dendrgram is a good alternative to plot only the dendrograms (partial or full) to get a better idea of the clustering. To study subgroups of sequences, use kmer_leiden, kmer_count_barplot, kmer_msd_barplot, kmer_comp_textplot and kmer_indi_textplot for further analysis.
 
 Python example:
 ```python
