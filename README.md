@@ -732,7 +732,7 @@ $ seekr
 Any suggestions, questions, or problems can be directed to our
 [GitHub Issues page](https://github.com/CalabreseLab/seekr/issues).
 
-Please also see [the pre-print](https://github.com/CalabreseLab/seekr/blob/logchanges/methods_mol_bio_seekr-v20.pdf) to a methods paper we wrote last year. This paper was originally scheduled to appear in Methods in Molecular Biology in 2020 but its publication date may be delayed.
+Please also see the methods paper we published in 2021 https://pubmed.ncbi.nlm.nih.gov/33326069/
 
 ## Citation
 
