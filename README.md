@@ -441,7 +441,7 @@ $ seekr_kmer_heatmap pval.csv 0 1 -th 0.05 -cr '#1b7837,#ffffff,#c51b7d' -cl -di
 ```
 
 #### kmer_dendrogram
-Customizeable dendrograms (outputname.pformat) for easier visualization of the hierarchical clustering results of seekr.pearson (r values) or find_pval (p values). Performs hierarchial clustering on either rows or columns of a dataframe, which is a better way to visualize the whole or partial clusters in kmer_heatmap. For interested subgroups, use kmer_leiden, kmer_count_barplot, kmer_msd_barplot, kmer_comp_textplot and kmer_indi_textplot for further analysis.
+Customizeable dendrograms (outputname.pformat) for easier visualization of the hierarchical clustering results of seekr.pearson (r values) or find_pval (p values). Performs hierarchial clustering on either rows or columns of a dataframe, which is a better way to visualize the whole or partial clusters in kmer_heatmap. To study subgroups of sequences, use kmer_leiden, kmer_count_barplot, kmer_msd_barplot, kmer_comp_textplot and kmer_indi_textplot for further analysis.
 
 Python example:
 ```python
@@ -461,7 +461,7 @@ $ seekr_kmer_dendrogram pval.csv -dd column -distm correlation -linkm complete -
 ```
 
 #### kmer_leiden
-Plot Leiden community network (plotname.pdf ) for input fasta seqeunces: calculte sequences distance matrix as seekr pearson correlation of the fasta file to itself. After filtering the edges with pearsoncutoff, use Leiden algorithms to call cluster. Seed can be set to get reporducible community assignments. The resulting undirected network edges are weighted with the pearson correlation r values: darker and thicker edges have higher weights. It works better with small number of nodes (less than 50). For better visualization and customization, please set csvfile to a customized name (string) and import the saved nodes and edges files (csvfile_edges_leiden.csv and csvfile_nodes_leiden.csv) directly to Gephi.
+Create a Leiden community network that categorizes relationships between *k*-mer profiles in a set of input fasta sequences. This function can also plot the resulting Leiden community network, but for better visualization, end-users will wish to suppress the plotting option and import the community.csv file into Gephi (not plot the network using Python). 
 
 Python example:
 ```python
