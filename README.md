@@ -483,7 +483,7 @@ $ seekr_kmer_leiden ldseq.fa mean_4mer.npy std_4mer.npy 4 -a RBERVertexPartition
 ```
 
 #### kmer_count_barplot
-Barplot enables users to create barplots of z-scores showing the relative abundance for select k-mers in a select set of sequences. Plotted *k*-mers can be arranged by their summed differences from the mean among all sequences, in descending or ascending order. Limit of 10 *k*-mers. [*** is this limit correct? ***]
+Barplot enables users to create barplots of z-scores showing the relative abundance for select k-mers in a select set of sequences. Plotted *k*-mers can be arranged by their summed differences from the mean among all sequences, in descending or ascending order. Limit of 10 sequences.
 
 Python example:
 ```python
