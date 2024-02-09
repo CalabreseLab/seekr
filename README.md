@@ -376,9 +376,7 @@ $ seekr_find_dist default -k 4 -l Log2.pre -mdl common10 -sbt -sbs 100000 -fm -s
 ```
 
 #### find_pval
-Calculate p values of the seekr.pearson correlation r values for input sequences 1 vs input sequences 2, sequences 1 and sequences 2 can be the same. The calculation is based on the output of find_dist, which is either a list of models or an numpy array. This function connects the output of find_dist and the input sequnces of interests. Given the background sequencs, find_dist calculates all possible pairwise seekr.pearson values and then outputs either a list of fitted models or the numpy array of the actual data. find_pval firstly calculates the seekr.pearson of the two input sequences, which produces a correlation matrix. p value is then calculated for each r value in the pearson correlation matrix based on the output of find_dist.
-
-The output of find_pval is a dataframe of p values, with the row names (input 1) and column names (input 2) as the headers of the input sequences. If outputname is given, the dataframe is saved to a csv file named as outputname.csv. 
+Calculate p values for a matrix of seekr_pearson correlation values, based on the output of find_dist, which is either a list of distributions or a npy array. The output of this function is a dataframe of p values, with the row names (input 1) and column names (input 2) being assigned to the same values as the headers of the two input sequence files. If an outputname is given, the dataframe is saved to a csv file named as outputname.csv. find_pval firstly calculates the seekr.pearson of the two input sequences, which produces a correlation matrix. p value is then calculated for each r value in the pearson correlation matrix based on the output of find_dist.
 
 Python example:
 ```python
