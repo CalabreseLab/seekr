@@ -503,7 +503,7 @@ $ seekr_kmer_count_barplot test.fa mean_4mer.npy std_4mer.npy 4 -l Log2.post -sm
 ```
 
 #### kmer_msd_barplot
-Barplot (outputname.pformat) of the mean of the transformed or raw z-score for kmer words across input sequences. Error bar represents the standard deviation. Order kmer words by mean or sd, in descending or ascending order. Plot the top x kmer words with each bar corresponds to one kmer word.
+Function to make barplots of mean and standard deviations of z-scores for select k-mers words across a set of input sequences. *k*-mers can be arranged by mean or sd, in descending or ascending order. 
 
 Python example:
 ```python
@@ -525,7 +525,7 @@ $ seekr_kmer_msd_barplot test.fa mean_4mer.npy std_4mer.npy 4 -l Log2.post -ss m
 ```
 
 #### kmer_comp_textplot
-Highlight the interested kmer words and compare them in two input sequences (outputname.plotformat). Align the 2 input sequences at the beginning and label sequence positions on the bottom. Highlight in colors the words of interest. For multiple words, if the words overlap, the overlapped characters will be highlighted in the color of the first word in the list. Therefore arrange the words of interest based on the priority of the words, with the most important word at the beginning of the list.
+This function prints to a single file two sequences aligned by nucleotide position and highlights the location of a list of up to 10 user-specified *k*-mers within them. Overlapping k-mers will be highlighted with a priority given to the earlier *k*-mer in the list.
 
 Python example:
 ```python
@@ -547,7 +547,7 @@ $ seekr_kmer_comp_textplot seq1.fa seq2.fa 'ATTA,AAAA,ACTC' -cv '#d62728,#e377c2
 ```
 
 #### kmer_indi_textplot
-Highlight the input kmer words across all input sequences and save for each sequence a separate plot. This is a similar function as kmer_comp_textplot. But instead of aligning and comparing two sequences, kmer_indi_textplot highlight the interested words in all input sequences and plot each sequence individually. For multiple words, if the words overlap, the overlapped characters will be highlighted in the color of the first word in the list. Therefore arrange the words of interest based on the priority of the words, with the most important word at the beginning of the list.
+This function highlights the location of a list of up to 10 user-specified k-mers within each sequence in an input file, and prints each sequence to a separate location. Overlapping *k*-mers will be highlighted with a priority given to the earlier *k*-mers in the list.
 
 Python example:
 ```python
