@@ -305,9 +305,9 @@ Once this has been saved, the first portion of the code doesn't need to be run a
 * `xist_vs_lncs_{k}mers.npy`: Pearson's r values for all pairwise comparisons between Xist and the other lncRNAs.
 * `xist_vs_lncs_{k}mers.csv`: Labeled, plain text version of pairwise comparisons.
 
-## Seekr2.0.0 functions update
+## SEEKR2.0.0 functions update
 
-In seekr2.0.0 we updated several functions that enable users to process sequences, calculate p-values for seekr-derived similarities, and visualize different aspects of *k*-mer similarity. The updates are described below and in the manual associated with this github page.
+In SEEKR2.0.0 we updated several functions that enable users to process sequences, calculate p-values for SEEKR-derived similarities, and visualize different aspects of *k*-mer similarity. The following functions from SEEKR 1.x have been depracated: seekr_canonical_gencode, seekr_gen_rand_rnas, seekr_visualize_distro, seekr_graph, seekr_pwm, seekr_domain_pearson. The updates are described below and in the manual associated with this github page. 
 
 ### Sequence processing
 
