@@ -81,8 +81,8 @@ Here are some examples if you just want to get going.
 
 #### seekr_download
 
-Browsing [GENCODE](https://www.gencodegenes.org/) is nice if you want to explore fasta file options.
-But if you know what you want, you can just download it from the command line.
+[GENCODE](https://www.gencodegenes.org/) is the site from which you can download lncRNA sequences and their annotations from current and former releases.
+You can also use seekr_download to obtain GENCODE lncRNAs from the command line.
 This tool is also helpful on remote clusters.
 
 To download all human transcripts of the latest release into a fasta file, run:
@@ -97,7 +97,7 @@ GENCODE also stores mouse sequences. You can select mouse using the `--species` 
     $ seekr_download_gencode all -s mouse
 ```
 
-For consistency across experiments, you may want to stick to a particular release of GENCODE. To get lncRNAs from the M5 release of mouse, use `--release`:
+For consistency across experiments, you may want to use a particular release of GENCODE. To get lncRNAs from the M5 release of mouse, use `--release`:
 
 ```
     $ seekr_download_gencode lncRNA -s mouse -r M5
@@ -109,7 +109,7 @@ If you do not want the script to automatically unzip the file, you can leave the
     $ seekr_download_gencode all -z
 ```
 
-Finally, if you want to download the gtf file from the same species and same release for further useage in sequence filtering with seekr_filter_gencode, you can do so with `--gtf`:
+Finally, if you want to download the gtf file from the same species and release for further use in sequence filtering with seekr_filter_gencode, you can do so with `--gtf` or `-g`:
 ```
     $ seekr_download_gencode all -g
 ```
@@ -135,7 +135,7 @@ Pass `--log2 Log2.pre` for log transformation of length normalized *k*-mer count
 pass `--log2 Log2.post` for log transformation of z-scores following count standardization (this is the default),
 and pass `--log2 Log2.none` for no log transformation.
 
-If we want to avoid normalization, we can produce *k*-mer counts per kb by setting the `--log2 Log2.none`, `--uncentered` and `--unstandardized` flags:
+If we want to avoid standardization, we can produce *k*-mer counts per kb by setting the `--log2 Log2.none`, `--uncentered` and `--unstandardized` flags:
 
 ```
 $ seekr_kmer_counts example.fa -o out_counts.csv -k 2 --log2 Log2.none -uc -us
@@ -161,7 +161,7 @@ WARNING: You have `np.nan` values in your counts after standardization.
 This is likely due to a *k*-mer not appearing in any of your sequences. Try:
 1) using a smaller *k*-mer size,
 2) beginning with a larger set of sequences,
-3) passing precomputed normalization vectors from a larger data set (e.g. GENCODE).
+3) passing precomputed standardization vectors from a larger data set (e.g. GENCODE).
 
 ```
 
@@ -181,7 +181,7 @@ But what should you do if you're only interested in specific sequences?
 #### seekr_norm_vectors
 
 An effective way to find important *k*-mers in a small number of RNAs is to
-count their *k*-mers, but normalize their counts to mean and
+count their *k*-mers, but to standardize their counts to mean and
 standard deviation vectors produced from a larger set of transcripts.
 We can produce these vectors once, then use them on multiple smaller sets
 of RNAs of interest. To produce the vectors, run:
