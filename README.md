@@ -7,15 +7,15 @@ Find communities of nucleotide sequences based on *k*-mer frequencies.
 
 ## Installation
 
- To use this library, you have to have >=Python3.9.5 on your computer.
+ To use this library, you must have >=Python3.9.5 on your computer.
 
- Once you have Python, run:
+ Once Python is installed, run:
 
  ```
  $ pip install seekr
  ```
 
- which will make both the command line tool and the python module available.
+ which will make available both the command line tool and the python module.
 
 ### CentOS
 
@@ -25,7 +25,7 @@ Users have been successful in installing `seekr` from source on CentOS:
 conda create --name seekr_source python=3.9.5
 conda activate seekr_source
 git clone https://github.com/CalabreseLab/seekr.git
-python3 setup.py install
+python3 setup.py install [**Shuang this did not work for me?]
 conda install python-igraph
 conda install louvain
 ```
