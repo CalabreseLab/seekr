@@ -5,6 +5,8 @@
 
 Find communities of nucleotide sequences based on *k*-mer frequencies.
 
+TO DO: make links open in different pages, update citations at bottom of page, and search for *** to resolve MC comments
+
 ## Installation
 
  To use this library, you must have >=Python3.9.5 on your computer.
