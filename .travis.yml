@@ -6,7 +6,7 @@ os:
 language: python
 cache: pip
 python:
-  - "3.6"
+  - "3.9"
 # command to install dependencies
 install:
   - pip install pytest
