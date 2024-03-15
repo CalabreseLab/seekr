@@ -33,7 +33,7 @@ First you need to install Docker on your local computer. Then pull the Docker Im
 $ docker pull calabreselab/seekr:latest
 ```
 
-This will install the Docker container which enables running seekr from the command line or Jupyter Notebook. See below the Seekr Docker Image secion for more details.
+This will install the Docker container which enables running seekr from the command line or Jupyter Notebook. See below the Seekr Docker Image section for more details.
 
 ### CentOS
 
