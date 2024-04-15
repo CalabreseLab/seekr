@@ -224,12 +224,12 @@ Any issues can be reported to https://github.com/CalabreseLab/seekr/issues
 
 FIND_PVAL_DOC = """
 Description: 
-calculte p values of the seekr.pearson correlation values for input sequence 1 vs input sequence 2 
+calculate p values of the seekr.pearson correlation values for input sequence 1 vs input sequence 2 
 p value is based on the output of find_dist, which is either a list of distributions or a npy array
 
 Details:
 this function connects the output of find_dist and the input sequnces of interests (2 input sequences)
-given the background sequencs, find_dist calculate all possible pairwise seekr.pearson values
+given the background sequences, find_dist calculate all possible pairwise seekr.pearson values
 and then outputs either a list of fitted distributions or the npy array of the actual data 
 find_pval firstly calculates the seekr.pearson of the two input sequences, which produces a correlation matrix 
 find_pval then calculate the p value for each r value in the pearson correlation matrix based on the output of find_dist
@@ -238,7 +238,7 @@ the output of find_pval is a dataframe of p values, with the row names (input 1)
 Example:
 calculate p values for the seekr.pearson correlation between input sequences 1 and input sequences 2
 with kmer size of 4, log2 transform of 'Log2.post', and corresponding normalization vectors saved as mean_4mer.npy and std_4mer.npy
-with the bakcground distribution saved as a list of fitted distributions fitres.csv, among which the best fitted distribution is the first one
+with the background distribution saved as a list of fitted distributions fitres.csv, among which the best fitted distribution is the first one
 show progress bar for the p value calculation step and save the output to test_pval.csv under current directory
     
     $ seekr_find_pval seqs1.fa seqs2.fa mean_4mer.npy std_4mer.npy 4 fitres.csv -ft distribution -bf 1 -o test_pval -pb
