@@ -18,7 +18,7 @@
 # Log2.none -- no log2 transformation
 # models: groups of candidate models for fitting, options are: 'all','common10' (default), or a list of distributions by user input for example ['norm','expon','pareto']
 # 'all' - fit all available distributions from scipy stats, both rv_continuous and rv_discrete: https://docs.scipy.org/doc/scipy/reference/stats.html#continuous-distributions
-# 'common10' - fit 10 common distributions ('cauchy', 'chi2', 'expon', 'exponpow', 'gamma', 'lognorm', 'norm', 'pareto', 'rayleigh', 'uniform')
+# 'common10' - fit 10 common distributions ('cauchy', 'chi2', 'expon', 'exponpow', 'gamma', 'lognorm', 'norm', 'pareto', 'rayleigh', 't')
 # common10 distributions are deteremined from get_common_distributions() from the Fitter library with 'powerlaw' replaced by 'pareto' as pareto belongs to powerlaw family and bears a biology relation 
 # user can also choose to input their own list of distributions in a list format, but be sure all distributions are available in scipy.stats
 # subsetting: True (default) or False. whether or not to use a subset of the data for fitting or output. For large datasets, subsetting is recommended to save time
@@ -95,7 +95,7 @@ def find_dist(inputseq='default', k_mer=4, log2='Log2.post', models='common10', 
     #preprare the list of distributions to be used
     if models == 'common10':
         distributions = ['cauchy', 'chi2', 'expon', 'exponpow', 'gamma', 
-                         'lognorm', 'norm', 'pareto', 'rayleigh', 'uniform']
+                         'lognorm', 'norm', 'pareto', 'rayleigh', 't']
         
     else: 
         #Create all distributions (continous and discrete) that would be used
