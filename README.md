@@ -1,7 +1,6 @@
 # SEEKR
 
-[Build Status](https://travis-ci.com/CalabreseLab/seekr.svg?branch=master)](https://travis-ci.com/CalabreseLab/seekr)
-[Build Status](https://img.shields.io/pypi/v/seekr.svg)](https://pypi.python.org/pypi/seekr)
+[![Build Status](https://img.shields.io/pypi/v/seekr.svg)](https://pypi.python.org/pypi/seekr)
 
 Find communities of nucleotide sequences based on *k*-mer frequencies.
 
