@@ -474,6 +474,8 @@ If fit_model is False, it returns the actual data (with or without subsetting ba
 If plotfit is given, a pdf plot with the given name and path will be saved, showing the fitted distributions (red dash line) vs the actual data (blue solid line) for all distributions in models.
 If outputname is given, a csv file (outputname.csv) will be saved for either a list of fitted models or an numpy array.
 
+The output csv file (outputname.csv) could contain parameters (3rd column) in the format of: (np.float64(0.056), np.float64(-2.95), np.float64(2.15)), which is a result from newer version of Numpy formated numbers. This would cause error when imported in for further analysis. Solutions include removing the np.float64() or np.float32() part manually: the expected format is (-0.76, 1.75, 2.39). Or installing/importing Numpy version 1.26.2 would be a quick and more reliable way to solve this problem.
+
 Python example:
 ```python
 from seekr import find_dist
